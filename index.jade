@@ -1,0 +1,119 @@
+html
+	head
+		link(href="reset.css", rel="stylesheet")
+		link(href="style.css", rel="stylesheet")
+
+		script(src="underscore-min.js")
+		script(src="jquery-1.11.2.min.js")
+		script(src="jquery.animate-colors-min.js")
+
+		script(src="src/gm.js")
+		script(src="src/constants.js")
+		script(src="src/settings.js")
+		script(src="src/image-resource.js")
+		script(src="src/collision-rules.js")
+		script(src="src/input.js")
+		script(src="src/transform-functions.js")
+		script(src="src/body.js")
+		script(src="src/map.js")
+		script(src="src/sprite.js")
+		script(src="src/entity.js")
+		script(src="src/layer-map.js")
+		script(src="src/layer.js")
+		script(src="src/camera.js")
+		script(src="src/game-collision.js")
+		script(src="src/game.js")
+
+		script(src="src/renderers/entity-sprite.js")
+		script(src="src/renderers/map.js")
+		script(src="src/renderers/map-image.js")
+		script(src="src/renderers/map-sprite.js")
+		script(src="src/renderers/map-collision.js")
+		
+		script(src="src/editor/settings.js")
+		script(src="src/editor/editor.js")
+		script(src="src/editor/renderer.js")
+		script(src="src/editor/renderers/map.js")
+		script(src="src/editor/renderers/entity.js")
+		script(src="src/editor/binds.js")
+
+		script(src="src/editor/util/selector.js")
+		script(src="src/editor/util/shapes.js")
+
+		script(src="src/editor/tools/brush.js")
+		script(src="src/editor/tools/select-tileset.js")
+
+		script(src="src/init.js")
+	body
+		#container
+			#level
+				label load
+				input
+				label write
+				input
+			#editor
+				#layer-section
+					h1 layers
+					#layer-listing
+						a.button#remove-layer -
+						a.button#move-layer-up &uarr;
+						a.button#move-layer-down &darr;
+						ul#layer-list
+					.divider
+					#layer-attrs
+						.attr-group
+							label name
+							input(value="layer1")#layer-name
+						.attr-group
+							label collision
+							input(type="checkbox")#layer-collision
+						.attr-group
+							label tileset
+							input(value="images/tilesets/graffiti1.png")#layer-map-tileset
+						.attr-group
+							label frames per row
+							input(value=1)#layer-frames-per-row.small
+						.attr-group
+							label tilesize
+							input(value=16).small#layer-map-tilesize
+						.attr-group
+							label tiles
+							label x
+							input(value=8).small#layer-map-tiles-x
+							label y
+							input(value=8).small#layer-map-tiles-y
+						.attr-group
+							label offset
+							label x
+							input(value=0).small#layer-map-offset-x
+							label y
+							input(value=0).small#layer-map-offset-y
+						.attr-group
+							label dist
+							label x
+							input(value=0).small#layer-map-dist-x
+							label y
+							input(value=0).small#layer-map-dist-y
+						a.button#add-layer +
+						a.button#update-layer &#8634;
+				#entity-section
+					h1 entities
+					#entity-listing
+						a.button#remove-entity -
+						a.button#move-entity-up &uarr;
+						a.button#move-entity-down &darr;
+						ul#entity-list
+					.divider
+					#new-entity
+						.attr-group
+							label name
+							input#entity-name
+						.attr-group
+							label classname
+							input#entity-class-name
+						a.button#add-entity +
+					.divider
+					#entity-attrs
+			#game-content
+				#buffer
+				#game

@@ -1,0 +1,100 @@
+*
+	box-sizing: border-box
+
+body
+	background-color: #ffffaa
+	width: 100%
+	height: 100%
+	font-family: Helvetica
+	font-size: 10px
+	overflow-y: hidden
+
+h1
+	font-size: 15px
+	font-weight: bold
+
+#container
+	width: 100%
+	height: 100%
+	position: relative
+
+#level
+	background-color: black
+	color: white
+	padding: 0.5rem 0.2rem
+	input
+		margin-right: 2rem
+
+#editor
+	height: 100%
+	float: left
+	
+#game-content
+	height: 100%
+	float: left
+	z-index: -1
+	top: 0
+	left: 0
+	text-align: center
+	
+#buffer
+	height: 2rem
+	
+canvas
+
+#entity-section, #layer-section
+	display: inline-block
+	vertical-align: text-top
+
+#entity-section, #layer-section
+	overflow-y: scroll
+	width: 15%
+	min-width: 10rem
+	height: 100%
+	border-right: 1px solid black
+	padding: 0 0.5rem
+	text-align: center
+	
+#entity-list, #layer-list
+	background-color: white
+	height: 5rem
+	overflow-y: scroll
+	
+#layer-list li.selected
+	background-color: #ffffaa
+	font-weight: bold
+
+#layer-section
+	background-color: #aaeeee
+
+#entity-section
+	background-color: #aaffaa
+
+input:disabled
+	background-color: #f5f5f5
+	color: #aaaaaa
+
+input.med
+	width: 6rem
+	
+input.small
+	width: 2.5rem
+	
+label
+	margin: 0 0.2rem
+	
+.button
+	margin: 0.2rem
+	padding: 0.2rem 0.5rem
+	background-color: black
+	color: white
+	display: inline-block
+	font-weight: bold
+	
+.attr-group
+	margin: 0.2rem 0
+	
+.divider
+	height: 0.2rem
+	background-color: rgba(0, 0, 0, 0.5)
+	margin: 0.5rem 0
