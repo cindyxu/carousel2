@@ -1,8 +1,7 @@
 var imageCache = {};
 
-gm.ImageResource = function(source, callback) {
+gm.ImageResource = function(source) {
 	this.source = source;
-	this.load(callback);
 };
 
 gm.ImageResource.prototype.load = function(callback) {

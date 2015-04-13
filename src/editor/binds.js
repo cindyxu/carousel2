@@ -16,8 +16,8 @@ $(function() {
 	var $layerMapTilesizeInput = $("#layer-map-tilesize");
 	var $layerMapOffsetXInput = $("#layer-map-offset-x");
 	var $layerMapOffsetYInput = $("#layer-map-offset-y");
-	var $layerMapDistXInput = $("#layer-map-dist-x");
-	var $layerMapDistYInput = $("#layer-map-dist-y");
+	var $layerDistXInput = $("#layer-dist-x");
+	var $layerDistYInput = $("#layer-dist-y");
 
 	var $addLayerButton = $("#add-layer");
 	var $updateLayerButton = $("#update-layer");
@@ -43,7 +43,7 @@ $(function() {
 		$entry.attr("data-layer-tag", layer._tag);
 
 		var $p = $("<p>");
-		$p.html(layer._tag);
+		$p.html(layer.name + " - " + layer._tag);
 		
 		$entry.append($p);
 		return $entry;
@@ -72,10 +72,10 @@ $(function() {
 		$layerMapTilesYInput.val(map._tilesX);
 		$layerMapTilesizeInput.val(map.tilesize);
 		
-		$layerMapOffsetXInput.val(layerMap.offsetX);
-		$layerMapOffsetYInput.val(layerMap.offsetY);
-		$layerMapDistXInput.val(layerMap.distX);
-		$layerMapDistYInput.val(layerMap.distY);
+		$layerMapOffsetXInput.val(layerMap._offsetX);
+		$layerMapOffsetYInput.val(layerMap._offsetY);
+		$layerDistXInput.val(layer.distX);
+		$layerDistYInput.val(layer.distY);
 	};
 
 	var gatherLayerParams = function() {
@@ -88,17 +88,17 @@ $(function() {
 		var tilesY = parseInt($layerMapTilesYInput.val());
 		var offsetX = parseInt($layerMapOffsetXInput.val());
 		var offsetY = parseInt($layerMapOffsetYInput.val());
-		var distX = parseInt($layerMapDistXInput.val());
-		var distY = parseInt($layerMapDistYInput.val());
+		var distX = parseFloat($layerDistXInput.val());
+		var distY = parseFloat($layerDistYInput.val());
 
 		return {
 			name: name,
+			distX: distX,
+			distY: distY,
 			layerMap: {
 				collision: isCollision,
 				offsetX: offsetX,
 				offsetY: offsetY,
-				distX: distX,
-				distY: distY,
 				renderer: {
 					tilesetSrc: tilesetSrc,
 					framesPerRow: framesPerRow
@@ -154,7 +154,6 @@ $(function() {
 
 	$("#layer-list").on("click", "li", function() {
 		var layer = gm.Game.findLayerByTag(parseInt($(this).attr("data-layer-tag")));
-		console.log(layer, $(this).attr("data-layer-tag"));
 		gm.Editor.selectLayer(layer);
 		refreshSelectedLayer();
 	});

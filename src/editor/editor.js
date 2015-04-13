@@ -20,7 +20,7 @@ editor.registerTool = function(name, tool) {
 };
 
 editor.addNewLayer = function(params, callback) {
-	var layer = editor.createLayer(params, function(layer) {
+	var layer = editor.manager.createLayer(params, function(layer) {
 		gm.Game.addLayer(layer);
 		editor.renderer.onLayerChanged(layer);
 		if (callback) callback(layer);
@@ -28,33 +28,8 @@ editor.addNewLayer = function(params, callback) {
 	return layer;
 };
 
-var assignLayerMapRenderer = function(layerMap, params, callback) {
-	var renderer;
-
-	var onRendererPrepared = function() {
-		layerMap.renderer = renderer;
-		if (callback) callback();
-	};
-
-	if (params.map.isCollision) {
-		renderer = new gm.Renderer.CollisionMap(layerMap.map, params.renderer);
-		onRendererPrepared();
-	}
-	else if (params.renderer.tilesetSrc) {
-		if (params.renderer.framesPerRow > 1) {
-			renderer = new gm.Renderer.SpriteMap(layerMap.map, params.renderer, onRendererPrepared);
-		}
-		else renderer = new gm.Renderer.ImageMap(layerMap.map, params.renderer, onRendererPrepared);
-	} else onRendererPrepared();
-	
-};
-
 editor.updateLayer = function(layer, params, callback) {
-	layer.setParams(params);
-	layer.layerMap.setParams(params.layerMap);
-	layer.layerMap.map.setParams(params.layerMap.map);
-
-	assignLayerMapRenderer(layer.layerMap, params.layerMap, function() {
+	editor.manager.updateLayer(layer, params, function() {
 		editor.onLayerChanged(layer);
 		if (callback) callback();
 	});
@@ -68,22 +43,6 @@ editor.onLayerChanged = function(layer) {
 		tool = editor._toolPalette[t];
 		if (tool.onLayerChanged) tool.onLayerChanged(layer);
 	}
-};
-
-editor.createLayer = function(params, callback) {
-	var map = new gm.Map(params.layerMap.map);
-	var layerMap = new gm.LayerMap(params.layerMap);
-	layerMap.map = map;
-	var layer = new gm.Layer(params.name, layerMap);
-
-	if (callback) {
-		assignLayerMapRenderer(layerMap, params.layerMap, function() {
-			callback(layer);
-		});
-	} else {
-		assignLayerMapRenderer(layerMap, params.layerMap);
-	}
-	return layer;
 };
 
 editor.selectLayer = function(layer) {
@@ -100,15 +59,15 @@ editor.createToolPalette = function() {
 				if (editor._toolPalette[t] === editor._holdTool) {
 					editor._holdTool.switchOut();
 					editor._holdTool = tool;
-					editor._holdTool.switchIn();
+					editor._holdTool.switchIn(gm.Game._camera);
 				}
 				else if (editor._toolPalette[t] === editor._tool) {
 					editor._tool.switchOut();
 					editor._tool = tool;
-					editor._tool.switchIn();
+					editor._tool.switchIn(gm.Game._camera);
 				}
 			}
-			
+
 			editor._toolPalette[t] = tool;
 		}
 	} else {
@@ -144,7 +103,7 @@ editor.update = function() {
 editor.checkChangeTool = function() {
 	if (editor._holdTool && editor._holdTool.shouldSwitchOut()) {
 		editor._holdTool.switchOut();
-		if (editor._tool) editor._tool.switchIn();
+		if (editor._tool) editor._tool.switchIn(gm.Game._camera);
 		editor._holdTool = undefined;
 	} else {
 		for (var t in editor._toolPalette) {
@@ -153,7 +112,7 @@ editor.checkChangeTool = function() {
 				tool.shouldSwitchIn()) {
 				
 				if (editor._tool) editor._tool.switchOut();
-				tool.switchIn();
+				tool.switchIn(gm.Game._camera);
 				
 				if (tool.holdTool) editor._holdTool = tool;
 				else editor._tool = tool;

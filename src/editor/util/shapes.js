@@ -16,5 +16,14 @@ gm.Editor.Util.Shapes = {
 		ctx.stroke();
 		
 		ctx.restore();
+	},
+
+	O: function(ctx, x, y) {
+		ctx.save();
+		ctx.fillStyle = "rgba(0,200,255,0.5)";
+		ctx.beginPath();
+		ctx.arc(x, y, 20, 0, 2 * Math.PI, false);
+		ctx.fill();
+		ctx.restore();
 	}
 };

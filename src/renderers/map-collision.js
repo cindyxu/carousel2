@@ -4,6 +4,7 @@ gm.Renderer.CollisionMap = function(map) {
 };
 
 gm.Renderer.CollisionMap.prototype = Object.create(gm.Renderer.Map.prototype);
+/////
 
 gm.Renderer.CollisionMap.prototype.isValid = function() {
 	return true;

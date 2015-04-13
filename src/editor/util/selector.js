@@ -13,19 +13,20 @@ var Selector = gm.Editor.Util.Selector = function(layerMap) {
 	selector._endty = undefined;
 };
 
-Selector.prototype.start = function(gx, gy, bbox) {
+Selector.prototype.start = function(gx, gy) {
 	var selector = this;
 
-	selector.layerMap.posToTile(gx, gy, bbox, tres);
+	selector.layerMap.posToTile(gx, gy, tres);
 
 	selector._origtx = tres.tx;
 	selector._origty = tres.ty;
 };
 
-Selector.prototype.update = function(gx, gy, bbox) {
+Selector.prototype.update = function(gx, gy) {
+
 	var selector = this;
 
-	selector.layerMap.posToTile(gx, gy, bbox, tres);
+	selector.layerMap.posToTile(gx, gy, tres);
 
 	selector._endtx = tres.tx;
 	selector._endty = tres.ty;
@@ -59,7 +60,6 @@ Selector.prototype.render = function(ctx, bbox) {
 
 	var selector = this;
 
-	var tileBounds = selector._tileBounds;
 	var tilesize = selector.layerMap.map.tilesize;
 
 	var trx0, trx1, try0, try1;
@@ -79,14 +79,13 @@ Selector.prototype.render = function(ctx, bbox) {
 
 	}
 
-	// console.log(trx0, trx1, try0, try1);
-
-	selector.layerMap.tileToPos(trx0, try0, bbox, res0);
-	selector.layerMap.tileToPos(trx1, try1, bbox, res1);
+	selector.layerMap.tileToPos(trx0, try0, res0);
+	selector.layerMap.tileToPos(trx1, try1, res1);
 
 	ctx.save();
 	ctx.fillStyle = gm.Settings.Editor.colors.SELECT;
-	ctx.fillRect(res0.x, res0.y, res1.x - res0.x + tilesize, res1.y - res0.y + tilesize);
+	ctx.fillRect(res0.x - bbox.x0, res0.y - bbox.y0, 
+		res1.x - res0.x + tilesize, res1.y - res0.y + tilesize);
 	ctx.restore();
 
 };

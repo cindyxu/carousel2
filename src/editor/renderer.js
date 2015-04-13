@@ -5,11 +5,18 @@ var renderer = editor.renderer = {};
 var mapRenderers = {};
 var entityRenderers = {};
 
+var tbbox = {};
 var renderLayerDebug = function(layer, ctx, bbox) {
-	renderLayerMapDebug(layer, ctx, bbox);
+	ctx.save();
+
+	layer.transformBboxToLocalSpace(bbox, tbbox);
+	
+	renderLayerMapDebug(layer, ctx, tbbox);
 	for (var e = 0; e < layer._entities.length; e++) {
-		renderEntityDebug(layer._entities[e], ctx, bbox);
+		renderEntityDebug(layer._entities[e], ctx, tbbox);
 	}
+	
+	ctx.restore();
 };
 
 var renderLayerMapDebug = function(layer, ctx, bbox) {

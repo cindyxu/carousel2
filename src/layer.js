@@ -11,15 +11,15 @@ gm.Layer = function(name, layerMap, params) {
 
 	layer._tag = tag++;
 
-	layer._distX = 1;
-	layer._distY = 1;
+	layer.distX = 1;
+	layer.distY = 1;
 
 	if (params) layer.setParams(params);
 };
 
 gm.Layer.prototype.setParams = function(params) {
-	if (params.distX !== undefined) layer._distX = params.distX;
-	if (params.distY !== undefined) layer._distY = params.distY;
+	if (params.distX !== undefined) this.distX = params.distX;
+	if (params.distY !== undefined) this.distY = params.distY;
 };
 
 gm.Layer.prototype.addEntity = function(entity) {
@@ -80,6 +80,19 @@ gm.Layer.prototype.postUpdate = function() {
 	}
 };
 
+gm.Layer.prototype.transformBboxToLocalSpace = function(bbox, tbbox) {
+	var layer = this;
+	
+	var sx = bbox.x1 - bbox.x0;
+	var sy = bbox.y1 - bbox.y0;
+
+	tbbox.x0 = bbox.x0 * layer.distX;
+	tbbox.y0 = bbox.y0 * layer.distY;
+	tbbox.x1 = tbbox.x0 + sx;
+	tbbox.y1 = tbbox.y0 + sy;
+};
+
+var tbbox = {};
 gm.Layer.prototype.render = function(ctx, bbox) {
 	var layer = this;
 
@@ -87,12 +100,32 @@ gm.Layer.prototype.render = function(ctx, bbox) {
 		layer._entities.sort(entityDrawSortFunction);
 		layer._entitiesNeedSort = false;
 	}
-	
-	layer.layerMap.render(ctx, bbox);
+
+	ctx.save();
+
+	layer.transformBboxToLocalSpace(bbox, tbbox);
+
+	layer.layerMap.render(ctx, tbbox);
 
 	var entities = layer._entities;
 	var elength = entities.length;
 	for (var e = 0; e < elength; e++) {
-		entities[e].render(ctx, bbox);
+		entities[e].render(ctx, tbbox);
 	}
+
+	ctx.restore();
+};
+
+gm.Layer.prototype.posToObservedTile = function(px, py, bbox, res) {
+	this.transformBboxToLocalSpace(bbox, tbbox);
+	this.layerMap.posToTile(px + (tbbox.x0 - bbox.x0), 
+		py + (tbbox.y0 - bbox.y0), 
+		res);
+};
+
+gm.Layer.prototype.tileToObservedPos = function(tx, ty, bbox, res) {
+	this.layerMap.tileToPos(tx, ty, res);
+	this.transformBboxToLocalSpace(bbox, tbbox);
+	res.x -= (tbbox.x0 - bbox.x0);
+	res.y -= (tbbox.y0 - bbox.y0);
 };

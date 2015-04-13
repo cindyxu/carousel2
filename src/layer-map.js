@@ -37,12 +37,12 @@ gm.LayerMap.prototype.render = function(ctx, bbox) {
 };
 
 gm.LayerMap.prototype.updateStep = function(delta) {
-	var layerMap = this;
 	layerMap._elapsed += delta;
 	this.updatePosition();
 };
 
 gm.LayerMap.prototype.updatePosition = function() {
+	var layerMap = this;
 	var pos = layerMap._pos;
 	pos.x = layerMap._offsetX;
 	pos.y = layerMap._offsetY;

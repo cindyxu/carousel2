@@ -34,14 +34,15 @@ var tres = {};
 var pres = {};
 Brush.prototype.render = function(ctx, camera) {
 	var layerMap = this._layer.layerMap;
-	var bbox = camera._body.getBbox();
 
 	var mx = gm.Input.mouseX,
 		my = gm.Input.mouseY;
 
 	camera.canvasToWorldPos(mx, my, pres);
-	layerMap.posToTile(pres.x, pres.y, tres);
-	layerMap.tileToPos(tres.tx, tres.ty, pres);
+	var bbox = camera._body.getBbox();
+
+	this._layer.posToObservedTile(pres.x, pres.y, bbox, tres);
+	this._layer.tileToObservedPos(tres.tx, tres.ty, bbox, pres);
 
 	if (this._renderer) this._renderer.render(ctx, pres.x, pres.y, bbox);
 	this._debugRenderer.render(ctx, pres.x, pres.y, bbox);
@@ -87,7 +88,7 @@ Brush.prototype.paint = function(camera) {
 		my = gm.Input.mouseY;
 
 	camera.canvasToWorldPos(mx, my, pres);
-	layerMap.posToTile(pres.x, pres.y, tres);
+	brush._layer.posToObservedTile(pres.x, pres.y, camera._body.getBbox(), tres);
 
 	layerMap.map.copyArea(bmap, 
 		tres.tx, 

@@ -33,14 +33,18 @@ html
 		script(src="src/editor/settings.js")
 		script(src="src/editor/editor.js")
 		script(src="src/editor/renderer.js")
+		script(src="src/editor/manager.js")
+		script(src="src/editor/binds.js")
+			
 		script(src="src/editor/renderers/map.js")
 		script(src="src/editor/renderers/entity.js")
-		script(src="src/editor/binds.js")
 
 		script(src="src/editor/util/selector.js")
 		script(src="src/editor/util/shapes.js")
+		script(src="src/editor/util/pan-camera.js")
 
 		script(src="src/editor/tools/brush.js")
+		script(src="src/editor/tools/pan.js")
 		script(src="src/editor/tools/select-tileset.js")
 
 		script(src="src/init.js")
@@ -91,9 +95,9 @@ html
 						.attr-group
 							label dist
 							label x
-							input(value=0).small#layer-map-dist-x
+							input(value=1).small#layer-dist-x
 							label y
-							input(value=0).small#layer-map-dist-y
+							input(value=1).small#layer-dist-y
 						a.button#add-layer +
 						a.button#update-layer &#8634;
 				#entity-section

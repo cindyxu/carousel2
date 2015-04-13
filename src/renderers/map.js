@@ -50,7 +50,7 @@ gm.Renderer.Map.prototype.render = function(ctx, x, y, bbox) {
 	var tby1 = Math.ceil((by1 - y) / tilesize);
 
 	ctx.save();
-	ctx.translate(x, y);
+	ctx.translate(x - bbox.x0, y - bbox.y0);
 
 	for (var ty = tby0; ty < tby1; ty++) {
 		var pty = ((ty % tilesY) + tilesY) % tilesY;

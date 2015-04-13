@@ -131,9 +131,9 @@ gm.Game.render = function(ctx) {
 		nlength = externals.length;
 
 	ctx.save();
-	
 	ctx.fillStyle = gm.Settings.Game.BACKGROUND_COLOR;
 	ctx.fillRect(0, 0, game._width, game._height);
+	ctx.restore();
 
 	for (var l = 0; l < llength; l++) {
 		layers[l].render(ctx, bbox);
@@ -143,5 +143,4 @@ gm.Game.render = function(ctx) {
 		if (externals[n].render) externals[n].render(ctx, bbox);
 	}	
 	
-	ctx.restore();
 };

@@ -1,7 +1,7 @@
 gm.Settings.Editor = {};
 
 gm.Settings.Editor.keyBinds = {
-	PAN: "ctrl",
+	PAN: "A",
 	BRUSH: "B",
 	ERASE: "E",
 	SELECT_LAYERMAP: "shift",

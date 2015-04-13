@@ -1,12 +1,3 @@
-var customParams = {
-	sizeX: 0,
-	sizeY: 0,
-	offsetX: 0,
-	offsetY: 0,
-	flipX: 0,
-	flipY: 0
-};
-
 gm.Renderer.EntitySprite = function(entity, spritesheetSrc, params) {
 	var renderer = this;
 
