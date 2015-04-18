@@ -6,6 +6,7 @@ var game = gm.Game;
 var toolTypes = {};
 
 editor._layer = undefined;
+editor._entity = undefined;
 
 editor._toolPalette = {};
 editor._tool = undefined;
@@ -31,7 +32,7 @@ editor.addNewLayer = function(params, callback) {
 editor.updateLayer = function(layer, params, callback) {
 	editor.manager.updateLayer(layer, params, function() {
 		editor.onLayerChanged(layer);
-		if (callback) callback();
+		if (callback) callback(true);
 	});
 };
 
@@ -39,10 +40,13 @@ editor.onLayerChanged = function(layer) {
 	editor.renderer.onLayerChanged(layer);
 
 	var tool;
-	for (var t in editor._toolPalette) {
-		tool = editor._toolPalette[t];
-		if (tool.onLayerChanged) tool.onLayerChanged(layer);
+	for (var t in toolTypes) {
+		if (toolTypes[t].onLayerChanged) toolTypes[t].onLayerChanged(layer);
 	}
+};
+
+editor.onEntityChanged = function(entity) {
+	editor.renderer.onEntityChanged(entity);
 };
 
 editor.selectLayer = function(layer) {
@@ -84,15 +88,47 @@ editor.createToolPalette = function() {
 	}
 };
 
-editor.createEntity = function(className, name) {
-	var entity = new gm.EntityClasses[className](name);
+editor.selectEntity = function(entity) {
+	editor._entity = entity;
 };
 
-editor.selectEntity = function(entity) {
+editor.addNewEntity = function(className, name, callback) {
+	if (!editor._layer) {
+		if (callback) callback(); 
+		return;
+	}
+	var entity = editor.manager.createEntity(className, name, function(entity) {
+		if (!entity) {
+			if (callback) callback(); 
+			return;
+		}
+		gm.Game.addEntity(entity, editor._layer);
+		editor.onEntityChanged(entity);
+		if (callback) callback(entity);
+	});
+};
 
+editor.playGame = function() {
+	gm.Game.play();
+};
+
+editor.pauseGame = function() {
+	gm.Game.pause();
 };
 
 editor.update = function() {
+	if (gm.Game._playing) {
+		if (gm.Input.pressed[gm.Settings.Editor.keyBinds.TOGGLE_PLAY]) {
+			editor.pauseGame();
+		}
+		else return;
+	} else {
+		if (gm.Input.pressed[gm.Settings.Editor.keyBinds.TOGGLE_PLAY]) {
+			editor.playGame();
+			return;
+		}
+	}
+
 	if (editor._layer) {
 		if (editor._holdTool) editor._holdTool.action(gm.Game._camera);
 		else if (editor._tool) editor._tool.action(gm.Game._camera);
@@ -122,6 +158,8 @@ editor.checkChangeTool = function() {
 };
 
 editor.render = function(ctx) {
+	// if (gm.Game._playing) return;
+
 	var camera = gm.Game._camera;
 	var bbox = camera._body.getBbox();
 

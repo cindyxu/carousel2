@@ -18,10 +18,10 @@ gm.Body = function(params) {
 
 	body._x = 0;
 	body._y = 0;
-	body._vx = 0;
-	body._vy = 0;
-	body._ax = 0;
-	body._ay = 0;
+	body.vx = 0;
+	body.vy = 0;
+	body.ax = 0;
+	body.ay = 0;
 
 	body.__center = {
 		x: 0,
@@ -35,17 +35,7 @@ gm.Body = function(params) {
 	};
 	body.measurementsDirty = false;
 
-	body.colliding = {};
-	body.colliding[dir.LEFT] = undefined;
-	body.colliding[dir.RIGHT] = undefined;
-	body.colliding[dir.UP] = undefined;
-	body.colliding[dir.DOWN] = undefined;
-
-	body.passThrough = {};
-	body.passThrough[dir.LEFT] = undefined;
-	body.passThrough[dir.RIGHT] = undefined;
-	body.passThrough[dir.UP] = undefined;
-	body.passThrough[dir.DOWN] = undefined;
+	body._collisionState = gm.CollisionRules.createCollisionState();
 
 	if (params) body.setParams(params);
 };
@@ -81,6 +71,37 @@ gm.Body.prototype.moveTo = function(x, y) {
 	body.measurementsDirty = true;
 };
 
+gm.Body.prototype.resetAccel = function() {
+	this.ax = 0;
+	this.ay = 0;
+};
+
+gm.Body.prototype.addForce = function(gx, gy) {
+	this.ax += gx * this.weight;
+	this.ay += gy * this.weight;
+};
+
+gm.Body.prototype.addImpulse = function(ix, iy) {
+	this.vx += ix * this.weight;
+	this.vy += iy * this.weight;
+};
+
+gm.Body.prototype.clampVelLeft = function() {
+	this.vx = Math.max(0, this.vx);
+};
+
+gm.Body.prototype.clampVelRight = function() {
+	this.vx = Math.min(0, this.vx);
+};
+
+gm.Body.prototype.clampVelUp = function() {
+	this.vy = Math.max(0, this.vy);
+};
+
+gm.Body.prototype.clampVelDown = function() {
+	this.vy = Math.min(0, this.vy);
+};
+
 gm.Body.prototype.recalculateBbox = function() {
 	var body = this;
 
@@ -108,25 +129,20 @@ gm.Body.prototype.recalculateMeasurements = function() {
 
 gm.Body.prototype.updateStep = function(delta, dim) {
 	var body = this;
-	
+
 	if (dim === X) {
-		body._x += body._vx * delta;
-		body._vx += (_ax - (body._vx * body.dampX)) * delta;
-		if (body._vx < -body.maxVelX) body._vx = -body.maxVelX;
-		else if (body._vx > body.maxVelX) body._vx = body.maxVelX;
+		body._x += body.vx * delta;
+		body.vx += (body.ax - (body.vx * body.dampX)) * delta;
+		if (body.vx < -body.maxVelX) body.vx = -body.maxVelX;
+		else if (body.vx > body.maxVelX) body.vx = body.maxVelX;
 	} else {
-		body._y += body._vy * delta;
-		body._vy += (_ay - (body._vx * body.dampY)) * delta;
-		if (body._vy < -body.maxVelY) body._vy = -body.maxVelY;
-		else if (body._vy > body.maxVelY) body._vy = body.maxVelY;
+		body._y += body.vy * delta;
+		body.vy += (body.ay - (body.vy * body.dampY)) * delta;
+		if (body.vy < -body.maxVelY) body.vy = -body.maxVelY;
+		else if (body.vy > body.maxVelY) body.vy = body.maxVelY;
 	}
-};
 
-gm.Body.prototype.stopMoving = function() {
-	var body = this;
-
-	body._vx = 0;
-	body._vy = 0;
+	body.measurementsDirty = true;
 };
 
 gm.Body.prototype.getCenter = function() {

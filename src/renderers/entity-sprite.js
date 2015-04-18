@@ -1,7 +1,7 @@
-gm.Renderer.EntitySprite = function(entity, spritesheetSrc, params) {
+gm.Renderer.EntitySprite = function(body, sprite, params) {
 	var renderer = this;
 
-	renderer.entity = entity;
+	renderer._body = body;
 	renderer._spritesheetSrc = spritesheetSrc;
 	renderer._ires = new gm.ImageResource(spritesheetSrc);
 
@@ -13,6 +13,15 @@ gm.Renderer.EntitySprite = function(entity, spritesheetSrc, params) {
 	renderer.flipY = 0;
 
 	if (params) renderer.setParams(params);
+
+	renderer.load();
+};
+
+gm.Renderer.EntitySprite.prototype.load = function(callback) {
+	var renderer = this;
+	renderer._ires.load(function(image) {
+		if (callback) callback();
+	});
 };
 
 gm.Renderer.EntitySprite.prototype.setParams = function(params) {
@@ -30,13 +39,13 @@ gm.Renderer.EntitySprite.prototype.setParams = function(params) {
 
 gm.Renderer.EntitySprite.prototype.render = function(ctx, x, y) {
 	var renderer = this;
-	var entity = renderer.entity;
-	var sprite = entity.sprite;
+	var body = renderer._body;
+	var sprite = this._sprite;
 	
 	if (!renderer._ires || !sprite.anim) return;
 
 	var targetFrame = sprite._anim.frames[sprite._frame];
-	renderer.renderInternal(ctx, x, y, targetFrame, entity.body._sizeX, entity.body._sizeY);
+	renderer.renderInternal(ctx, x, y, targetFrame, body._sizeX, body._sizeY);
 };
 
 gm.Renderer.EntitySprite.prototype.renderInternal = function(ctx, x, y, rframe, containerX, containerY) {

@@ -25,7 +25,7 @@ var renderLayerMapDebug = function(layer, ctx, bbox) {
 };
 
 var renderEntityDebug = function(entity, ctx, bbox) {
-	entityRenderers[entity._tag].render(ctx, entity.body._x, entity.body._y, bbox);
+	entityRenderers[entity._tag].render(ctx, entity.body._x - bbox.x0, entity.body._y - bbox.y0);
 };
 
 renderer.render = function(ctx, bbox) {

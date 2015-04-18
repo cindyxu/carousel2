@@ -9,7 +9,7 @@ game.tickStep = gm.Settings.Game.TICKSTEP;
 game.maxTicks = gm.Settings.Game.MAX_TICKS;
 
 game.lastRun = undefined;
-game.playing = false;
+game._playing = false;
 
 var layers = game._layers = [];
 var entities = game._entities = [];
@@ -18,6 +18,15 @@ var externals = game._externals = [];
 gm.Game.init = function() {
 	game._camera = new gm.Camera();
 	externals.push(game._camera);
+};
+
+gm.Game.play = function() {
+	game._playing = true;
+	game.lastRun = Date.now();
+};
+
+gm.Game.pause = function() {
+	game._playing = false;
 };
 
 gm.Game.clearLevel = function() {
@@ -56,7 +65,7 @@ gm.Game.findLayerByTag = function(tag) {
 
 gm.Game.addEntity = function(entity, layer) {
 	var e = entities.indexOf(entity);
-	if (e >= 0) {
+	if (e < 0) {
 		entities.push(entity);
 		layer.addEntity(entity);
 	}
@@ -70,10 +79,12 @@ gm.Game.removeEntity = function(entity) {
 };
 
 gm.Game.update = function() {
-	if (!game.playing) return;
+	if (!game._playing) return;
 
 	var now = Date.now();
-	var targetTicks = Math.min(game.maxTicks, Math.floor((now - game.lastRun) / game.tickStep));
+
+	var targetTicks = Math.min(game.maxTicks, 
+		Math.floor((now - game.lastRun) / game.tickStep));
 	var tickStep = game.tickStep;
 
 	game.preUpdate();
@@ -89,23 +100,18 @@ gm.Game.update = function() {
 };
 
 gm.Game.preUpdate = function() {
-	var llength = layers.length;
-
-	for (var l = 0; l < llength; l++) {
-		layers[l].preUpdate();
+	var elength = entities.length;
+	for (var e = 0; e < elength; e++) {
+		game.physics.preUpdate(entities[e]);
+		entities[e].preUpdate();
 	}
 };
 
 gm.Game.postUpdate = function(deltaTime) {
-	var llength = layers.length;
-
-	for (var l = 0; l < llength; l++) {
-		layers[l].postUpdate();
-	}
-
-	var nlength = externals.length;
-	for (var n = 0; n < nlength; n++) {
-		externals[n].update(deltaTime);
+	var elength = entities.length;
+	for (var e = 0; e < elength; e++) {
+		entities[e].postUpdate();
+		game.physics.postUpdate(entities[e]);
 	}
 };
 
@@ -115,14 +121,24 @@ var sortEntitiesXAxis = function(e1, e2) {
 
 gm.Game.updateStep = function(delta, dim) {
 	var llength = layers.length;
-
 	for (var l = 0; l < llength; l++) {
 		layers[l].updateStep(delta, dim);
 	}
 
-	gm.Collision.collideEntitiesWithMaps(layers, entities, dim);
+	var elength = entities.length;
+	for (var e = 0; e < elength; e++) {
+		game.physics.updateStep(entities[e], delta, dim);
+	}
+
+	gm.Collision.startCollisions(layers, entities, dim);
+	gm.Collision.collideEntitiesWithLayers(layers, entities, dim);
 	if (dim === X) entities.sort(sortEntitiesXAxis);
-	gm.Collision.collideEntities(game.entities, dim);
+	gm.Collision.collideEntities(entities, dim);
+	gm.Collision.finishCollisions(layers, entities, dim);
+
+	for (e = 0; e < elength; e++) {
+		game.physics.postCollision(entities[e], dim);
+	}
 };
 
 gm.Game.render = function(ctx) {

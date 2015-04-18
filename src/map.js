@@ -56,7 +56,7 @@ gm.Map.prototype.inRange = function(tx, ty) {
 };
 
 gm.Map.prototype.tileAt = function(tx, ty) {
-	return this.tiles[ty * this._tilesX + tx];
+	return this._tiles[ty * this._tilesX + tx];
 };
 
 gm.Map.prototype.fill = function(val, x0, y0, x1, y1) {
@@ -87,8 +87,8 @@ gm.Map.prototype.fill = function(val, x0, y0, x1, y1) {
 	}
 };
 
-gm.Map.prototype.set = function(tx, ty, val) {
-	this.tiles[ty * this._tilesX + tx] = val;
+gm.Map.prototype.setTile = function(tx, ty, val) {
+	this._tiles[ty * this._tilesX + tx] = val;
 };
 
 gm.Map.prototype.resize = function(nsx, nsy, repeat) {

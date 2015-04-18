@@ -5,7 +5,10 @@ var states = {
 	SELECTED: 3
 };
 
-var getTilesetMap = function(layerMap) {
+var getTilesetMap = function(layer) {
+	if (layer.isCollision) return undefined;
+
+	var layerMap = layer.layerMap;
 	if (!layerMap.renderer || !layerMap.renderer.isValid()) return undefined;
 
 	var map = layerMap.map,
@@ -41,7 +44,7 @@ var getTilesetMap = function(layerMap) {
 
 var SelectTileset = gm.Editor.Tools.SelectTileset = function(layer) {
 	this.state = states.IDLE;
-	this.tilesetLayerMap = getTilesetMap(layer.layerMap);
+	this.tilesetLayerMap = getTilesetMap(layer);
 	this.localCamera = new gm.Camera();
 	this.pan = new gm.Editor.Util.PanCamera(this.localCamera);
 	this.selector = undefined;
@@ -60,11 +63,11 @@ SelectTileset.getToolForLayer = function(layer) {
 	return selectTilesets[layer._tag];
 };
 
-SelectTileset.prototype.onLayerChanged = function(layer) {
-	this.tilesetLayerMap = getTilesetMap(layer.layerMap);
-	this.state = states.IDLE;
-	if (this.tilesetLayerMap) {
-		this.selector = new gm.Editor.Util.Selector(this.tilesetLayerMap);
+SelectTileset.onLayerChanged = function(layer) {
+	var selectTileset = selectTilesets[layer._tag];
+	selectTileset.tilesetLayerMap = getTilesetMap(layer);
+	if (selectTileset.tilesetLayerMap) {
+		selectTileset.selector = new gm.Editor.Util.Selector(selectTileset.tilesetLayerMap);
 	}
 };
 

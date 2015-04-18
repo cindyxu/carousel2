@@ -1,15 +1,15 @@
 var tag = 0;
 
-gm.Entity = function(name, body, renderer, controller, params) {
+gm.Entity = function(name, params) {
 	var entity = this;
 
 	entity.name = name;
-	entity.body = body;
-	entity.renderer = renderer;
-	entity.controller = controller;
-	controller.bind(entity);
 
 	entity.layer = undefined;
+
+	entity.body = undefined;
+	entity.renderer = undefined;
+	entity.controller = undefined;
 
 	entity._drawIndex = 0;
 	entity.collideMapType = gm.Constants.Collision.mapTypes.ALL;
@@ -21,21 +21,17 @@ gm.Entity = function(name, body, renderer, controller, params) {
 };
 
 gm.Entity.prototype.setParams = function(params) {
-	if (params.drawIndex !== undefined) entity._drawIndex = params.drawIndex;
-	if (params.collideMapType !== undefined) entity.collideMapType = params.collideMapType;
-	if (params.collideBodyType !== undefined) entity.collideBodyTyp = params.collideBodyTyp;
+	if (params.drawIndex !== undefined) this._drawIndex = params.drawIndex;
+	if (params.collideMapType !== undefined) this.collideMapType = params.collideMapType;
+	if (params.collideBodyType !== undefined) this.collideBodyType = params.collideBodyType;
 };
 
 gm.Entity.prototype.preUpdate = function() {
 	if (this.controller) this.controller.control();
 };
 
-gm.Entity.prototype.updateStep = function(delta) {
-	if (this.body) this.body.updateStep(delta);
-};
-
 gm.Entity.prototype.postUpdate = function() {
-	if (this.controller) this.controller.post();
+	if (this.controller && this.controller.post) this.controller.post();
 };
 
 gm.Entity.prototype.render = function(ctx, bbox) {

@@ -1,16 +1,12 @@
-gm.Controllers.Player = function() { };
-
-gm.Controllers.Player.prototype.bind = function(entity) {
-	this.entity = entity;
+gm.Controllers.Player = function(body, params) {
+	this._body = body;
+	this._runBehavior = new gm.Behaviors.Runner(body, params);
 };
 
 gm.Controllers.Player.prototype.control = function() {
-	var input = gm.Input;
-	if (input.down.left) {
-		
-	}
+	this._runBehavior.control(gm.Input);
 };
 
 gm.Controllers.Player.prototype.post = function() {
-	
+	this._runBehavior.post();
 };

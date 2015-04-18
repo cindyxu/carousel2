@@ -10,17 +10,17 @@ var assignLayerMapRenderer = function(layerMap, params, callback) {
 		if (callback) callback();
 	};
 
-	if (params.map.isCollision) {
-		renderer = new gm.Renderer.CollisionMap(layerMap.map, params.renderer);
+	if (params.isCollision) {
+		renderer = new gm.Renderer.CollisionMap(layerMap.map, params.layerMap.renderer);
 		onRendererPrepared();
 	}
-	else if (params.renderer.tilesetSrc) {
-		if (params.renderer.framesPerRow > 1) {
-			renderer = new gm.Renderer.SpriteMap(layerMap.map, params.renderer);
+	else if (params.layerMap.renderer.tilesetSrc) {
+		if (params.layerMap.renderer.framesPerRow > 1) {
+			renderer = new gm.Renderer.SpriteMap(layerMap.map, params.layerMap.renderer);
 			renderer.load(onRendererPrepared);
 		}
 		else {
-			renderer = new gm.Renderer.ImageMap(layerMap.map, params.renderer);
+			renderer = new gm.Renderer.ImageMap(layerMap.map, params.layerMap.renderer);
 			renderer.load(onRendererPrepared);
 		}
 	} else onRendererPrepared();
@@ -33,11 +33,11 @@ manager.createLayer = function(params, callback) {
 	var layer = new gm.Layer(params.name, layerMap, params);
 
 	if (callback) {
-		assignLayerMapRenderer(layerMap, params.layerMap, function() {
+		assignLayerMapRenderer(layerMap, params, function() {
 			callback(layer);
 		});
 	} else {
-		assignLayerMapRenderer(layerMap, params.layerMap);
+		assignLayerMapRenderer(layerMap, params);
 	}
 	return layer;
 };
@@ -47,5 +47,16 @@ manager.updateLayer = function(layer, params, callback) {
 	layer.layerMap.setParams(params.layerMap);
 	layer.layerMap.map.setParams(params.layerMap.map);
 
-	assignLayerMapRenderer(layer.layerMap, params.layerMap, callback);
+	assignLayerMapRenderer(layer.layerMap, params, callback);
+};
+
+manager.createEntity = function(className, name, callback) {
+	var entityClass = gm.EntityClasses[className];
+	if (!entityClass) {
+		if (callback) callback();
+		return;
+	}
+	var entity = entityClass.create(name, callback);
+	entity.className = className;
+	return entity;
 };

@@ -1,5 +1,8 @@
 var Brush = gm.Editor.Tools.Brush = function(layer) {
 	this.build(layer);
+	if (layer._isCollision) {
+		this._map.setTile(0, 0, gm.Constants.Collision.SOLID);
+	}
 };
 
 Brush.toolName = "BRUSH";
@@ -15,14 +18,23 @@ Brush.prototype.build = function(layer) {
 		tilesize: layer.layerMap.map.tilesize
 	});
 
-	if (layer.layerMap.renderer) {
-		this._renderer = new gm.Renderer.ImageMap(this._map, {
-			tilesetSrc: layer.layerMap.renderer._tilesetSrc
-		});
+	var renderer;
+
+	if (layer._isCollision) {
+		renderer = new gm.Renderer.CollisionMap(this._map);
 	}
+	else {
+		if (layer.layerMap.renderer) {
+			renderer = new gm.Renderer.ImageMap(this._map, {
+				tilesetSrc: layer.layerMap.renderer._tilesetSrc
+			});
+		}
+	}
+	this._renderer = renderer;
 	this._debugRenderer = new gm.Editor.Renderer.Map(this._map, {
 		strokeStyle: gm.Settings.Editor.colors.BRUSH
 	});
+
 	this._layer = layer;
 };
 
@@ -45,7 +57,7 @@ Brush.prototype.render = function(ctx, camera) {
 	this._layer.tileToObservedPos(tres.tx, tres.ty, bbox, pres);
 
 	if (this._renderer) this._renderer.render(ctx, pres.x, pres.y, bbox);
-	this._debugRenderer.render(ctx, pres.x, pres.y, bbox);
+	if (this._debugRenderer) this._debugRenderer.render(ctx, pres.x, pres.y, bbox);
 };
 
 Brush.prototype.switchIn = function() {
@@ -69,8 +81,11 @@ Brush.getToolForLayer = function(layer) {
 	return brush;
 };
 
-Brush.prototype.onLayerChanged = function(layer) {
+Brush.onLayerChanged = function(layer) {
 	layerBrushes[layer._tag].build(layer);
+	if (layer._isCollision) {
+		layerBrushes[layer._tag]._map.setTile(0, 0, gm.Constants.Collision.SOLID);
+	}
 };
 
 Brush.prototype.fromMapArea = function(map, tx, ty, tsx, tsy) {

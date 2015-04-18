@@ -16,6 +16,8 @@ $(function() {
 	var $layerMapTilesizeInput = $("#layer-map-tilesize");
 	var $layerMapOffsetXInput = $("#layer-map-offset-x");
 	var $layerMapOffsetYInput = $("#layer-map-offset-y");
+	var $layerMapRepeatXInput = $("#layer-map-repeat-x");
+	var $layerMapRepeatYInput = $("#layer-map-repeat-y");
 	var $layerDistXInput = $("#layer-dist-x");
 	var $layerDistYInput = $("#layer-dist-y");
 
@@ -26,6 +28,9 @@ $(function() {
 
 	var $entityNameInput = $("#entity-name");
 	var $entityClassNameInput = $("#entity-class-name");
+
+	var $addEntityButton = $("#add-entity");
+	var $updateEntityButton = $("#update-entity");
 
 	var flashBody = function(success) {
 		if (success) {
@@ -63,9 +68,14 @@ $(function() {
 			renderer = layerMap.renderer,
 			map = layerMap.map;
 
+		$layerCollisionCheckbox.prop("checked", !!layer._isCollision);
+
 		if (renderer) {
 			$layerMapTilesetInput.val(renderer._tilesetSrc);
 			$layerFramesPerRowInput.val(renderer._framesPerRow);
+
+			$layerMapRepeatXInput.val(renderer.repeatX);
+			$layerMapRepeatYInput.val(renderer.repeatY);
 		}
 
 		$layerMapTilesXInput.val(map._tilesX);
@@ -74,6 +84,7 @@ $(function() {
 		
 		$layerMapOffsetXInput.val(layerMap._offsetX);
 		$layerMapOffsetYInput.val(layerMap._offsetY);
+		
 		$layerDistXInput.val(layer.distX);
 		$layerDistYInput.val(layer.distY);
 	};
@@ -88,6 +99,8 @@ $(function() {
 		var tilesY = parseInt($layerMapTilesYInput.val());
 		var offsetX = parseInt($layerMapOffsetXInput.val());
 		var offsetY = parseInt($layerMapOffsetYInput.val());
+		var repeatX = $layerMapRepeatXInput.is(":checked");
+		var repeatY = $layerMapRepeatYInput.is(":checked");
 		var distX = parseFloat($layerDistXInput.val());
 		var distY = parseFloat($layerDistYInput.val());
 
@@ -95,13 +108,15 @@ $(function() {
 			name: name,
 			distX: distX,
 			distY: distY,
+			isCollision: isCollision,
 			layerMap: {
-				collision: isCollision,
 				offsetX: offsetX,
 				offsetY: offsetY,
 				renderer: {
 					tilesetSrc: tilesetSrc,
-					framesPerRow: framesPerRow
+					framesPerRow: framesPerRow,
+					repeatX: repeatX,
+					repeatY: repeatY
 				},
 				map: {
 					tilesize: tilesize,
@@ -110,13 +125,6 @@ $(function() {
 				}
 			}
 		};
-	};
-
-	var validateLayerParams = function(params) {
-		if (!params.name) return false;
-		var duplicateName = !!(_.findWhere(gm.Game.layers, { "name": params.name }));
-		if (duplicateName) return false;
-		return true;
 	};
 
 	var refreshLayerList = function() {
@@ -133,7 +141,7 @@ $(function() {
 		$entry.attr("data-entity-tag", entity._tag);
 
 		var $p = $("<p>");
-		$p.html(entity.name);
+		$p.html(entity.name + " - " + entity._tag);
 		
 		$entry.append($p);
 		return $entry;
@@ -148,8 +156,10 @@ $(function() {
 		}
 	};
 
-	var onEntitySelected = function(entity) {
-
+	var refreshSelectedEntity = function() {
+		var entity = editor._entity;
+		$entityClassNameInput.val(entity.className);
+		$entityNameInput.val(entity.name);
 	};
 
 	$("#layer-list").on("click", "li", function() {
@@ -161,11 +171,12 @@ $(function() {
 	$("#entity-list li").on("click", function() {
 		var entity = gm.Game._entities[entity];
 		gm.Editor.selectEntity(entity);
-		onEntitySelected(entity);
+		refreshSelectedEntity();
 	});
 
 	$layerCollisionCheckbox.change(function() {
 		$layerFramesPerRowInput.prop("disabled", this.checked);
+		$layerMapTilesetInput.prop("disabled", this.checked);
 	});
 
 	$addLayerButton.click(function(e) {
@@ -173,14 +184,15 @@ $(function() {
 		e.stopPropagation();
 
 		var params = gatherLayerParams();
-		if (validateLayerParams(params)) {
-			gm.Editor.addNewLayer(params, function(layer) {
-				refreshLayerList();
-				gm.Editor.selectLayer(layer);
-				refreshSelectedLayer();
-				flashBody(true);	
-			});
-		} else flashBody(false);
+		
+		gm.Editor.addNewLayer(params, function(layer) {
+			if (!layer) return flashBody(false);
+
+			refreshLayerList();
+			editor.selectLayer(layer);
+			refreshSelectedLayer();
+			flashBody(true);	
+		});
 		
 	});
 
@@ -189,17 +201,35 @@ $(function() {
 		e.stopPropagation();
 
 		var params = gatherLayerParams();
-		if (validateLayerParams(params)) {
-			gm.Editor.updateLayer(editor._layer, params, function() {
-				refreshSelectedLayer();
-				flashBody(true);	
-			});
-		} else flashBody(false);
+
+		editor.updateLayer(editor._layer, params, function(success) {
+			if (!success) return flashBody(false);
+
+			refreshSelectedLayer();
+			flashBody(true);
+		});
 	});
 
 	$removeLayerButton.click(function(e) {
 		e.preventDefault();
 		e.stopPropagation();
+	});
+
+	$addEntityButton.click(function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		var name = $entityNameInput.val();
+		var className = $entityClassNameInput.val();
+
+		editor.addNewEntity(className, name, function(entity) {
+			if (!entity) return flashBody(false);
+			
+			refreshEntityList();
+			editor.selectEntity(entity);
+			refreshSelectedEntity();
+			flashBody(true);
+		});
 	});
 
 });

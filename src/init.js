@@ -1,4 +1,5 @@
 var $canvas, ctx;
+var stats;
 
 var createCanvas = function() {
   $canvas = $("<canvas/>")
@@ -14,6 +15,18 @@ var createCanvas = function() {
   ctx.webkitImageSmoothingEnabled = false;
   ctx.msImageSmoothingEnabled = false;
   ctx.imageSmoothingEnabled = false;
+};
+
+var createStats = function() {
+  stats = new Stats();
+  stats.setMode(0); // 0: fps, 1: ms
+
+  // align top-left
+  stats.domElement.style.position = 'absolute';
+  stats.domElement.style.right = '0px';
+  stats.domElement.style.top = '0px';
+
+  document.body.appendChild( stats.domElement );
 };
 
 var setupGameLoop = function() {
@@ -39,6 +52,7 @@ var setupGameLoop = function() {
 
 $(function() {
   createCanvas();
+  createStats();
 
   gm.Game.init();
   gm.Editor.init();
@@ -47,12 +61,16 @@ $(function() {
   setupGameLoop();
 
   window.onEachFrame(function() {
+    stats.begin();
+
     gm.Game.update();
     gm.Editor.update();
     gm.Game.render(ctx);
     gm.Editor.render(ctx);
 
     gm.Input.reset();
+
+    stats.end();
   });
 
 });

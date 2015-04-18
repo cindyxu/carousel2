@@ -14,12 +14,15 @@ gm.Layer = function(name, layerMap, params) {
 	layer.distX = 1;
 	layer.distY = 1;
 
+	layer._isCollision = false;
+
 	if (params) layer.setParams(params);
 };
 
 gm.Layer.prototype.setParams = function(params) {
 	if (params.distX !== undefined) this.distX = params.distX;
 	if (params.distY !== undefined) this.distY = params.distY;
+	if (params.isCollision !== undefined) this._isCollision = params.isCollision;
 };
 
 gm.Layer.prototype.addEntity = function(entity) {
@@ -44,40 +47,8 @@ var entityDrawSortFunction = function(e1, e2) {
 	return e1._drawIndex - e2._drawIndex;
 };
 
-gm.Layer.prototype.preUpdate = function() {
-	var layer = this;
-	
-	layer.layerMap.preUpdate();
-
-	var entities = layer._entities;
-	var elength = entities.length;
-	for (var e = 0; e < elength; e++) {
-		entities[e].preUpdate();
-	}
-};
-
 gm.Layer.prototype.updateStep = function(delta) {
-	var layer = this;
-
-	layer.layerMap.updateStep(delta);
-
-	var entities = layer._entities;
-	var elength = entities.length;
-	for (var e = 0; e < elength; e++) {
-		entities[e].updateStep(delta);
-	}
-};
-
-gm.Layer.prototype.postUpdate = function() {
-	var layer = this;
-	
-	layer.layerMap.postUpdate();
-
-	var entities = layer._entities;
-	var elength = entities.length;
-	for (var e = 0; e < elength; e++) {
-		entities[e].postUpdate();
-	}
+	this.layerMap.updateStep(delta);
 };
 
 gm.Layer.prototype.transformBboxToLocalSpace = function(bbox, tbbox) {

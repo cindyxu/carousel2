@@ -37,7 +37,7 @@ gm.LayerMap.prototype.render = function(ctx, bbox) {
 };
 
 gm.LayerMap.prototype.updateStep = function(delta) {
-	layerMap._elapsed += delta;
+	this._elapsed += delta;
 	this.updatePosition();
 };
 

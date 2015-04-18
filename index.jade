@@ -6,6 +6,7 @@ html
 		script(src="underscore-min.js")
 		script(src="jquery-1.11.2.min.js")
 		script(src="jquery.animate-colors-min.js")
+		script(src="stats.js")
 
 		script(src="src/gm.js")
 		script(src="src/constants.js")
@@ -23,12 +24,19 @@ html
 		script(src="src/camera.js")
 		script(src="src/game-collision.js")
 		script(src="src/game.js")
+		script(src="src/physics.js")
 
 		script(src="src/renderers/entity-sprite.js")
 		script(src="src/renderers/map.js")
 		script(src="src/renderers/map-image.js")
 		script(src="src/renderers/map-sprite.js")
 		script(src="src/renderers/map-collision.js")
+		
+		script(src="src/behaviors/runner.js")
+		
+		script(src="src/controllers/player.js")
+
+		script(src="src/entities/player.js")
 		
 		script(src="src/editor/settings.js")
 		script(src="src/editor/editor.js")
@@ -44,6 +52,7 @@ html
 		script(src="src/editor/util/pan-camera.js")
 
 		script(src="src/editor/tools/brush.js")
+		script(src="src/editor/tools/erase.js")
 		script(src="src/editor/tools/pan.js")
 		script(src="src/editor/tools/select-tileset.js")
 
@@ -98,6 +107,12 @@ html
 							input(value=1).small#layer-dist-x
 							label y
 							input(value=1).small#layer-dist-y
+						.attr-group
+							label repeat
+							label x
+							input(type="checkbox")#layer-map-repeat-x
+							label y
+							input(type="checkbox")#layer-map-repeat-y
 						a.button#add-layer +
 						a.button#update-layer &#8634;
 				#entity-section
@@ -111,11 +126,12 @@ html
 					#new-entity
 						.attr-group
 							label name
-							input#entity-name
+							input(value="entity")#entity-name
 						.attr-group
 							label classname
-							input#entity-class-name
+							input(value="Player")#entity-class-name
 						a.button#add-entity +
+						a.button#update-entity &#8634;
 					.divider
 					#entity-attrs
 			#game-content

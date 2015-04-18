@@ -36,7 +36,18 @@ h1
 	top: 0
 	left: 0
 	text-align: center
-	
+
+#collision-tiles
+	background-color: orange
+	padding: 0.5rem	
+	display: inline-block
+	*
+		vertical-align: middle
+	label
+		margin-left: 0.5rem
+	#update-collision-brush	
+		margin-left: 1rem
+
 #buffer
 	height: 2rem
 	
@@ -73,6 +84,9 @@ canvas
 input:disabled
 	background-color: #f5f5f5
 	color: #aaaaaa
+
+input
+	border-width: 0px
 
 input.med
 	width: 6rem

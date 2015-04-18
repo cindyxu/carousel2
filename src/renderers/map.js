@@ -2,8 +2,8 @@ gm.Renderer.Map = function(map, params) {
 	
 	var renderer = this;
 
-	renderer.repeatX = 0;
-	renderer.repeatY = 0;
+	renderer.repeatX = false;
+	renderer.repeatY = false;
 
 	if (params) {
 		if (params.repeatX !== undefined) renderer.repeatX = params.repeatX;
@@ -12,6 +12,16 @@ gm.Renderer.Map = function(map, params) {
 
 	renderer.map = map;
 };
+
+gm.Renderer.Map.prototype.toJSON = function() {
+	var renderer = this;
+	return {
+		repeatX : renderer.repeatX,
+		repeatY: renderer.repeatY
+	};
+};
+
+gm.Renderer.Map.prototype.applyStyle = function(ctx) {};
 
 gm.Renderer.Map.prototype.render = function(ctx, x, y, bbox) {
 
@@ -51,12 +61,11 @@ gm.Renderer.Map.prototype.render = function(ctx, x, y, bbox) {
 
 	ctx.save();
 	ctx.translate(x - bbox.x0, y - bbox.y0);
+	renderer.applyStyle(ctx);
 
 	for (var ty = tby0; ty < tby1; ty++) {
-		var pty = ((ty % tilesY) + tilesY) % tilesY;
 		for (var tx = tbx0; tx < tbx1; tx++) {
-			var ptx = ((tx % tilesX) + tilesX) % tilesX;
-			renderer.renderTileFn(ctx, map, ptx, pty);
+			renderer.renderTileFn(ctx, map, tx, ty);
 		}
 	}
 

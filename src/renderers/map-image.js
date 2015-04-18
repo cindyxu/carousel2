@@ -12,6 +12,20 @@ gm.Renderer.ImageMap = function(map, params) {
 gm.Renderer.ImageMap.prototype = Object.create(gm.Renderer.Map.prototype);
 /////
 
+gm.Renderer.ImageMap.prototype.toJSON = function() {
+	var obj = gm.Renderer.Map.call(this, toJSON);
+	obj.tilesetSrc = this._tilesetSrc;
+	return obj;
+};
+
+gm.Renderer.ImageMap.prototype.setParams = function(params) {
+	this._tilesetSrc = params.tilesetSrc;
+	this._ires = new gm.ImageResource(params.tilesetSrc);
+	gm.Renderer.Map.prototype.setParams.call(this, params);
+
+	this.load();
+};
+
 gm.Renderer.ImageMap.prototype.load = function(callback) {
 	var renderer = this;
 	renderer._ires.load(function(image) {
@@ -29,12 +43,16 @@ gm.Renderer.ImageMap.prototype.isValid = function() {
 
 gm.Renderer.ImageMap.prototype._framesPerRow = 1;
 
-gm.Renderer.ImageMap.prototype.renderTileFn = function(ctx, map, ptx, pty) {
-
+gm.Renderer.ImageMap.prototype.renderTileFn = function(ctx, map, tx, ty) {
 	var renderer = this;
+	var tilesX = map._tilesX;
+	var tilesY = map._tilesY;
+
+	var mtx = ((tx % tilesX) + tilesX) % tilesX;
+	var mty = ((ty % tilesY) + tilesY) % tilesY;
 
 	var image = renderer._ires.image;
-	var index = renderer.map._tiles[pty * renderer.map._tilesX + ptx];
+	var index = renderer.map._tiles[mty * renderer.map._tilesX + mtx];
 	var ity = Math.floor(index / renderer._imageTilesX);
 	var itx = index % renderer._imageTilesY;
 
@@ -44,8 +62,8 @@ gm.Renderer.ImageMap.prototype.renderTileFn = function(ctx, map, ptx, pty) {
 		ity * tilesize,
 		tilesize,
 		tilesize,
-		ptx * tilesize,
-		pty * tilesize,
+		tx * tilesize,
+		ty * tilesize,
 		tilesize,
 		tilesize);
 };
