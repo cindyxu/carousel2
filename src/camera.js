@@ -1,9 +1,9 @@
-gm.Camera = function() {
+gm.Camera = function(params) {
 	var camera = this;
 	
 	camera._body = new gm.Body({
-		sizeX: gm.Settings.Game.WIDTH,
-		sizeY: gm.Settings.Game.HEIGHT
+		sizeX: (params && params.sizeX ? params.sizeX : gm.Settings.Game.WIDTH),
+		sizeY: (params && params.sizeY ? params.sizeY : gm.Settings.Game.HEIGHT)
 	});
 
 	camera.zoom = 1;

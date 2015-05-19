@@ -1,3 +1,6 @@
+if (!gm.Editor) gm.Editor = {};
+if (!gm.Editor.Util) gm.Editor.Util = {};
+
 var PanCamera = gm.Editor.Util.PanCamera = function(camera) {
 	this._startX = undefined;
 	this._startY = undefined;

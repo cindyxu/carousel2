@@ -1,41 +1,49 @@
-var Brush = gm.Editor.Tools.Brush = function(layer) {
-	this.build(layer);
-	if (layer._isCollision) {
-		this._map.setTile(0, 0, gm.Constants.Collision.SOLID);
-	}
-};
+if (!gm.Editor) gm.Editor = {};
+if (!gm.Editor.Tools) gm.Editor.Tools = {};
 
-Brush.toolName = "BRUSH";
-gm.Editor.registerTool(Brush.toolName, Brush);
+var Brush = gm.Editor.Tools.Brush = function(layer, params) {
+	this.color = this.defaultColor;
+	if (params) {
+		if (params.color) this.color = params.color;
+	}
+	this.build(layer);
+};
 
 Brush.prototype = Object.create(gm.Map.prototype);
 ////
+Brush.prototype.defaultColor = "yellow";
 
 Brush.prototype.build = function(layer) {
-	this._map = new gm.Map({
+	var brush = this;
+	brush._map = new gm.Map({
 		tilesX: 1,
 		tilesY: 1,
-		tilesize: layer.layerMap.map.tilesize
+		tilesize: layer._layerMap._map.tilesize
 	});
 
 	var renderer;
 
 	if (layer._isCollision) {
-		renderer = new gm.Renderer.CollisionMap(this._map);
+		brush.initCollisionBrush();
+		renderer = new gm.Renderer.CollisionMap(brush._map);
 	}
 	else {
-		if (layer.layerMap.renderer) {
-			renderer = new gm.Renderer.ImageMap(this._map, {
-				tilesetSrc: layer.layerMap.renderer._tilesetSrc
+		if (layer._layerMap.renderer) {
+			renderer = new gm.Renderer.ImageMap(brush._map, {
+				tilesetSrc: layer._layerMap.renderer._tilesetSrc
 			});
 		}
 	}
-	this._renderer = renderer;
-	this._debugRenderer = new gm.Editor.Renderer.Map(this._map, {
-		strokeStyle: gm.Settings.Editor.colors.BRUSH
+	brush._renderer = renderer;
+	brush._debugRenderer = new gm.Renderer.DebugMap(brush._map, {
+		strokeStyle: brush.color
 	});
 
-	this._layer = layer;
+	brush._layer = layer;
+};
+
+Brush.prototype.initCollisionBrush = function() {
+	this._map.setTile(0, 0, gm.Constants.Collision.SOLID);
 };
 
 Brush.prototype.action = function(camera) {
@@ -45,7 +53,7 @@ Brush.prototype.action = function(camera) {
 var tres = {};
 var pres = {};
 Brush.prototype.render = function(ctx, camera) {
-	var layerMap = this._layer.layerMap;
+	var layerMap = this._layer._layerMap;
 
 	var mx = gm.Input.mouseX,
 		my = gm.Input.mouseY;
@@ -60,32 +68,8 @@ Brush.prototype.render = function(ctx, camera) {
 	if (this._debugRenderer) this._debugRenderer.render(ctx, pres.x, pres.y, bbox);
 };
 
-Brush.prototype.switchIn = function() {
-
-};
-
-Brush.prototype.switchOut = function() {
-
-};
-
-Brush.prototype.shouldSwitchIn = function() {
-	return gm.Input.pressed[gm.Settings.Editor.keyBinds.BRUSH];
-};
-
-var layerBrushes = {};
-Brush.getToolForLayer = function(layer) {
-	var brush = layerBrushes[layer._tag];
-	if (!brush) {
-		brush = layerBrushes[layer._tag] = new Brush(layer);
-	}
-	return brush;
-};
-
-Brush.onLayerChanged = function(layer) {
-	layerBrushes[layer._tag].build(layer);
-	if (layer._isCollision) {
-		layerBrushes[layer._tag]._map.setTile(0, 0, gm.Constants.Collision.SOLID);
-	}
+Brush.onLayerChanged = function() {
+	this.build(this._layer);
 };
 
 Brush.prototype.fromMapArea = function(map, tx, ty, tsx, tsy) {
@@ -97,7 +81,7 @@ Brush.prototype.fromMapArea = function(map, tx, ty, tsx, tsy) {
 Brush.prototype.paint = function(camera) {
 	var brush = this;
 	var bmap = brush._map;
-	var layerMap = brush._layer.layerMap;
+	var layerMap = brush._layer._layerMap;
 
 	var mx = gm.Input.mouseX,
 		my = gm.Input.mouseY;
@@ -105,7 +89,7 @@ Brush.prototype.paint = function(camera) {
 	camera.canvasToWorldPos(mx, my, pres);
 	brush._layer.posToObservedTile(pres.x, pres.y, camera._body.getBbox(), tres);
 
-	layerMap.map.copyArea(bmap, 
+	layerMap._map.copyArea(bmap, 
 		tres.tx, 
 		tres.ty, 
 		0, 

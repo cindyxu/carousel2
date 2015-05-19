@@ -13,7 +13,9 @@ gm.LayerMap = function(params) {
 	layerMap._offsetX = 0;
 	layerMap._offsetY = 0;
 
-	layerMap.map = undefined;
+	layerMap.listener = undefined;
+
+	layerMap._map = undefined;
 	layerMap.renderer = undefined;
 
 	if (params) layerMap.setParams(params);
@@ -24,8 +26,25 @@ gm.LayerMap.prototype.setParams = function(params) {
 
 	if (params.offsetX !== undefined) layerMap._offsetX = params.offsetX;
 	if (params.offsetY !== undefined) layerMap._offsetY = params.offsetY;
-
 	layerMap.updatePosition();
+
+	layerMap.onChanged();
+};
+
+gm.LayerMap.prototype.setMap = function(map) {
+	if (this._map) this._map.listener = undefined;
+	this._map = map;
+	
+	this._map.listener = this;
+	this.onChanged();
+};
+
+gm.LayerMap.prototype.onMapChanged = function() {
+	this.onChanged();
+};
+
+gm.LayerMap.prototype.onChanged = function() {
+	if (this.listener) this.listener.onLayerMapChanged();
 };
 
 gm.LayerMap.prototype.addTransformation = function(transformFn) {
@@ -55,12 +74,12 @@ gm.LayerMap.prototype.updatePosition = function() {
 };
 
 gm.LayerMap.prototype.posToTile = function(px, py, res) {
-	this.map.posToTile(px - this._pos.x, py - this._pos.y, res);
+	this._map.posToTile(px - this._pos.x, py - this._pos.y, res);
 };
 
 gm.LayerMap.prototype.tileToPos = function(tx, ty, res) {
 	var layerMap = this;
-	layerMap.map.tileToPos(tx, ty, res);
+	layerMap._map.tileToPos(tx, ty, res);
 	res.x += layerMap._pos.x;
 	res.y += layerMap._pos.y;
 };

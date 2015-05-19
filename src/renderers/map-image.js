@@ -44,6 +44,7 @@ gm.Renderer.ImageMap.prototype.isValid = function() {
 gm.Renderer.ImageMap.prototype._framesPerRow = 1;
 
 gm.Renderer.ImageMap.prototype.renderTileFn = function(ctx, map, tx, ty) {
+
 	var renderer = this;
 	var tilesX = map._tilesX;
 	var tilesY = map._tilesY;

@@ -1,30 +1,26 @@
-var Erase = gm.Editor.Tools.Erase = function(layer) {
+if (!gm.Editor) gm.Editor = {};
+if (!gm.Editor.Tools) gm.Editor.Tools = {};
+
+var Erase = gm.Editor.Tools.Erase = function(layer, params) {
+	this.color = this.defaultColor;
+	if (params) {
+		if (params.color) this.color = params.color;
+}
 	this.build(layer);
 };
 
 Erase.prototype = Object.create(gm.Editor.Tools.Brush.prototype);
 
-Erase.toolName = "ERASE";
-gm.Editor.registerTool(Erase.toolName, Erase);
+Erase.prototype.initCollisionBrush = function() {
+	this._map.setTile(0, 0, undefined);
+};
+
+Erase.prototype.defaultColor = "red";
 
 Erase.prototype.build = function(layer) {
 	gm.Editor.Tools.Brush.prototype.build.call(this, layer);
-	this._debugRenderer.strokeStyle = gm.Settings.Editor.colors.ERASE;
-};
-
-var layerErasers = {};
-Erase.getToolForLayer = function(layer) {
-	var erase = layerErasers[layer._tag];
-	if (!erase) {
-		erase = layerErasers[layer._tag] = new Erase(layer);
-	}
-	return erase;
 };
 
 Erase.onLayerChanged = function(layer) {
-	layerErasers[layer._tag].build(layer);
-};
-
-Erase.prototype.shouldSwitchIn = function() {
-	return gm.Input.pressed[gm.Settings.Editor.keyBinds.ERASE];
+	this.build(layer);
 };

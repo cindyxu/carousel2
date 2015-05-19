@@ -5,27 +5,69 @@ var colRules = gm.CollisionRules;
 var X = gm.Constants.Dir.X;
 var Y = gm.Constants.Dir.Y;
 
-var Collision = gm.Collision = {};
+var EntityPhysics = gm.EntityPhysics = {
+	gravityX: 0,
+	gravityY: 1
+};
 
-Collision.startCollisions = function(layers, entities, dim) {
+EntityPhysics.preUpdate = function(entity) {
+	entity.body.addForce(EntityPhysics.gravityX, EntityPhysics.gravityY);
+};
+
+EntityPhysics.postUpdate = function(entity) {
+	entity.body.resetAccel();
+};
+
+EntityPhysics.updateStep = function(entity, delta, dim) {
+	if (dim === X) entity.body.updateStepX(delta);
+	else entity.body.updateStepY(delta);
+};
+
+EntityPhysics.resolveCollisions = function(layers, entities, dim) {
+	EntityPhysics.startCollisions(layers, entities, dim);
+	EntityPhysics.collideEntitiesWithLayers(layers, entities, dim);
+	EntityPhysics.collideEntities(entities, dim);
+	EntityPhysics.finishCollisions(layers, entities, dim);
+};
+
+EntityPhysics.startCollisions = function(layers, entities, dim) {
 	for (var e = 0; e < entities.length; e++) {
 		colRules.onStartCollisions(entities[e]);
 	}
 };
 
-Collision.finishCollisions = function(layers, entities, dim) {
+EntityPhysics.finishCollisions = function(layers, entities, dim) {
 	for (var e = 0; e < entities.length; e++) {
+		
 		colRules.onFinishCollisions(entities[e]);
+
+		var entity = entities[e];
+		var body = entity.body;
+		if (dim === X) {
+			if (body._collisionState.left) {
+				body.clampVelLeft();
+			}
+			if (body._collisionState.right) {
+				body.clampVelRight();
+			}
+		} else {
+			if (body._collisionState.up) {
+				body.clampVelUp();
+			}
+			if (body._collisionState.down) {
+				body.clampVelDown();
+			}
+		}
 	}
 };
 
-Collision.collideEntityWithLayer = function(entity, layer, dim) {
+EntityPhysics.collideEntityWithLayer = function(entity, layer, dim) {
 
 	var tile, stileX, stileY, etileX, etileY;
 
 	var body = entity.body;
-	var layerMap = layer.layerMap;
-	var map = layerMap.map;
+	var layerMap = layer._layerMap;
+	var map = layerMap._map;
 	var collided = false;
 	var collideDir;
 
@@ -44,7 +86,7 @@ Collision.collideEntityWithLayer = function(entity, layer, dim) {
 		etileY = map.clampTileDim(tres.ty, Y);
 
 		for (var y = stileY; y < etileY; y++) {
-			collided = collided || Collision.collideBodyWithTile(body, layerMap, stileX, y, dim);
+			EntityPhysics.collideBodyWithTile(body, layerMap, stileX, y, dim);
 		}
 
 		if (collided) {
@@ -67,7 +109,7 @@ Collision.collideEntityWithLayer = function(entity, layer, dim) {
 		etileX = map.clampTileDim(tres.tx, X);
 
 		for (var x = stileX; x < etileX; x++) {
-			collided = collided || Collision.collideBodyWithTile(body, layerMap, x, stileY, dim);
+			EntityPhysics.collideBodyWithTile(body, layerMap, x, stileY, dim);
 		}
 
 		if (collided) {
@@ -81,29 +123,29 @@ Collision.collideEntityWithLayer = function(entity, layer, dim) {
 	}
 };
 
-Collision.collideBodyWithTile = function(body, layerMap, tx, ty, dim) {
-	var tile = layerMap.map.tileAt(tx, ty);
+EntityPhysics.collideBodyWithTile = function(body, layerMap, tx, ty, dim) {
+	var tile = layerMap._map.tileAt(tx, ty);
 	if (tile == gm.Constants.Collision.SOLID) {
 		layerMap.tileToPos(tx, ty, pres);
 		if (dim === X) {
 			if (body.vx > 0) {
 				body.moveTo(pres.x - body._sizeX, body._y);
 			} else {
-				body.moveTo(pres.x + layerMap.map.tilesize, body._y);
+				body.moveTo(pres.x + layerMap._map.tilesize, body._y);
 			}
 			return true;
 		} else {
 			if (body.vy > 0) {
 				body.moveTo(body._x, pres.y - body._sizeY);
 			} else {
-				body.moveTo(body._x, pres.y + layerMap.map.tilesize);
+				body.moveTo(body._x, pres.y + layerMap._map.tilesize);
 			}
 			return true;
 		}
 	}
 };
 
-Collision.collideEntities = function(entity1, entity2, dim) {
+EntityPhysics.collideEntityWithEntity = function(entity1, entity2, dim) {
 
 	var overlapAmt;
 
@@ -149,7 +191,7 @@ Collision.collideEntities = function(entity1, entity2, dim) {
 	}
 };
 
-Collision.collideEntitiesWithLayers = function(layers, entities, dim) {
+EntityPhysics.collideEntitiesWithLayers = function(layers, entities, dim) {
 	var layer, map, entity, body;
 	var llength = layers.length;
 	var elength = entities.length;
@@ -162,23 +204,28 @@ Collision.collideEntitiesWithLayers = function(layers, entities, dim) {
 		// collide against collideLayer first
 		var currentCollideLayer = entity.body._collisionState.layer;
 		if (currentCollideLayer) {
-			Collision.collideEntityWithLayer(body, currentCollideLayer.layerMap, dim);
+			EntityPhysics.collideEntityWithLayer(body, currentCollideLayer._layerMap, dim);
 		}
 		
 		for (var l = 0; l < llength; l++) {
 			layer = layers[l];
 			if (layer === currentCollideLayer || !layer._isCollision) continue;
-			layerMap = layer.layerMap;
+			layerMap = layer._layerMap;
 			
 			if (colRules.shouldCollideEntityWithLayer(entity, layer)) {
-				Collision.collideEntityWithLayer(entity, layer, dim);
+				EntityPhysics.collideEntityWithLayer(entity, layer, dim);
 			}
 		}
 	}
 };
 
-// assumes entities are sorted on x axis.
-Collision.collideEntities = function(entities, dim) {
+var sortEntitiesXAxis = function(e1, e2) {
+	return e1.body.x - e2.body.x;
+};
+
+EntityPhysics.collideEntities = function(entities, dim) {
+	if (dim === X) entities.sort(sortEntitiesXAxis);
+
 	var elength = entities.length;
 	var currEntity, currBody, nextEntity, nextBody;
 
@@ -192,11 +239,11 @@ Collision.collideEntities = function(entities, dim) {
 
 			// if next entity is not x-intersecting with this one,
 			// go to next group
-			if (!currBody.overlapsAxis(nextBody, X)) break;
+			if (!currBody.overlapsAxisX(nextBody)) break;
 
 			if (colRules.shouldCollideEntities(currEntity, nextEntity) && 
-				currBody.overlapsAxis(nextBody, Y)) {
-				Collision.collideEntities(currEntity, nextEntity, dim);
+				currBody.overlapsAxisY(nextBody)) {
+				EntityPhysics.collideEntityWithEntity(currEntity, nextEntity, dim);
 			}
 		}
 	}

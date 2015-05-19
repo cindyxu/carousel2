@@ -1,8 +1,8 @@
 var Dir = gm.Constants.Dir;
 
-gm.Behaviors.Runner = function(body, params) {
+gm.Behaviors.Walker = function(body, params) {
 	this._body = body;
-	this.runForce = 0;
+	this.walkForce = 0;
 	this.jumpImpulse = 0;
 	this.maxJumps = 0;
 
@@ -12,21 +12,21 @@ gm.Behaviors.Runner = function(body, params) {
 	this._jumpCount = 0;
 };
 
-gm.Behaviors.Runner.prototype.setParams = function(params) {
-	if (params.runForce !== undefined) this.runForce = params.runForce;
+gm.Behaviors.Walker.prototype.setParams = function(params) {
+	if (params.walkForce !== undefined) this.walkForce = params.walkForce;
 	if (params.jumpImpulse !== undefined) this.jumpImpulse = params.jumpImpulse;
 	if (params.maxJumps !== undefined) this.maxJumps = params.maxJumps;
 };
 
-gm.Behaviors.Runner.prototype.control = function(input) {
+gm.Behaviors.Walker.prototype.control = function(input) {
 	var body = this._body;
 
 	if (input.down.left) {
-		body.addForce(-this.runForce, 0);
+		body.addForce(-this.walkForce, 0);
 		this._facing = Dir.LEFT;
 	} 
 	else if (input.down.right) {
-		body.addForce(this.runForce, 0);
+		body.addForce(this.walkForce, 0);
 		this._facing = Dir.RIGHT;
 	}
 
@@ -36,7 +36,7 @@ gm.Behaviors.Runner.prototype.control = function(input) {
 	}	
 };
 
-gm.Behaviors.Runner.prototype.post = function() {
+gm.Behaviors.Walker.prototype.post = function() {
 	if (this._body._collisionState.down) {
 		this._jumpCount = 0;
 	}

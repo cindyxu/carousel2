@@ -1,16 +1,18 @@
 var cconsts = gm.Constants.Collision = {};
 
-cconsts.SOLID = 1;
+var Dir = gm.Constants.Dir;
+
+cconsts.SOLID = Dir.LEFT | Dir.RIGHT | Dir.UP | Dir.DOWN;
 
 cconsts.mapTypes = {
-	NONE: 0,
-	ALL: 1,
-	STICKY: 2
+	NONE: 1,
+	ALL: 1 << 1,
+	STICKY: 1 << 2
 };
 
 cconsts.bodyTypes = {
-	NONE: 0,
-	ALL: 1
+	NONE: 1,
+	ALL: 1 << 1
 };
 
 var cmatrix = {};
@@ -22,8 +24,8 @@ cconsts.BodyCollideMatrix = cmatrix;
 
 //////////////////////////////////////////////////////
 
-var X = gm.Constants.Dir.X;
-var Y = gm.Constants.Dir.Y;
+var X = gm.Constants.Dim.X;
+var Y = gm.Constants.Dim.Y;
 
 var COLLIDE_MAP_TYPE_ALL = cconsts.mapTypes.ALL;
 var COLLIDE_MAP_TYPE_STICKY = cconsts.mapTypes.STICKY;
@@ -95,7 +97,6 @@ CollisionRules.onEntityCollidedWithLayer = function(entity, layer, dir) {
 };
 
 CollisionRules.onEntitiesCollided = function(pentity, nentity, dim) {
-
 	var pnextCollisionState = pentity.__nextCollisionState;
 	var nnextCollisionState = nentity.__nextCollisionState;
 

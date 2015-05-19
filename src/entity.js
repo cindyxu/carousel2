@@ -20,6 +20,14 @@ gm.Entity = function(name, params) {
 	if (params) entity.setParams(params);
 };
 
+gm.Entity.prototype.readState = function(state) {
+	this._body.readState(state);
+};
+
+gm.Entity.prototype.writeState = function(state) {
+	this._body.writeState(state);
+};
+
 gm.Entity.prototype.setParams = function(params) {
 	if (params.drawIndex !== undefined) this._drawIndex = params.drawIndex;
 	if (params.collideMapType !== undefined) this.collideMapType = params.collideMapType;

@@ -1,5 +1,4 @@
 gm.Renderer.Map = function(map, params) {
-	
 	var renderer = this;
 
 	renderer.repeatX = false;
@@ -17,8 +16,12 @@ gm.Renderer.Map.prototype.toJSON = function() {
 	var renderer = this;
 	return {
 		repeatX : renderer.repeatX,
-		repeatY: renderer.repeatY
+		repeatY : renderer.repeatY
 	};
+};
+
+gm.Renderer.Map.prototype.isValid = function() {
+	return true;
 };
 
 gm.Renderer.Map.prototype.applyStyle = function(ctx) {};

@@ -1,17 +1,13 @@
-var dir = gm.Constants.Dir;
-var X = gm.Constants.Dim.X,
-	Y = gm.Constants.Dim.Y;
-
 gm.Body = function(params) {
 	var body = this;
 	
-	body.maxVelX = 0;
-	body.maxVelY = 0;
+	body._maxVelX = 0;
+	body._maxVelY = 0;
 	
-	body.dampX = 0;
-	body.dampY = 0;
+	body._dampX = 0;
+	body._dampY = 0;
 	
-	body.weight = 0;
+	body._weight = 0;
 	
 	body._sizeX = 0;
 	body._sizeY = 0;
@@ -33,7 +29,7 @@ gm.Body = function(params) {
 		x1: 0,
 		y1: 0
 	};
-	body.measurementsDirty = false;
+	body._measurementsDirty = false;
 
 	body._collisionState = gm.CollisionRules.createCollisionState();
 
@@ -43,23 +39,47 @@ gm.Body = function(params) {
 gm.Body.prototype.setParams = function(params) {
 	var body = this;
 	
-	if (params.maxVelX !== undefined) body.maxVelX = params.maxVelX;
-	if (params.maxVelY !== undefined) body.maxVelY = params.maxVelY;
+	if (params.maxVelX !== undefined) body._maxVelX = params.maxVelX;
+	if (params.maxVelY !== undefined) body._maxVelY = params.maxVelY;
 	
-	if (params.dampX !== undefined) body.dampX = params.dampX;
-	if (params.dampY !== undefined) body.dampY = params.dampY;
+	if (params.dampX !== undefined) body._dampX = params.dampX;
+	if (params.dampY !== undefined) body._dampY = params.dampY;
 
-	if (params.weight !== undefined) body.weight = params.weight;
+	if (params.weight !== undefined) body._weight = params.weight;
 	
 	if (params.sizeX !== undefined) {
 		body._sizeX = params.sizeX;
-		body.measurementsDirty = true;
+		body._measurementsDirty = true;
 	}
 	if (params.sizeY !== undefined) {
 		body._sizeY = params.sizeY;
-		body.measurementsDirty = true;
+		body._measurementsDirty = true;
 	}
-	if (body.measurementsDirty) body.recalculateMeasurements();
+	if (body._measurementsDirty) body.recalculateMeasurements();
+};
+
+gm.Body.prototype.writeState = function(state) {
+	state.x = this._x;
+	state.y = this._x;
+	state.vx = this.vx;
+	state.vy = this.vy;
+	state.ax = this.ax;
+	state.ay = this.ay;
+
+	state.collisionState = gm.CollisionRules.copyCollisionState(state.collisionState || {});
+};
+
+gm.Body.prototype.readState = function(state) {
+	this._x = state.x;
+	this._x = state.y;
+	this.vx = state.vx;
+	this.vy = state.vy;
+	this.ax = state.ax;
+	this.ay = state.ay;
+
+	gm.CollisionRules.copyCollisionState(state.collisionState, this._collisionState);
+
+	this._measurementsDirty = true;
 };
 
 gm.Body.prototype.moveTo = function(x, y) {
@@ -68,7 +88,7 @@ gm.Body.prototype.moveTo = function(x, y) {
 	body._x = x;
 	body._y = y;
 
-	body.measurementsDirty = true;
+	body._measurementsDirty = true;
 };
 
 gm.Body.prototype.resetAccel = function() {
@@ -77,13 +97,13 @@ gm.Body.prototype.resetAccel = function() {
 };
 
 gm.Body.prototype.addForce = function(gx, gy) {
-	this.ax += gx * this.weight;
-	this.ay += gy * this.weight;
+	this.ax += gx * this._weight;
+	this.ay += gy * this._weight;
 };
 
 gm.Body.prototype.addImpulse = function(ix, iy) {
-	this.vx += ix * this.weight;
-	this.vy += iy * this.weight;
+	this.vx += ix * this._weight;
+	this.vy += iy * this._weight;
 };
 
 gm.Body.prototype.clampVelLeft = function() {
@@ -124,36 +144,40 @@ gm.Body.prototype.recalculateMeasurements = function() {
 	var body = this;
 	body.recalculateBbox();
 	body.recalculateCenter();
-	body.measurementsDirty = false;
+	body._measurementsDirty = false;
 };
 
-gm.Body.prototype.updateStep = function(delta, dim) {
+gm.Body.prototype.updateStepX = function(delta) {
 	var body = this;
 
-	if (dim === X) {
-		body._x += body.vx * delta;
-		body.vx += (body.ax - (body.vx * body.dampX)) * delta;
-		if (body.vx < -body.maxVelX) body.vx = -body.maxVelX;
-		else if (body.vx > body.maxVelX) body.vx = body.maxVelX;
-	} else {
-		body._y += body.vy * delta;
-		body.vy += (body.ay - (body.vy * body.dampY)) * delta;
-		if (body.vy < -body.maxVelY) body.vy = -body.maxVelY;
-		else if (body.vy > body.maxVelY) body.vy = body.maxVelY;
-	}
+	body._x += body.vx * delta;
+	body.vx += (body.ax - (body.vx * body._dampX)) * delta;
+	if (body.vx < -body._maxVelX) body.vx = -body._maxVelX;
+	else if (body.vx > body._maxVelX) body.vx = body._maxVelX;
 
-	body.measurementsDirty = true;
+	body._measurementsDirty = true;
+};
+
+gm.Body.prototype.updateStepY = function(delta) {
+	var body = this;
+
+	body._y += body.vy * delta;
+	body.vy += (body.ay - (body.vy * body._dampY)) * delta;
+	if (body.vy < -body._maxVelY) body.vy = -body._maxVelY;
+	else if (body.vy > body._maxVelY) body.vy = body._maxVelY;
+
+	body._measurementsDirty = true;
 };
 
 gm.Body.prototype.getCenter = function() {
 	var body = this;
-	if (body.measurementsDirty) body.recalculateMeasurements();
+	if (body._measurementsDirty) body.recalculateMeasurements();
 	return body.__center;
 };
 
 gm.Body.prototype.getBbox = function() {
 	var body = this;
-	if (body.measurementsDirty) body.recalculateMeasurements();
+	if (body._measurementsDirty) body.recalculateMeasurements();
 	return body.__bbox;
 };
 
@@ -174,14 +198,14 @@ gm.Body.prototype.overlapsBbox = function(obbox) {
 		bbox.y0 < obbox.y1 && bbox.y1 > obbox.y0);
 };
 
-gm.Body.prototype.overlapsAxis = function(other, dim) {
-	if (dim === X) {
-		return body._x < other._x + other._sizeX &&
-			other._x < body._x + body._sizeX;
-	} else {
-		return body._y < other._y + other._sizeY &&
-		other._y < body._y + body._sizeY;
-	}
+gm.Body.prototype.overlapsAxisX = function(other) {
+	return body._x < other._x + other._sizeX &&
+		other._x < body._x + body._sizeX;
+};
+
+gm.Body.prototype.overlapsAxis = function(other) {
+	return body._y < other._y + other._sizeY &&
+	other._y < body._y + body._sizeY;
 };
 
 gm.Body.prototype.render = function(ctx) {

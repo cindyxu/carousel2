@@ -1,13 +1,13 @@
 gm.Constants = {};
 
 gm.Constants.Dim = {
-	X: 0,
-	Y: 1
+	X: 1,
+	Y: 1 << 1
 };
 
 gm.Constants.Dir = {
-	LEFT: 0,
-	RIGHT: 1,
-	UP: 2,
-	DOWN: 3
+	LEFT: 1,
+	RIGHT: 1 << 1,
+	UP: 1 << 2,
+	DOWN: 1 << 3
 };

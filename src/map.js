@@ -10,10 +10,17 @@ gm.Map = function(params) {
 	
 	map._tiles = [];
 
+	map.listener = undefined;
+
 	if (params) map.setParams(params);
 };
 
+gm.Map.prototype.onChanged = function() {
+	if (this.listener) this.listener.onMapChanged();
+};
+
 gm.Map.prototype.setParams = function(params) {
+
 	var map = this;
 	
 	if (params.tiles) {
@@ -28,6 +35,8 @@ gm.Map.prototype.setParams = function(params) {
 		}
 	}
 	if (params.tilesize !== undefined) map.tilesize = params.tilesize;
+
+	map.onChanged();
 };
 
 gm.Map.prototype.posToTile = function(x, y, res) {
@@ -85,10 +94,13 @@ gm.Map.prototype.fill = function(val, x0, y0, x1, y1) {
 			tiles[ti] = val;
 		}
 	}
+
+	map.onChanged();
 };
 
 gm.Map.prototype.setTile = function(tx, ty, val) {
 	this._tiles[ty * this._tilesX + tx] = val;
+	this.onChanged();
 };
 
 gm.Map.prototype.resize = function(nsx, nsy, repeat) {
@@ -112,18 +124,22 @@ gm.Map.prototype.resize = function(nsx, nsy, repeat) {
 	map._tilesX = nsx;
 	map._tilesY = nsy;
 	map._tiles = ntiles;
+
+	map.onChanged();
 };
 
-gm.Map.prototype.copyArea = function(cmap, tstx, tsty, ctstx, ctsty, tszx, tszy) {
+gm.Map.prototype.copyArea = function(cmap, tstx, tsty, ctstx, ctsty, tszx, tszy, onlyContent) {
 	var tx, ty, ctx, cty;
 
-	var tiles = this._tiles;
+	var map = this;
+
+	var tiles = map._tiles;
 	var ctiles = cmap._tiles;
-	var tilesX = this._tilesX;
+	var tilesX = map._tilesX;
 	var ctilesX = cmap._tilesX;
 
 	// out of bounds
-	if (tstx > this._tilesX || tsty > this._tilesY || 
+	if (tstx > map._tilesX || tsty > map._tilesY || 
 		ctstx > cmap._tilesX || ctsty > cmap._tilesY) return;
 
 	// clamp to both maps
@@ -148,8 +164,8 @@ gm.Map.prototype.copyArea = function(cmap, tstx, tsty, ctstx, ctsty, tszx, tszy)
 		ctsty = 0;
 	}
 	
-	tszx = Math.min(cmap._tilesX - ctstx, Math.min(this._tilesX - tstx, tszx));
-	tszy = Math.min(cmap._tilesY - ctsty, Math.min(this._tilesY - tsty, tszy));
+	tszx = Math.min(cmap._tilesX - ctstx, Math.min(map._tilesX - tstx, tszx));
+	tszy = Math.min(cmap._tilesY - ctsty, Math.min(map._tilesY - tsty, tszy));
 
 	// copy viable area
 	for (var toy = 0; toy < tszy; toy++) {
@@ -158,7 +174,11 @@ gm.Map.prototype.copyArea = function(cmap, tstx, tsty, ctstx, ctsty, tszx, tszy)
 		for (var tox = 0; tox < tszx; tox++) {
 			tx = tstx + tox;
 			ctx = ctstx + tox;
-			tiles[ty * tilesX + tx] = ctiles[cty * ctilesX + ctx];
+			if (!onlyContent || ctiles[cty * ctilesX + ctx] !== undefined) {
+				tiles[ty * tilesX + tx] = ctiles[cty * ctilesX + ctx];
+			}
 		}
 	}
+
+	map.onChanged();
 };

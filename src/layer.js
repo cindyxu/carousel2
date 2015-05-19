@@ -4,8 +4,7 @@ gm.Layer = function(name, layerMap, params) {
 	var layer = this;
 
 	layer.name = name;
-	layer.layerMap = layerMap;
-	
+
 	layer._entities = [];
 	layer._entitiesNeedSort = false;
 
@@ -17,12 +16,33 @@ gm.Layer = function(name, layerMap, params) {
 	layer._isCollision = false;
 
 	if (params) layer.setParams(params);
+
+	layer._layerMap = undefined;
+	layer.setLayerMap(layerMap);
+
+	layer.listener = undefined;
+};
+
+gm.Layer.prototype.setLayerMap = function(layerMap) {
+	this._layerMap = layerMap;
+	this._layerMap.listener = this;
+	this.onChanged();
+};
+
+gm.Layer.prototype.onLayerMapChanged = function() {
+	this.onChanged();
+};
+
+gm.Layer.prototype.onChanged = function() {
+	if (this.listener) this.listener.onLayerChanged();
 };
 
 gm.Layer.prototype.setParams = function(params) {
 	if (params.distX !== undefined) this.distX = params.distX;
 	if (params.distY !== undefined) this.distY = params.distY;
 	if (params.isCollision !== undefined) this._isCollision = params.isCollision;
+
+	this.onChanged();
 };
 
 gm.Layer.prototype.addEntity = function(entity) {
@@ -48,7 +68,7 @@ var entityDrawSortFunction = function(e1, e2) {
 };
 
 gm.Layer.prototype.updateStep = function(delta) {
-	this.layerMap.updateStep(delta);
+	this._layerMap.updateStep(delta);
 };
 
 gm.Layer.prototype.transformBboxToLocalSpace = function(bbox, tbbox) {
@@ -76,7 +96,7 @@ gm.Layer.prototype.render = function(ctx, bbox) {
 
 	layer.transformBboxToLocalSpace(bbox, tbbox);
 
-	layer.layerMap.render(ctx, tbbox);
+	layer._layerMap.render(ctx, tbbox);
 
 	var entities = layer._entities;
 	var elength = entities.length;
@@ -89,13 +109,13 @@ gm.Layer.prototype.render = function(ctx, bbox) {
 
 gm.Layer.prototype.posToObservedTile = function(px, py, bbox, res) {
 	this.transformBboxToLocalSpace(bbox, tbbox);
-	this.layerMap.posToTile(px + (tbbox.x0 - bbox.x0), 
+	this._layerMap.posToTile(px + (tbbox.x0 - bbox.x0), 
 		py + (tbbox.y0 - bbox.y0), 
 		res);
 };
 
 gm.Layer.prototype.tileToObservedPos = function(tx, ty, bbox, res) {
-	this.layerMap.tileToPos(tx, ty, res);
+	this._layerMap.tileToPos(tx, ty, res);
 	this.transformBboxToLocalSpace(bbox, tbbox);
 	res.x -= (tbbox.x0 - bbox.x0);
 	res.y -= (tbbox.y0 - bbox.y0);

@@ -64,9 +64,9 @@ $(function() {
 	};
 
 	var fillParamsForLayer = function(layer) {
-		var layerMap = layer.layerMap,
+		var layerMap = layer._layerMap,
 			renderer = layerMap.renderer,
-			map = layerMap.map;
+			map = layerMap._map;
 
 		$layerCollisionCheckbox.prop("checked", !!layer._isCollision);
 
@@ -130,7 +130,7 @@ $(function() {
 	var refreshLayerList = function() {
 		$layerList.empty();
 
-		var layers = gm.Game._layers;
+		var layers = editor._level._layers;
 		for (var l = 0; l < layers.length; l++) {
 			$layerList.append(createLayerListEntry(layers[l]));
 		}
@@ -150,7 +150,7 @@ $(function() {
 	var refreshEntityList = function() {
 		$entityList.empty();
 
-		var entities = gm.Game._entities;
+		var entities = editor._level._entities;
 		for (var e = 0; e < entities.length; e++) {
 			$entityList.append(createEntityListEntry(entities[e]));
 		}
@@ -163,13 +163,13 @@ $(function() {
 	};
 
 	$("#layer-list").on("click", "li", function() {
-		var layer = gm.Game.findLayerByTag(parseInt($(this).attr("data-layer-tag")));
+		var layer = editor._level.findLayerByTag(parseInt($(this).attr("data-layer-tag")));
 		gm.Editor.selectLayer(layer);
 		refreshSelectedLayer();
 	});
 
 	$("#entity-list li").on("click", function() {
-		var entity = gm.Game._entities[entity];
+		var entity = editor._level._entities[entity];
 		gm.Editor.selectEntity(entity);
 		refreshSelectedEntity();
 	});

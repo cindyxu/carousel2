@@ -1,12 +1,12 @@
 gm.Controllers.Player = function(body, params) {
 	this._body = body;
-	this._runBehavior = new gm.Behaviors.Runner(body, params);
+	this._behavior = new gm.Behaviors.Walker(body, params);
 };
 
 gm.Controllers.Player.prototype.control = function() {
-	this._runBehavior.control(gm.Input);
+	this._behavior.control(gm.Input);
 };
 
 gm.Controllers.Player.prototype.post = function() {
-	this._runBehavior.post();
+	this._behavior.post();
 };

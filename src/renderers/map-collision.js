@@ -11,18 +11,26 @@ gm.Renderer.CollisionMap.prototype = Object.create(gm.Renderer.Map.prototype);
 gm.Renderer.CollisionMap.prototype.toJSON = function() {
 };
 
-gm.Renderer.CollisionMap.prototype.isValid = function() {
-	return true;
+gm.Renderer.CollisionMap.prototype.applyStyle = function(ctx) {
+	ctx.strokeStyle = "red";
+	ctx.lineWidth = 5;
 };
 
-gm.Renderer.CollisionMap.prototype.applyStyle = function(ctx) {
-	ctx.fillStyle = "rgba(255,0,0,0.6)";
-};
+var Dir = gm.Constants.Dir;
 
 gm.Renderer.CollisionMap.prototype.renderTileFn = function(ctx, map, ptx, pty) {
 	var tile = map._tiles[pty * map._tilesX + ptx];
 	var tilesize = map.tilesize;
-	if (tile === SOLID) {
-		ctx.fillRect(ptx * tilesize, pty * tilesize, tilesize, tilesize);
+	if (tile & Dir.LEFT) {
+		ctx.strokeRect(ptx * tilesize, pty * tilesize, 0, tilesize);
+	} 
+	if (tile & Dir.RIGHT) {
+		ctx.strokeRect((ptx+1) * tilesize, pty * tilesize, 0, tilesize);
+	} 
+	if (tile & Dir.UP) {
+		ctx.strokeRect(ptx * tilesize, pty * tilesize, tilesize, 0);
+	} 
+	if (tile & Dir.DOWN) {
+		ctx.strokeRect(ptx * tilesize, (pty+1) * tilesize, tilesize, 0);
 	}
 };

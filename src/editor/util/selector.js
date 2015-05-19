@@ -1,3 +1,6 @@
+if (!gm.Editor) gm.Editor = {};
+if (!gm.Editor.Util) gm.Editor.Util = {};
+
 var pres = {};
 var tres = {};
 
@@ -60,7 +63,7 @@ Selector.prototype.render = function(ctx, bbox) {
 
 	var selector = this;
 
-	var tilesize = selector.layerMap.map.tilesize;
+	var tilesize = selector.layerMap._map.tilesize;
 
 	var trx0, trx1, try0, try1;
 
