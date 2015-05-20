@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 var toolWrappers = [];
 
 var Brush = gm.Editor.Tools.Brush;
@@ -24,6 +26,7 @@ var brushWrapper = {
 		}
 	},
 	switchIn: function() {
+		if (LOGGING) console.log("active tool: brush");
 	},
 	switchOut: function() {
 	},
@@ -71,6 +74,7 @@ var eraseWrapper = {
 		}
 	},
 	switchIn: function() {
+		if (LOGGING) console.log("active tool: erase");
 	},
 	switchOut: function() {
 	},
@@ -125,6 +129,7 @@ var selectTilesetWrapper = {
 	},
 	switchIn: function(camera) {
 		activeSelectTileset.switchIn(camera);
+		if (LOGGING) console.log("active tool: select from tileset");
 	},
 	switchOut: function() {
 		var tb = activeSelectTileset.switchOut();
@@ -155,6 +160,7 @@ var panWrapper = {
 	onLayerChanged: function(layer) { },
 	switchIn: function(camera) {
 		Pan.switchIn(camera);
+		if (LOGGING) console.log("active tool: pan");
 	},
 	action: function() {
 		Pan.action();

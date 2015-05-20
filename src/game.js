@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 var game = gm.Game = {
 	_activeLevel: undefined,
 
@@ -22,10 +24,12 @@ gm.Game.init = function() {
 gm.Game.play = function() {
 	game._playing = true;
 	game._lastRun = Date.now();
+	if (LOGGING) console.log("game is playing");
 };
 
 gm.Game.pause = function() {
 	this._playing = false;
+	if (LOGGING) console.log("game is paused");
 };
 
 gm.Game.update = function() {

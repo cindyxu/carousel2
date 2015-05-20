@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 var tag = 0;
 
 gm.Entity = function(name, params) {
@@ -18,6 +20,8 @@ gm.Entity = function(name, params) {
 	entity._tag = tag++;
 
 	if (params) entity.setParams(params);
+
+	if (!name && LOGGING) console.log("!!! new entity - no name");
 };
 
 gm.Entity.prototype.readState = function(state) {

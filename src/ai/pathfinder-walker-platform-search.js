@@ -74,15 +74,7 @@ gm.Pathfinder.Walker.PlatformSearch = function(
 	this._originPlatform = originPlatform;
 	this._reachableAreas = {};
 
-	var xDelta = this.getDeltaXFromDeltaY(jumpSpd, tilesize);
-	var wxli = originPlatform.tx0 * platformMap.tilesize;
-	var wxri = originPlatform.tx1 * platformMap.tilesize;
-
-	var wxlo = wxli - xDelta;
-	var wxro = wxri + xDelta;
-
-	var mltx = Math.floor(wxlo / platformMap.tilesize);
-	var mrtx = Math.floor(wxro / platformMap.tilesize);
+	this.getRawWorldExtentX(originPlatform, res);
 
 	var ltx = originPlatform.tx0;
 	while(ltx >= mltx) {
@@ -99,8 +91,6 @@ gm.Pathfinder.Walker.PlatformSearch = function(
 	wxro = Math.min((rtx+1)*tilesize, wxro);
 
 	this._currentAreas = [{
-		ltx: ltx,
-		rtx: rtx,
 		ty: platform.ty - 1,
 		vyi: jumpSpd,
 		vyo: this.getDeltaVyFromDeltaY(jumpSpd, tilesize),
@@ -109,6 +99,111 @@ gm.Pathfinder.Walker.PlatformSearch = function(
 		rxlo: wxlo - ltx * tilesize,
 		rxro: rtx * tilesize - wxro
 	}];
+};
+
+gm.Pathfinder.Walker.PlatformSearch.prototype.getRawWorldExtentX = function(parentArea, res) {
+	var tilesize = platformMap.tilesize;
+	var jumpSpd = this._jumpSpd;
+	
+	var xDelta = this.getDeltaXFromDeltaY(jumpSpd, tilesize);
+
+	res.rxlo = parentArea.rxli - xDelta;
+	res.rxro = parentArea.rxri + xDelta;
+
+	res.ltxo = Math.floor(res.wxlo / platformMap.tilesize);
+	res.rtxo = Math.floor(res.wxro / platformMap.tilesize);
+};
+
+gm.Pathfinder.Walker.PlatformSearch.prototype.splitNextArea = function(parentArea, extents, ty, res) {
+
+	// from leftmost tile to rightmost tile
+	// 1. find blockages in the direction you are travelling
+	//    from there find the free areas
+	//    if we collided with the bottom of any platform,
+	//    this may include "bounced" areas
+	// 2. clamp ranges of areas. if there are horizontal only blockages,
+	// further split up the areas
+	
+	// |<  >|  |---------|
+
+	var DOWN = gm.Constants.Dir.DOWN;
+	var UP = gm.Constants.Dir.UP;
+
+
+	var landedPlatforms = res.landedPlatforms;
+	var areas = res.freeAreas;
+	for (var a in areas) {
+		areas[a] = clampArea(areas[a]);
+	}
+	addAreas();
+
+	var ltxi = parentArea.ltx;
+	var rtxi = parentArea.rtx;
+
+	var ltx = res.ltxo;
+
+	ltx = -1;
+	
+	var ctxl, ctxr;
+
+	for (tx = res.ltxo; tx <= res.rtxo; ) {
+		var platform = this._platformMap.tileAt(tx, nty);
+		var travelDir = this.parentArea.vyo >= 0 ? DOWN : UP;
+		if ((platform & DOWN) && travelDir === UP) {
+			// bounce area
+			ctxl = ctxr = -1;
+		}
+		else if ((platform & DOWN) && travelDir === UP) {
+			// add platforms to reachable
+			ctxl = ctxr = -1;
+		}
+		else {
+			if (ctxl < 0) ctxl = tx;
+		}
+	}
+
+		// if (platform) {
+		// 	if (ltx >= 0 && rtx >= ltxi && ltx <= rtxi) {
+
+		// 		var cwrxli = Math.max(ltx * tilesize, wxli);
+		// 		var cwrxri = Math.min(rtx * tilesize, wxri);
+		// 		var cwrxlo = Math.max(ltx * tilesize, wxlo);
+		// 		var cwrxro = Math.min(rtx * tilesize, wxro);
+
+		// 		var narea = {
+		// 			ltx: ltx,
+		// 			rtx: rtx,
+		// 			ty: nty,
+		// 			vyi: nvyi,
+		// 			vyo: nvyo,
+		// 			rxli: cwrxli - (ltx * tilesize),
+		// 			rxri: (rtx * tilesize) - cwrxri,
+		// 			rxlo: cwrxlo - (ltx * tilesize),
+		// 			rxro: (rtx * tilesize) - cwrxro
+		// 		};
+
+		// 		if (ltx === txlo && rtx === trxo) {
+		// 			narea.parent = area;
+		// 		} else {
+		// 			narea.parent = this.splitParent(area, ltx, rtx);
+		// 		}
+		// 		this._currentAreas.push(narea);
+
+		// 		if (!this._reachableAreas[platform]) {
+		// 			this._reachableAreas[platform] = [];
+		// 		}
+
+		// 		this._reachableAreas[platform].push(this.splitParent(area, platform.tx0, platform.tx1));
+
+		// 		ltx = -1;
+		// 	}
+		// 	rtx = platform.tx1;
+		// } else {
+		// 	if (ltx < 0) {
+		// 		ltx = rtx;
+		// 	}
+		// 	rtx++;
+		// }
 };
 
 var lres = {};

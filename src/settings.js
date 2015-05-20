@@ -1,4 +1,6 @@
-gm.Settings = {};
+gm.Settings = {
+	LOGGING: true
+};
 
 gm.Settings.Game = {
 	WIDTH: 800,

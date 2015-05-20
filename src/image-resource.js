@@ -1,7 +1,10 @@
+var LOGGING = gm.Settings.LOGGING;
+
 var imageCache = {};
 
 gm.ImageResource = function(source) {
 	this.source = source;
+	if (!source && LOGGING) console.log("!!! new image resource - no source");
 };
 
 gm.ImageResource.prototype.load = function(callback) {
@@ -40,14 +43,11 @@ gm.ImageResource.prototype.load = function(callback) {
 		if (errorCallback) {
 			if (!ires.image.complete) {
 				var internalOnError = ires.image.onerror;
-				if (internalOnError) {
-					ires.image.onerror = function() {
-						internalOnError();
-						errorCallback();
-					};
-				} else {
-					ires.image.onerror = errorCallback;
-				}
+				ires.image.onerror = function() {
+					if (internalOnError) internalOnError();
+					if (LOGGING) console.log("failed to get image", ires.source);
+					errorCallback();
+				};
 			}
 		}
 	}

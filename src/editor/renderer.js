@@ -30,7 +30,6 @@ var renderEntityDebug = function(entity, ctx, bbox) {
 };
 
 renderer.init = function() {
-	// renderer.ai.init();
 };
 
 renderer.render = function(ctx, bbox) {
@@ -39,7 +38,6 @@ renderer.render = function(ctx, bbox) {
 	for (var l = 0; l < layers.length; l++) {
 		renderLayerDebug(layers[l], ctx, bbox);
 	}
-	// renderer.ai.render(ctx, bbox);
 };
 
 renderer.onGameCleared = function() {

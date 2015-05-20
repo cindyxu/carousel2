@@ -1,5 +1,6 @@
 var X = gm.Constants.Dim.X;
 var Y = gm.Constants.Dim.Y;
+var LOGGING = gm.Settings.LOGGING;
 
 gm.Level = function() {
 	var level = this;
@@ -44,6 +45,7 @@ gm.Level.prototype.onLevelChanged = function() {
 gm.Level.prototype.clearLevel = function() {
 	this._layers.length = 0;
 	this._entities.length = 0;
+	if (LOGGING) console.log("cleared level");
 };
 
 gm.Level.prototype.addNewLayer = function(params, callback) {
@@ -61,6 +63,7 @@ gm.Level.prototype.addLayer = function(layer) {
 		level._collisionLayers.push(layer);
 	}
 	layer.listener = level;
+	if (LOGGING) console.log("added layer", layer.name);
 	level.onLevelChanged();
 };
 
@@ -68,6 +71,8 @@ gm.Level.prototype.updateLayer = function(layer, params, callback) {
 	var level = this;
 	var layers = level._layers;
 	model.updateLayer(layer, params, function() {
+		if (LOGGING) console.log("updated layer");
+		
 		if (layers.indexOf(layer) >= 0) level.onLevelChanged();
 		if (callback) callback();
 	});
@@ -92,6 +97,7 @@ gm.Level.prototype.removeLayer = function(layer) {
 		if (j >= 0) collisionLayers.splice(j, 1);
 	}
 
+	if (LOGGING) console.log("removed layer", layer.name);
 	level.onLevelChanged();
 };
 
@@ -114,6 +120,7 @@ gm.Level.prototype.addNewEntity = function(className, name, layer, callback) {
 	gm.Level.Model.createEntity(className, name, function(entity) {
 		level.addEntity(entity, layer);
 		if (callback) callback(entity);
+
 	});
 };
 
@@ -123,6 +130,7 @@ gm.Level.prototype.addEntity = function(entity, layer) {
 	if (e < 0) {
 		entities.push(entity);
 		layer.addEntity(entity);
+		if (LOGGING) console.log("added entity", entity.name, "to", layer.name);
 	}
 };
 
@@ -133,6 +141,8 @@ gm.Level.prototype.removeEntity = function(entity) {
 
 	var i = entities.indexOf(entity);
 	if (i >= 0) entities.splice(i, 1);
+	if (LOGGING) console.log("removed entity", entity.name);
+
 };
 
 gm.Level.prototype.resolveLevelChange = function() {

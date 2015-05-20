@@ -207,7 +207,3 @@ gm.Body.prototype.overlapsAxis = function(other) {
 	return body._y < other._y + other._sizeY &&
 	other._y < body._y + body._sizeY;
 };
-
-gm.Body.prototype.render = function(ctx) {
-
-};

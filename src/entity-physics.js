@@ -1,6 +1,3 @@
-var pres = {};
-var tres = {};
-
 var colRules = gm.CollisionRules;
 var X = gm.Constants.Dir.X;
 var Y = gm.Constants.Dir.Y;
@@ -61,6 +58,7 @@ EntityPhysics.finishCollisions = function(layers, entities, dim) {
 	}
 };
 
+var tres = {};
 EntityPhysics.collideEntityWithLayer = function(entity, layer, dim) {
 
 	var tile, stileX, stileY, etileX, etileY;
@@ -123,6 +121,7 @@ EntityPhysics.collideEntityWithLayer = function(entity, layer, dim) {
 	}
 };
 
+var pres = {};
 EntityPhysics.collideBodyWithTile = function(body, layerMap, tx, ty, dim) {
 	var tile = layerMap._map.tileAt(tx, ty);
 	if (tile == gm.Constants.Collision.SOLID) {

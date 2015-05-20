@@ -6,14 +6,14 @@ var Brush = gm.Editor.Tools.Brush = function(layer, params) {
 	if (params) {
 		if (params.color) this.color = params.color;
 	}
-	this.build(layer);
+	this._build(layer);
 };
 
 Brush.prototype = Object.create(gm.Map.prototype);
 ////
 Brush.prototype.defaultColor = "yellow";
 
-Brush.prototype.build = function(layer) {
+Brush.prototype._build = function(layer) {
 	var brush = this;
 	brush._map = new gm.Map({
 		tilesX: 1,
@@ -24,7 +24,7 @@ Brush.prototype.build = function(layer) {
 	var renderer;
 
 	if (layer._isCollision) {
-		brush.initCollisionBrush();
+		brush._initCollisionBrush();
 		renderer = new gm.Renderer.CollisionMap(brush._map);
 	}
 	else {
@@ -42,12 +42,12 @@ Brush.prototype.build = function(layer) {
 	brush._layer = layer;
 };
 
-Brush.prototype.initCollisionBrush = function() {
+Brush.prototype._initCollisionBrush = function() {
 	this._map.setTile(0, 0, gm.Constants.Collision.SOLID);
 };
 
 Brush.prototype.action = function(camera) {
-	if (gm.Input.mousedown) this.paint(camera);
+	if (gm.Input.mousedown) this._paint(camera);
 };
 
 var tres = {};
@@ -69,7 +69,7 @@ Brush.prototype.render = function(ctx, camera) {
 };
 
 Brush.onLayerChanged = function() {
-	this.build(this._layer);
+	this._build(this._layer);
 };
 
 Brush.prototype.fromMapArea = function(map, tx, ty, tsx, tsy) {
@@ -78,7 +78,7 @@ Brush.prototype.fromMapArea = function(map, tx, ty, tsx, tsy) {
 	bmap.copyArea(map, 0, 0, tx, ty, tsx, tsy);
 };
 
-Brush.prototype.paint = function(camera) {
+Brush.prototype._paint = function(camera) {
 	var brush = this;
 	var bmap = brush._map;
 	var layerMap = brush._layer._layerMap;

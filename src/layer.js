@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 var tag = 0;
 
 gm.Layer = function(name, layerMap, params) {
@@ -21,6 +23,9 @@ gm.Layer = function(name, layerMap, params) {
 	layer.setLayerMap(layerMap);
 
 	layer.listener = undefined;
+
+	if (!name && LOGGING) console.log("!!! new layer - no name");
+	if (!layerMap && LOGGING) console.log("!!! new layer - no layermap");
 };
 
 gm.Layer.prototype.setLayerMap = function(layerMap) {
