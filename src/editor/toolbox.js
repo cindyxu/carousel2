@@ -185,14 +185,14 @@ gm.Editor.toolbox.onLayerSwitched = function(layer) {
 		var wrapper = toolWrappers[i];
 
 		if ((holdWrapper && holdWrapper === wrapper) ||
-			(!holdWrapper && baseWrapper === wrapper)) {
+			(!holdWrapper && baseWrapper && baseWrapper === wrapper)) {
 			wrapper.switchOut();
 		}
 		
 		wrapper.onLayerSwitched(layer);
 		
 		if ((holdWrapper && holdWrapper === wrapper) ||
-			(!holdWrapper && baseWrapper === wrapper)) {
+			(!holdWrapper && baseWrapper && baseWrapper === wrapper)) {
 			wrapper.switchIn();
 		}
 	}
