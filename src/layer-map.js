@@ -26,6 +26,7 @@ gm.LayerMap.prototype.setParams = function(params) {
 
 	if (params.offsetX !== undefined) layerMap._offsetX = params.offsetX;
 	if (params.offsetY !== undefined) layerMap._offsetY = params.offsetY;
+	
 	layerMap.updatePosition();
 
 	layerMap.onChanged();

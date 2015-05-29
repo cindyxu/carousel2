@@ -3,7 +3,7 @@ var spriteSrc = "images/spritesheets/player.png";
 var bodyParams = {
 	sizeX: 16,
 	sizeY: 16,
-	maxVelX: 70,
+	maxVelX: 60,
 	maxVelY: 200,
 	dampX: 5,
 	dampY: 0,
@@ -11,7 +11,7 @@ var bodyParams = {
 };
 
 var controllerParams = {
-	runForce: 90,
+	walkForce: 120,
 	jumpImpulse: 0.5,
 	maxJumps: 1
 };
@@ -25,13 +25,12 @@ var entityParams = {
 gm.EntityClasses.Player = {
 	create: function(name, callback) {
 		var body = new gm.Body(bodyParams);
-		//var renderer = new gm.Renderer.EntitySprite(body, sprite, spriteSrc);
-		var controller = new gm.Controllers.Player(body, controllerParams);
-		
+		//var renderer = new gm.Renderer.EntitySprite(body, sprite);
+		var controller = new gm.Controllers.Player(controllerParams, body);
 		var entity = new gm.Entity(name, entityParams);
-		entity.body = body;
-		//entity.renderer = renderer;
-		entity.controller = controller;
+		entity.setBody(body);
+		//entity.setRenderer(renderer);
+		entity.setController(controller);
 
 		if (callback) {
 			// entity.renderer.load(function() { callback(entity); });

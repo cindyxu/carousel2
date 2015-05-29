@@ -3,10 +3,12 @@ if (!gm.Editor.Tools) gm.Editor.Tools = {};
 
 var Erase = gm.Editor.Tools.Erase = function(layer, params) {
 	this.color = this.defaultColor;
+	this._mx = undefined;
+	this._my = undefined;
 	if (params) {
 		if (params.color) this.color = params.color;
-}
-	this._build(layer);
+	}
+	this.build(layer);
 };
 
 Erase.prototype = Object.create(gm.Editor.Tools.Brush.prototype);
@@ -17,10 +19,10 @@ Erase.prototype._initCollisionBrush = function() {
 
 Erase.prototype.defaultColor = "red";
 
-Erase.prototype._build = function(layer) {
-	gm.Editor.Tools.Brush.prototype._build.call(this, layer);
+Erase.prototype.build = function(layer) {
+	gm.Editor.Tools.Brush.prototype.build.call(this, layer);
 };
 
 Erase.onLayerChanged = function(layer) {
-	this._build(layer);
+	this.build(layer);
 };

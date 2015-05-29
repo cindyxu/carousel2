@@ -73,6 +73,12 @@ gm.Level.prototype.updateLayer = function(layer, params, callback) {
 	model.updateLayer(layer, params, function() {
 		if (LOGGING) console.log("updated layer");
 		
+		var coli = level._collisionLayers.indexOf(coli);
+		if (layer._isCollision && coli < 0) {
+			level._collisionLayers.push(layer);
+		} else if (!layer._isCollision && coli >= 0) {
+			level._collisionLayers.splice(coli, 1);
+		}
 		if (layers.indexOf(layer) >= 0) level.onLevelChanged();
 		if (callback) callback();
 	});
@@ -93,8 +99,8 @@ gm.Level.prototype.removeLayer = function(layer) {
 	if (i >= 0) layers.splice(i, 1);
 
 	if (layer._isCollision) {
-		var j = collisionLayers.indexOf(layer);
-		if (j >= 0) collisionLayers.splice(j, 1);
+		var coli = collisionLayers.indexOf(layer);
+		if (coli >= 0) collisionLayers.splice(coli, 1);
 	}
 
 	if (LOGGING) console.log("removed layer", layer.name);

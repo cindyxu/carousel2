@@ -31,7 +31,8 @@ var brushWrapper = {
 	switchOut: function() {
 	},
 	action: function(camera) {
-		activeBrush.action(camera);
+		activeBrush.onMouseMove(gm.Input.mouseX, gm.Input.mouseY);
+		if (gm.Input.mousedown) activeBrush.paint(camera);
 	},
 	render: function(ctx, camera) {
 		activeBrush.render(ctx, camera);
@@ -79,7 +80,8 @@ var eraseWrapper = {
 	switchOut: function() {
 	},
 	action: function(camera) {
-		activeErase.action(camera);
+		activeErase.onMouseMove(gm.Input.mouseX, gm.Input.mouseY);
+		if (gm.Input.mousedown) activeErase.paint(camera);
 	},
 	render: function(ctx, camera) {
 		activeErase.render(ctx, camera);
@@ -119,11 +121,15 @@ var selectTilesetWrapper = {
 	},
 	action: function(camera) {
 		if (activeSelectTileset) {
-			activeSelectTileset.action(camera);
+			activeSelectTileset.onMouseMove(gm.Input.mouseX, gm.Input.mouseY, camera);
 			if (gm.Input.down[gm.Settings.Editor.keyBinds.PAN] && activeSelectTileset.isIdle()) {
-				this.startPanning();
+				activeSelectTileset.startPanning();
 			} else if (!gm.Input.down[gm.Settings.Editor.keyBinds.PAN] && activeSelectTileset.isPanning()) {
-				this.finishPanning();
+				activeSelectTileset.finishPanning();
+			} else if (gm.Input.mousedown && activeSelectTileset.isIdle()) {
+				activeSelectTileset.startSelecting();
+			} else if (!gm.Input.mousedown && activeSelectTileset.isSelecting()) {
+				activeSelectTileset.finishSelecting();
 			}
 		}
 	},
@@ -159,11 +165,11 @@ var panWrapper = {
 	},
 	onLayerChanged: function(layer) { },
 	switchIn: function(camera) {
-		Pan.switchIn(camera);
+		Pan.switchIn(gm.Input.mouseX, gm.Input.mouseY, camera);
 		if (LOGGING) console.log("active tool: pan");
 	},
 	action: function() {
-		Pan.action();
+		Pan.onMouseMove(gm.Input.mouseX, gm.Input.mouseY);
 	},
 	switchOut: function() { },
 	render: function(ctx, camera) {

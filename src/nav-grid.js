@@ -122,12 +122,12 @@ NavGrid.prototype.tileToPos = function(tx, ty, res) {
 
 NavGrid.prototype.fromCombinedLayerMap = function(combinedLayerMap) {
 
-	this._tx = combinedLayerMap.offsetX / tilesize;
-	this._ty = combinedLayerMap.offsetY / tilesize;
-	
 	var combinedMap = combinedLayerMap._map;
-
 	var tilesize = combinedMap.tilesize;
+
+	this._tx = combinedLayerMap._offsetX / tilesize;
+	this._ty = combinedLayerMap._offsetY / tilesize;
+
 	this._platformMap.resize(combinedMap._tilesX, combinedMap._tilesY);
 	this._platformMap.tilesize = tilesize;
 
@@ -163,5 +163,6 @@ NavGrid.prototype._addNewPlatform = function(tx0, tx1, ty) {
 
 NavGrid.prototype.render = function(ctx, bbox) {
 	var tilesize = this._platformMap.tilesize;
+	console.log(tilesize, this._tx, this._ty);
 	this._renderer.render(ctx, this._tx * tilesize, this._ty * tilesize, bbox);
 };

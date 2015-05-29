@@ -1,7 +1,9 @@
-gm.Renderer.EntitySprite = function(body, sprite, params) {
+gm.Renderer.EntitySprite = function(params, body, sprite) {
 	var renderer = this;
 
-	renderer._body = body;
+	if (body) renderer.setBody(body);
+	if (sprite) renderer.setSprite(sprite);
+
 	renderer._spritesheetSrc = spritesheetSrc;
 	renderer._ires = new gm.ImageResource(spritesheetSrc);
 
@@ -15,6 +17,14 @@ gm.Renderer.EntitySprite = function(body, sprite, params) {
 	if (params) renderer.setParams(params);
 
 	renderer.load();
+};
+
+gm.Renderer.EntitySprite.prototype.setBody = function(body) {
+	this._body = body;
+};
+
+gm.Renderer.EntitySprite.prototype.setSprite = function(sprite) {
+	this._sprite = sprite;
 };
 
 gm.Renderer.EntitySprite.prototype.load = function(callback) {
@@ -40,7 +50,7 @@ gm.Renderer.EntitySprite.prototype.setParams = function(params) {
 gm.Renderer.EntitySprite.prototype.render = function(ctx, x, y) {
 	var renderer = this;
 	var body = renderer._body;
-	var sprite = this._sprite;
+	var sprite = renderer._sprite;
 	
 	if (!renderer._ires || !sprite.anim) return;
 

@@ -8,16 +8,16 @@ var EntityPhysics = gm.EntityPhysics = {
 };
 
 EntityPhysics.preUpdate = function(entity) {
-	entity.body.addForce(EntityPhysics.gravityX, EntityPhysics.gravityY);
+	entity._body.addForce(EntityPhysics.gravityX, EntityPhysics.gravityY);
 };
 
 EntityPhysics.postUpdate = function(entity) {
-	entity.body.resetAccel();
+	entity._body.resetAccel();
 };
 
 EntityPhysics.updateStep = function(entity, delta, dim) {
-	if (dim === X) entity.body.updateStepX(delta);
-	else entity.body.updateStepY(delta);
+	if (dim === X) entity._body.updateStepX(delta);
+	else entity._body.updateStepY(delta);
 };
 
 EntityPhysics.resolveCollisions = function(layers, entities, dim) {
@@ -39,7 +39,7 @@ EntityPhysics.finishCollisions = function(layers, entities, dim) {
 		colRules.onFinishCollisions(entities[e]);
 
 		var entity = entities[e];
-		var body = entity.body;
+		var body = entity._body;
 		if (dim === X) {
 			if (body._collisionState.left) {
 				body.clampVelLeft();
@@ -63,7 +63,7 @@ EntityPhysics.collideEntityWithLayer = function(entity, layer, dim) {
 
 	var tile, stileX, stileY, etileX, etileY;
 
-	var body = entity.body;
+	var body = entity._body;
 	var layerMap = layer._layerMap;
 	var map = layerMap._map;
 	var collided = false;
@@ -84,7 +84,7 @@ EntityPhysics.collideEntityWithLayer = function(entity, layer, dim) {
 		etileY = map.clampTileDim(tres.ty, Y);
 
 		for (var y = stileY; y < etileY; y++) {
-			EntityPhysics.collideBodyWithTile(body, layerMap, stileX, y, dim);
+			collided = collided || EntityPhysics.collideBodyWithTile(body, layerMap, stileX, y, dim);
 		}
 
 		if (collided) {
@@ -107,7 +107,7 @@ EntityPhysics.collideEntityWithLayer = function(entity, layer, dim) {
 		etileX = map.clampTileDim(tres.tx, X);
 
 		for (var x = stileX; x < etileX; x++) {
-			EntityPhysics.collideBodyWithTile(body, layerMap, x, stileY, dim);
+			collided = collided || EntityPhysics.collideBodyWithTile(body, layerMap, x, stileY, dim);
 		}
 
 		if (collided) {
@@ -142,6 +142,7 @@ EntityPhysics.collideBodyWithTile = function(body, layerMap, tx, ty, dim) {
 			return true;
 		}
 	}
+	return false;
 };
 
 EntityPhysics.collideEntityWithEntity = function(entity1, entity2, dim) {
@@ -198,10 +199,10 @@ EntityPhysics.collideEntitiesWithLayers = function(layers, entities, dim) {
 	
 	for (var e = 0; e < elength; e++) {
 		entity = entities[e];
-		body = entity.body;
+		body = entity._body;
 
 		// collide against collideLayer first
-		var currentCollideLayer = entity.body._collisionState.layer;
+		var currentCollideLayer = entity._body._collisionState.layer;
 		if (currentCollideLayer) {
 			EntityPhysics.collideEntityWithLayer(body, currentCollideLayer._layerMap, dim);
 		}
@@ -230,11 +231,11 @@ EntityPhysics.collideEntities = function(entities, dim) {
 
 	for (var i = 0; i < elength-1; i++) {
 		currEntity = entities[i];
-		currBody = currEntity.body;
+		currBody = currEntity._body;
 		
 		for (var j = i+1; j < elength; j++) {
 			nextEntity = entities[j];
-			nextBody = nextEntity.body;
+			nextBody = nextEntity._body;
 
 			// if next entity is not x-intersecting with this one,
 			// go to next group

@@ -44,7 +44,7 @@ CollisionRules.createCollisionState = function() {
 };
 
 CollisionRules.onStartCollisions = function(entity) {
-	var body = entity.body;
+	var body = entity._body;
 	var nextCollisionState = body.__nextCollisionState;
 
 	if (!nextCollisionState) {
@@ -61,7 +61,7 @@ CollisionRules.onStartCollisions = function(entity) {
 };
 
 CollisionRules.onFinishCollisions = function(entity) {
-	var body = entity.body;
+	var body = entity._body;
 	var nextCollisionState = body.__nextCollisionState;
 	var currentCollisionState = body._collisionState;
 	
@@ -74,11 +74,12 @@ CollisionRules.onFinishCollisions = function(entity) {
 		gm.moveEntityToLayer(entity, layer);
 		currentCollisionState.layer = nextCollisionState.layer;
 	}
+
 };
 
 CollisionRules.shouldCollideEntityWithLayer = function(entity, layer) {
 	var collideType = entity.collideMapType;
-	var collideLayer = entity.body._collisionState.layer;
+	var collideLayer = entity._body._collisionState.layer;
 
 	return collideType === COLLIDE_MAP_TYPE_ALL ||
 		(collideType === COLLIDE_MAP_TYPE_STICKY &&
@@ -90,9 +91,9 @@ CollisionRules.shouldCollideEntities = function(entity1, entity2) {
 };
 
 CollisionRules.onEntityCollidedWithLayer = function(entity, layer, dir) {
-	entity.body.__nextCollisionState[dir] = layer;
+	entity._body.__nextCollisionState[dir] = layer;
 	if (entity.collideType === COLLIDE_MAP_TYPE_STICKY) {
-		entity.body.__nextCollisionState.layer = layer;
+		entity._body.__nextCollisionState.layer = layer;
 	}
 };
 
@@ -108,8 +109,8 @@ CollisionRules.onEntitiesCollided = function(pentity, nentity, dim) {
 		nnextCollisionState.up = pentity;
 	}
 
-	var collideLayer1 = pentity.body._collisionState.layer,
-		collideLayer2 = nentity.body._collisionState.layer;
+	var collideLayer1 = pentity._body._collisionState.layer,
+		collideLayer2 = nentity._body._collisionState.layer;
 
 	// for now rely on other entities not being sticky,
 	// but maybe think about collision priority

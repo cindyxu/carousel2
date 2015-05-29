@@ -53,6 +53,8 @@ var SelectTileset = gm.Editor.Tools.SelectTileset = function(layer) {
 	this._pan = new gm.Editor.Util.PanCamera(this._localCamera);
 	this._selector = undefined;
 	this._tb = undefined;
+	this._mx = undefined;
+	this._my = undefined;
 };
 
 SelectTileset.prototype.onLayerChanged = function(layer) {
@@ -88,31 +90,23 @@ SelectTileset.prototype.isValid = function() {
 };
 
 var res = {};
-SelectTileset.prototype.action = function() {
+SelectTileset.prototype.onMouseMove = function(mx, my) {
+
+	this._mx = mx;
+	this._my = my;
 
 	if (!this.isValid()) return;
 
-	var mx = gm.Input.mouseX,
-		my = gm.Input.mouseY;
-	this._localCamera.canvasToWorldPos(mx, my, res);
-
 	if (this._state === states.IDLE) {
-
+		this._localCamera.canvasToWorldPos(mx, my, res);
 		this._selector.update(res.x, res.y);
-		if (gm.Input.mousedown) {
-			this.startSelecting();
-		}
 
 	} else if (this._state === states.PANNING) {
-
-		this._pan.update(gm.Input.mouseX, gm.Input.mouseY);
+		this._pan.update(mx, my);
 
 	} else if (this._state === states.SELECTING) {
-		
+		this._localCamera.canvasToWorldPos(mx, my, res);
 		this._selector.update(res.x, res.y);
-		if (!gm.Input.mousedown) {
-			this.finishSelecting();
-		}
 	}
 };
 
@@ -134,6 +128,7 @@ SelectTileset.prototype.hasSelected = function() {
 
 SelectTileset.prototype.startSelecting = function() {
 	this._state = states.SELECTING;
+	this._localCamera.canvasToWorldPos(this._mx, this._my, res);
 	this._selector.start(res.x, res.y);
 };
 
@@ -143,7 +138,7 @@ SelectTileset.prototype.finishSelecting = function() {
 
 SelectTileset.prototype.startPanning = function() {
 	this._state = states.PANNING;
-	this._pan.start(gm.Input.mouseX, gm.Input.mouseY);
+	this._pan.start(this._mx, this._my);
 };
 
 SelectTileset.prototype.finishPanning = function() {
@@ -153,7 +148,7 @@ SelectTileset.prototype.finishPanning = function() {
 SelectTileset.prototype.render = function(ctx) {
 	
 	if (!this.isValid()) {
-		gm.Editor.Util.Shapes.X(ctx, gm.Input.mouseX, gm.Input.mouseY);
+		gm.Editor.Util.Shapes.X(ctx, this._mx, this._my);
 	}
 	else {
 		var bbox = this._localCamera._body.getBbox();
@@ -165,7 +160,7 @@ SelectTileset.prototype.render = function(ctx) {
 		ctx.restore();
 
 		if (this._state === states.PANNING) {
-			gm.Editor.Util.Shapes.O(ctx, gm.Input.mouseX, gm.Input.mouseY);
+			gm.Editor.Util.Shapes.O(ctx, this._mx, this._my);
 		}
 		else if (this._selector) this._selector.render(ctx, bbox);
 	}

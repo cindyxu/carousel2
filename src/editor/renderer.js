@@ -26,7 +26,7 @@ var renderLayerMapDebug = function(layer, ctx, bbox) {
 };
 
 var renderEntityDebug = function(entity, ctx, bbox) {
-	entityRenderers[entity._tag].render(ctx, entity.body._x - bbox.x0, entity.body._y - bbox.y0);
+	entityRenderers[entity._tag].render(ctx, entity._body._x - bbox.x0, entity._body._y - bbox.y0);
 };
 
 renderer.init = function() {
@@ -52,7 +52,7 @@ renderer.onLayerParamsChanged = function(layer) {
 };
 
 renderer.onEntityChanged = function(entity) {
-	entityRenderers[entity._tag] = new gm.Renderer.DebugEntity(entity);
+	entityRenderers[entity._tag] = new gm.Renderer.DebugEntity(entity._body);
 };
 
 renderer.onLayerRemoved = function(layer) {

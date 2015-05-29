@@ -1,6 +1,12 @@
-gm.Controllers.Player = function(body, params) {
-	this._body = body;
-	this._behavior = new gm.Behaviors.Walker(body, params);
+gm.Controllers.Player = function(params, body, sprite) {
+	this._behavior = new gm.Behaviors.Walker(params, body, sprite);
+};
+
+gm.Controllers.Player.prototype.setBody = function(body) {
+	this._behavior.setBody(body);
+};
+
+gm.Controllers.Player.prototype.setSprite = function(sprite) {
 };
 
 gm.Controllers.Player.prototype.control = function() {
