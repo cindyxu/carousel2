@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 if (!gm.Editor) gm.Editor = {};
 if (!gm.Editor.Tools) gm.Editor.Tools = {};
 
@@ -11,8 +13,6 @@ var Brush = gm.Editor.Tools.Brush = function(layer, params) {
 	this.build(layer);
 };
 
-Brush.prototype = Object.create(gm.Map.prototype);
-////
 Brush.prototype.defaultColor = "yellow";
 
 Brush.prototype.build = function(layer) {
@@ -52,6 +52,7 @@ Brush.prototype._initCollisionBrush = function() {
 var tres = {};
 var pres = {};
 Brush.prototype.render = function(ctx, camera) {
+
 	var layerMap = this._layer._layerMap;
 
 	camera.canvasToWorldPos(this._mx, this._my, pres);
@@ -59,7 +60,6 @@ Brush.prototype.render = function(ctx, camera) {
 
 	this._layer.posToObservedTile(pres.x, pres.y, bbox, tres);
 	this._layer.tileToObservedPos(tres.tx, tres.ty, bbox, pres);
-
 	if (this._renderer) this._renderer.render(ctx, pres.x, pres.y, bbox);
 	if (this._debugRenderer) this._debugRenderer.render(ctx, pres.x, pres.y, bbox);
 };
@@ -77,6 +77,10 @@ Brush.prototype.fromMapArea = function(map, tx, ty, tsx, tsy) {
 Brush.prototype.onMouseMove = function(mx, my) {
 	this._mx = mx;
 	this._my = my;
+	
+	if (LOGGING && (isNaN(this._mx) || isNaN(this._my))) {
+		console.log("!!! brush - mx: ", mx, ", my:", my);
+	}
 };
 
 Brush.prototype.paint = function(camera) {

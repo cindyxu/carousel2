@@ -9,7 +9,7 @@ var states = {
 };
 
 var getTilesetMap = function(layer) {
-	if (layer.isCollision) return undefined;
+	if (layer._isCollision) return undefined;
 
 	var layerMap = layer._layerMap;
 	if (!layerMap._renderer || !layerMap._renderer.isValid()) return undefined;
@@ -106,6 +106,10 @@ SelectTileset.prototype.onMouseMove = function(mx, my) {
 		this._localCamera.canvasToWorldPos(mx, my, res);
 		this._selector.update(res.x, res.y);
 	}
+
+	if (LOGGING && (isNaN(this._mx) || isNaN(this._my))) {
+		console.log("!!! brush - mx: ", mx, ", my:", my);
+	}
 };
 
 SelectTileset.prototype.isIdle = function() {
@@ -125,6 +129,7 @@ SelectTileset.prototype.hasSelected = function() {
 };
 
 SelectTileset.prototype.startSelecting = function() {
+	if (!this._tilesetLayerMap) return;
 	this._state = states.SELECTING;
 	this._localCamera.canvasToWorldPos(this._mx, this._my, res);
 	this._selector.start(res.x, res.y);

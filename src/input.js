@@ -41,7 +41,7 @@ input.mousedownEvt = function(e) {
 	input.lastClickedY = e.pageY - this.offsetTop;
 
 	if (input.bindings.mousedown) {
-		input.bindings.mousedown();
+		input.bindings.mousedown(input.lastClickedX, input.lastClickedY);
 	}
 };
 
@@ -53,7 +53,7 @@ input.mousemoveEvt = function(e) {
 	input.mouseY = e.pageY - this.offsetTop;
 	
 	if (input.bindings.mousemove) {
-		input.bindings.mousemove();
+		input.bindings.mousemove(input.mouseX, input.mouseY);
 	}
 };
 
@@ -61,7 +61,7 @@ input.mouseupEvt = function(e) {
 	input.mousedown = false;
 
 	if (input.bindings.mouseup) {
-		input.bindings.mouseup();
+		input.bindings.mouseup(input.mouseX, input.mouseY);
 	}
 	return false;
 };

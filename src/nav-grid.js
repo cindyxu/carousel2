@@ -161,6 +161,5 @@ NavGrid.prototype._addNewPlatform = function(tx0, tx1, ty) {
 
 NavGrid.prototype.render = function(ctx, bbox) {
 	var tilesize = this._platformMap.tilesize;
-	console.log(tilesize, this._tx, this._ty);
 	this._renderer.render(ctx, this._tx * tilesize, this._ty * tilesize, bbox);
 };

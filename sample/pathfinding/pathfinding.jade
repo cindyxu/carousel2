@@ -1,7 +1,7 @@
 html
 	head
 		link(href="/reset.css", rel="stylesheet")
-		link(href="/style.css", rel="stylesheet")
+		link(href="/sample/pathfinding/pathfinding.css", rel="stylesheet")
 
 		script(src="/underscore-min.js")
 		script(src="/jquery-1.11.2.min.js")
@@ -11,19 +11,38 @@ html
 		script(src="/src/constants.js")
 		script(src="/src/settings.js")
 		script(src="/src/collision-rules.js")
+		script(src="/src/input.js")
 		script(src="/src/map.js")
 		script(src="/src/layer-map.js")
 		script(src="/src/layer.js")
+		script(src="/src/entity.js")
 		script(src="/src/nav-grid.js")
 		script(src="/src/body.js")
 		script(src="/src/camera.js")
+		script(src="/src/level.js")
+		script(src="/src/renderer.js")
+		script(src="/src/renderers/renderer.js")
 		script(src="/src/renderers/map.js")
 		script(src="/src/renderers/map-debug.js")
 		script(src="/src/renderers/map-collision.js")
 		script(src="/src/renderers/map-platform.js")
+		script(src="/src/renderers/entity-debug.js")
+		script(src="/src/editor/util/move-body.js")
 		script(src="/src/editor/tools/brush.js")
-		script(src="/src/sample/sample.js")
-		script(src="/src/sample/pathfinding/init.js")
+		script(src="/src/editor/tools/move.js")
+		script(src="/src/sample/pathfinding/toy-world.js")
+		script(src="/src/sample/pathfinding/editor.js")
+		script(src="/src/sample/pathfinding/search.js")
+		script(src="/src/sample/pathfinding/page-binds.js")
 		
 	body
+		#editor
+			.option
+				button plan path
+			.option
+				label render map
+				input(type="checkbox")#toggle-collision-renderer
+			.option
+				label render navgrid
+				input(type="checkbox")#toggle-navgrid-renderer
 		#game

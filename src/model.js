@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 var model = gm.Level.Model = {};
 
 var assignLayerMapRenderer = function(layerMap, params, callback) {
@@ -50,8 +52,8 @@ model.updateLayer = function(layer, params, callback) {
 
 model.createEntity = function(className, name, callback) {
 	var entityClass = gm.EntityClasses[className];
-	console.log(entityClass);
 	if (!entityClass) {
+		if (LOGGING) console.log("!!! no such entity class", entityClass);
 		if (callback) callback();
 		return;
 	}

@@ -19,9 +19,11 @@ gm.Map = function(params) {
 
 gm.Map.prototype.onChanged = function() {
 	if (LOGGING) {
-		if (isNaN(this._tilesX)) console.log("!!! tilesX was NaN");
-		if (isNaN(this._tilesY)) console.log("!!! tilesY was NaN");
-		if (isNaN(this.tilesize)) console.log("!!! tilesize was NaN");
+		if (isNaN(this._tilesX) || isNaN(this._tilesY) || isNaN(this.tilesize)) {
+			console.log("!!! map - tilesX:", this._tilesX, "tilesY:", this._tilesY, ", tilesize", this.tilesize);
+			var err = new Error();
+			console.log(err.stack);
+		}
 	}
 	if (this.listener) this.listener.onMapChanged();
 };
@@ -42,7 +44,6 @@ gm.Map.prototype.setParams = function(params) {
 		}
 	}
 	if (params.tilesize !== undefined) map.tilesize = params.tilesize;
-
 	map.onChanged();
 };
 

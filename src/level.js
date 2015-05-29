@@ -131,6 +131,10 @@ gm.Level.prototype.addNewEntity = function(className, name, layer, callback) {
 };
 
 gm.Level.prototype.addEntity = function(entity, layer) {
+	if (!layer) {
+		if (LOGGING) console.log("!!! addEntity - no layer provided");
+		return;
+	}
 	var entities = this._entities;
 	var e = entities.indexOf(entity);
 	if (e < 0) {

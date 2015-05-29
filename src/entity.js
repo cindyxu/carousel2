@@ -53,14 +53,14 @@ gm.Entity.prototype.setSprite = function(sprite) {
 
 gm.Entity.prototype.setRenderer = function(renderer) {
 	this._renderer = renderer;
-	if (this._body) this._renderer.setBody(this._body);
-	if (this._sprite) this._renderer.setSprite(this._sprite);
+	this._renderer.setBody(this._body);
+	this._renderer.setSprite(this._sprite);
 };
 
 gm.Entity.prototype.setController = function(controller) {
 	this._controller = controller;
-	if (this._body) this._controller.setBody(this._body);
-	if (this._sprite) this._controller.setSprite(this._sprite);
+	this._controller.setBody(this._body);
+	this._controller.setSprite(this._sprite);
 };
 
 gm.Entity.prototype.preUpdate = function() {
@@ -72,8 +72,8 @@ gm.Entity.prototype.postUpdate = function() {
 };
 
 gm.Entity.prototype.render = function(ctx, bbox) {
-	if (this.renderer && this.body && this.body.overlapsBbox(bbox)) {
-		this.renderer.render(ctx, bbox);
+	if (this._renderer && this._body && this._body.overlapsBbox(bbox)) {
+		this._renderer.render(ctx, this._body._x, this._body._y);
 	}
 };
 

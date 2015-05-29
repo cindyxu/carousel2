@@ -82,6 +82,14 @@ gm.Layer.prototype.updateStep = function(delta) {
 	this._layerMap.updateStep(delta);
 };
 
+gm.Layer.prototype.transformPointToLocalSpace = function(px, py, bbox, res) {
+	var sx = px - bbox.x0;
+	var sy = py - bbox.y0;
+
+	res.x = bbox.x0 * this.distX + sx;
+	res.y = bbox.y0 * this.distY + sy;
+};
+
 gm.Layer.prototype.transformBboxToLocalSpace = function(bbox, tbbox) {
 	var layer = this;
 	

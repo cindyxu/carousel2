@@ -102,7 +102,3 @@ editor.render = function(ctx) {
 	editor.renderer.render(ctx, bbox);
 	editor.toolbox.render(ctx, camera);
 };
-
-editor.Tools = {};
-editor.Util = {};
-editor.Renderer = {};

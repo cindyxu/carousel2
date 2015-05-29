@@ -19,6 +19,10 @@ Pan.onMouseMove = function(mx, my) {
 	this._mx = mx;
 	this._my = my;
 	this._panCamera.update(mx, my);
+
+	if (LOGGING && (isNaN(this._mx) || isNaN(this._my))) {
+		console.log("!!! brush - mx: ", mx, ", my:", my);
+	}
 };
 
 Pan.render = function(ctx) {

@@ -181,6 +181,35 @@ toolWrappers.push(panWrapper);
 
 ///////////////////////////////////////////////
 
+console.log(gm.Editor.Tools);
+var Move = gm.Editor.Tools.Move;
+
+var move = new Move();
+var moveWrapper = {
+	onLayerSwitched: function(layer) {
+		move.switchLayer(layer);
+	},
+	shouldSwitchIn: function(camera) {
+		return gm.Input.pressed[gm.Settings.Editor.keyBinds.MOVE] &&
+		move.getMoveObject(gm.Input.mouseX, gm.Input.mouseY, camera);
+	},
+	shouldSwitchOut: function(camera) {
+		return !gm.Input.down[gm.Settings.Editor.keyBinds.MOVE];
+	},
+	switchIn: function(camera) {
+		move.switchIn(gm.Input.mouseX, gm.Input.mouseY, camera);
+	},
+	switchOut: function() {},
+	action: function() {
+		move.onMouseMove(gm.Input.mouseX, gm.Input.mouseY);
+	},
+	render: function(ctx, camera) {
+		move.render(ctx, camera);
+	}
+};
+
+///////////////////////////////////////////////
+
 var holdWrapper;
 var baseWrapper;
 
@@ -224,7 +253,7 @@ var checkActiveTool = function(camera) {
 	}
 	else {
 		for (var i = 0; i < toolWrappers.length; i++) {
-			if (toolWrappers[i].shouldSwitchIn()) {
+			if (toolWrappers[i].shouldSwitchIn(camera)) {
 				var isHoldTool = toolWrappers[i].shouldSwitchOut;
 				if (isHoldTool) {
 					holdWrapper = toolWrappers[i];
