@@ -12,14 +12,14 @@ var getTilesetMap = function(layer) {
 	if (layer.isCollision) return undefined;
 
 	var layerMap = layer._layerMap;
-	if (!layerMap.renderer || !layerMap.renderer.isValid()) return undefined;
+	if (!layerMap._renderer || !layerMap._renderer.isValid()) return undefined;
 
 	var map = layerMap._map,
-		renderer = layerMap.renderer;
+		renderer = layerMap._renderer;
 
 	var tilesX = renderer._imageTilesX / (renderer._framesPerRow || 1);
 	var tilesY = renderer._imageTilesY;
-	
+
 	var tiles = [];
 	for (var y = 0; y < tilesY; y++) {
 		for (var x = 0; x < tilesX; x++) {
@@ -38,9 +38,7 @@ var getTilesetMap = function(layer) {
 		tilesetSrc: renderer._tilesetSrc
 	});
 
-	var tilesetLayerMap = new gm.LayerMap();
-	tilesetLayerMap.setMap(tilesetMap);
-	tilesetLayerMap.renderer = tilesetRenderer;
+	var tilesetLayerMap = new gm.LayerMap(tilesetMap, tilesetRenderer);
 
 	return tilesetLayerMap;
 };

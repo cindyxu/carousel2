@@ -1,5 +1,5 @@
 gm.Renderer.ImageMap = function(map, params) {
-	
+
 	var renderer = this;
 
 	renderer._tilesetSrc = params.tilesetSrc;

@@ -1,5 +1,19 @@
-gm.LayerMap = function(params) {
+var LOGGING = gm.Settings.LOGGING;
+
+gm.LayerMap = function(map, renderer, params) {
+
+	if (arguments.length === 2 && !(renderer instanceof gm.Renderer)) {
+		params = renderer;
+		renderer = undefined;
+	} else if (arguments.length === 1 && !(map instanceof gm.Map)) {
+		params = map;
+		renderer = map = undefined;
+	}
+
 	var layerMap = this;
+
+	layerMap._map = undefined;
+	layerMap._renderer = undefined;
 
 	layerMap._pos = {
 		x: 0,
@@ -14,11 +28,14 @@ gm.LayerMap = function(params) {
 	layerMap._offsetY = 0;
 
 	layerMap.listener = undefined;
-
-	layerMap._map = undefined;
-	layerMap.renderer = undefined;
+	layerMap._renderer = undefined;
 
 	if (params) layerMap.setParams(params);
+
+	if (map) layerMap.setMap(map);
+    else if (LOGGING) console.log("!!! new layermap - no map");
+	
+	if (renderer) layerMap.setRenderer(renderer);
 };
 
 gm.LayerMap.prototype.setParams = function(params) {
@@ -26,7 +43,7 @@ gm.LayerMap.prototype.setParams = function(params) {
 
 	if (params.offsetX !== undefined) layerMap._offsetX = params.offsetX;
 	if (params.offsetY !== undefined) layerMap._offsetY = params.offsetY;
-	
+
 	layerMap.updatePosition();
 
 	layerMap.onChanged();
@@ -36,8 +53,14 @@ gm.LayerMap.prototype.setMap = function(map) {
 	if (this._map) this._map.listener = undefined;
 	this._map = map;
 	
+	if (this.renderer) this.renderer.setMap(this._map);
 	this._map.listener = this;
 	this.onChanged();
+};
+
+gm.LayerMap.prototype.setRenderer = function(renderer) {
+	this._renderer = renderer;
+	this._renderer.setMap(this._map);
 };
 
 gm.LayerMap.prototype.onMapChanged = function() {
@@ -53,7 +76,7 @@ gm.LayerMap.prototype.addTransformation = function(transformFn) {
 };
 
 gm.LayerMap.prototype.render = function(ctx, bbox) {
-	if (this.renderer) this.renderer.render(ctx, this._pos.x, this._pos.y, bbox);
+	if (this._renderer) this._renderer.render(ctx, this._pos.x, this._pos.y, bbox);
 };
 
 gm.LayerMap.prototype.updateStep = function(delta) {

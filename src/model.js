@@ -4,7 +4,7 @@ var assignLayerMapRenderer = function(layerMap, params, callback) {
 	var renderer;
 
 	var onRendererPrepared = function() {
-		layerMap.renderer = renderer;
+		layerMap.setRenderer(renderer);
 		if (callback) callback();
 	};
 
@@ -27,8 +27,7 @@ var assignLayerMapRenderer = function(layerMap, params, callback) {
 model.createLayer = function(params, callback) {
 
 	var map = new gm.Map(params.layerMap.map);
-	var layerMap = new gm.LayerMap(params.layerMap);
-	layerMap.setMap(map);
+	var layerMap = new gm.LayerMap(map, params.layerMap);
 	var layer = new gm.Layer(params.name, layerMap, params);
 
 	if (callback) {

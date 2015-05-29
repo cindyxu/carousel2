@@ -65,7 +65,7 @@ $(function() {
 
 	var fillParamsForLayer = function(layer) {
 		var layerMap = layer._layerMap,
-			renderer = layerMap.renderer,
+			renderer = layerMap._renderer,
 			map = layerMap._map;
 
 		$layerCollisionCheckbox.prop("checked", !!layer._isCollision);

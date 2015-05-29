@@ -3,6 +3,12 @@ var LOGGING = gm.Settings.LOGGING;
 var tag = 0;
 
 gm.Layer = function(name, layerMap, params) {
+
+	if (layerMap && !(layerMap instanceof gm.LayerMap)) {
+		if (!params) params = layerMap;
+		layerMap = undefined;
+	}
+
 	var layer = this;
 
 	layer.name = name;
@@ -17,10 +23,10 @@ gm.Layer = function(name, layerMap, params) {
 
 	layer._isCollision = false;
 
-	if (params) layer.setParams(params);
-
 	layer._layerMap = undefined;
-	layer.setLayerMap(layerMap);
+	if (layerMap) layer.setLayerMap(layerMap);
+
+	if (params) layer.setParams(params);
 
 	layer.listener = undefined;
 

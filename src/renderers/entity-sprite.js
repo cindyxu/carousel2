@@ -1,4 +1,4 @@
-gm.Renderer.EntitySprite = function(params, body, sprite) {
+gm.Renderer.SpriteEntity = function(body, sprite, params) {
 	var renderer = this;
 
 	if (body) renderer.setBody(body);
@@ -19,22 +19,24 @@ gm.Renderer.EntitySprite = function(params, body, sprite) {
 	renderer.load();
 };
 
-gm.Renderer.EntitySprite.prototype.setBody = function(body) {
+gm.Renderer.SpriteEntity.prototype = Object.create(gm.Renderer.prototype);
+
+gm.Renderer.SpriteEntity.prototype.setBody = function(body) {
 	this._body = body;
 };
 
-gm.Renderer.EntitySprite.prototype.setSprite = function(sprite) {
+gm.Renderer.SpriteEntity.prototype.setSprite = function(sprite) {
 	this._sprite = sprite;
 };
 
-gm.Renderer.EntitySprite.prototype.load = function(callback) {
+gm.Renderer.SpriteEntity.prototype.load = function(callback) {
 	var renderer = this;
 	renderer._ires.load(function(image) {
 		if (callback) callback();
 	});
 };
 
-gm.Renderer.EntitySprite.prototype.setParams = function(params) {
+gm.Renderer.SpriteEntity.prototype.setParams = function(params) {
 	var renderer = this;
 	
 	if (params.sizeX !== undefined) renderer.sizeX = params.sizeX;
@@ -47,7 +49,7 @@ gm.Renderer.EntitySprite.prototype.setParams = function(params) {
 	if (params.flipY !== undefined) renderer.flipY = params.flipY;
 };
 
-gm.Renderer.EntitySprite.prototype.render = function(ctx, x, y) {
+gm.Renderer.SpriteEntity.prototype.render = function(ctx, x, y) {
 	var renderer = this;
 	var body = renderer._body;
 	var sprite = renderer._sprite;
@@ -58,7 +60,7 @@ gm.Renderer.EntitySprite.prototype.render = function(ctx, x, y) {
 	renderer.renderInternal(ctx, x, y, targetFrame, body._sizeX, body._sizeY);
 };
 
-gm.Renderer.EntitySprite.prototype.renderInternal = function(ctx, x, y, rframe, containerX, containerY) {
+gm.Renderer.SpriteEntity.prototype.renderInternal = function(ctx, x, y, rframe, containerX, containerY) {
 	var renderer = this;
 
 	var numFramesX = Math.floor(renderer.image.width / renderer.sizeX);

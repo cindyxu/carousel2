@@ -2,6 +2,8 @@ gm.Renderer.DebugEntity = function(body, sprite) {
 	this.setBody(body);
 };
 
+gm.Renderer.DebugEntity.prototype = Object.create(gm.Renderer.prototype);
+
 gm.Renderer.DebugEntity.prototype.setBody = function(body) {
 	this._body = body;
 };

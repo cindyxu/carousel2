@@ -31,9 +31,9 @@ Brush.prototype.build = function(layer) {
 		renderer = new gm.Renderer.CollisionMap(brush._map);
 	}
 	else {
-		if (layer._layerMap.renderer) {
+		if (layer._layerMap._renderer) {
 			renderer = new gm.Renderer.ImageMap(brush._map, {
-				tilesetSrc: layer._layerMap.renderer._tilesetSrc
+				tilesetSrc: layer._layerMap._renderer._tilesetSrc
 			});
 		}
 	}

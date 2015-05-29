@@ -22,8 +22,7 @@ var tileLayer;
 		tilesY: TILES_Y,
 		tilesize: TILESIZE
 	});
-	var tileLayerMap = new gm.LayerMap();
-	tileLayerMap.setMap(tileMap);
+	var tileLayerMap = new gm.LayerMap(tileMap);
 	tileLayer = new gm.Layer("tileMap", tileLayerMap, {
 		isCollision: true
 	});

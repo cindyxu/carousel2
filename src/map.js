@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 var X = gm.Constants.Dim.X,
 	Y = gm.Constants.Dim.Y;
 
@@ -16,6 +18,11 @@ gm.Map = function(params) {
 };
 
 gm.Map.prototype.onChanged = function() {
+	if (LOGGING) {
+		if (isNaN(this._tilesX)) console.log("!!! tilesX was NaN");
+		if (isNaN(this._tilesY)) console.log("!!! tilesY was NaN");
+		if (isNaN(this.tilesize)) console.log("!!! tilesize was NaN");
+	}
 	if (this.listener) this.listener.onMapChanged();
 };
 

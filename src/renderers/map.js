@@ -9,7 +9,13 @@ gm.Renderer.Map = function(map, params) {
 		if (params.repeatY !== undefined) renderer.repeatY = params.repeatY;
 	}
 
-	renderer.map = map;
+	if (map) renderer.setMap(map);
+};
+
+gm.Renderer.Map.prototype = Object.create(gm.Renderer.prototype);
+
+gm.Renderer.Map.prototype.setMap = function(map) {
+	this.map = map;
 };
 
 gm.Renderer.Map.prototype.toJSON = function() {

@@ -71,12 +71,10 @@ NavGrid.prototype.generateCombinedLayerMap = function(layers) {
 
 	this._fillCombinedMap(combinedMap, tx, ty, layers);
 
-	var combinedLayerMap = new gm.LayerMap({
+	var combinedLayerMap = new gm.LayerMap(combinedMap, {
 			offsetX: tx * map.tilesize, 
 			offsetY: ty * map.tilesize
-		}
-	);
-	combinedLayerMap.setMap(combinedMap);
+		});
 	
 	return combinedLayerMap;
 };

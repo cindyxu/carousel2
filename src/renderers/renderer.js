@@ -1,0 +1,2 @@
+gm.Renderer = function() {
+};
