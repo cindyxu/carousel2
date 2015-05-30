@@ -1,17 +1,17 @@
 if (!gm.Sample) gm.Sample = {};
 if (!gm.Sample.Pathfinding) gm.Sample.Pathfinding = {};
 
-gm.Sample.Pathfinding.ToyWorld = (function(Values) {
+gm.Sample.Pathfinding.ToyWorld = (function(values) {
 
-	var TILES_X = Values.TILES_X;
-	var TILES_Y = Values.TILES_Y;
-	var TILESIZE = Values.TILESIZE;
-	var SIZE_X = Values.SIZE_X;
-	var SIZE_Y = Values.SIZE_Y;
-	var WALK_SPD = Values.WALK_SPD;
-	var JUMP_SPD = Values.JUMP_SPD;
-	var TERMINAL_V = Values.TERMINAL_V;
-	var FALL_ACCEL = Values.FALL_ACCEL;
+	var TILES_X = values.TILES_X;
+	var TILES_Y = values.TILES_Y;
+	var TILESIZE = values.TILESIZE;
+	var SIZE_X = values.SIZE_X;
+	var SIZE_Y = values.SIZE_Y;
+	var WALK_SPD = values.WALK_SPD;
+	var JUMP_SPD = values.JUMP_SPD;
+	var TERMINAL_V = values.TERMINAL_V;
+	var FALL_ACCEL = values.FALL_ACCEL;
 
 	var camera = new gm.Camera({
 		sizeX : TILES_X * TILESIZE, 
@@ -62,4 +62,4 @@ gm.Sample.Pathfinding.ToyWorld = (function(Values) {
 	};
 
 	return ToyWorld;
-})(gm.Sample.Pathfinding.Values);
+})(gm.Sample.Pathfinding.values);

@@ -1,6 +1,6 @@
 gm.Sample.Pathfinding.Search = function() {
 
-	var Values = gm.Sample.Pathfinding.Values;
+	var values = gm.Sample.Pathfinding.values;
 	var ToyWorld = gm.Sample.Pathfinding.ToyWorld;
 
 	var navGrid = new gm.NavGrid();
@@ -10,12 +10,12 @@ gm.Sample.Pathfinding.Search = function() {
 	var startSearch = function(originPlatform) {
 		platformSearch = new gm.Pathfinder.Walker.PlatformSearch(
 			navGrid._platformMap,
-			Values.SIZE_X,
-			Values.SIZE_Y, 
-			Values.WALK_SPD,
-			Values.JUMP_SPD,
-			Values.FALL_ACCEL,
-			Values.TERMINAL_V,
+			values.SIZE_X,
+			values.SIZE_Y, 
+			values.WALK_SPD,
+			values.JUMP_SPD,
+			values.FALL_ACCEL,
+			values.TERMINAL_V,
 			originPlatform);
 	};
 

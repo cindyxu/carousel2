@@ -2,7 +2,7 @@ if (!gm.Sample) gm.Sample = {};
 
 gm.Sample.Pathfinding = {};
 
-gm.Sample.Pathfinding.Values = {
+gm.Sample.Pathfinding.values = {
 	TILES_X: 15,
 	TILES_Y: 15,
 	TILESIZE: 32,

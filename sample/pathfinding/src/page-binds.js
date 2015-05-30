@@ -1,6 +1,6 @@
 $(function() {
 
-	var Values = gm.Sample.Pathfinding.Values;
+	var values = gm.Sample.Pathfinding.values;
 	var ToyWorld = gm.Sample.Pathfinding.ToyWorld;
 	var Editor = gm.Sample.Pathfinding.Editor;
 	var Search = gm.Sample.Pathfinding.Search;
@@ -11,8 +11,8 @@ $(function() {
 
 	var $canvas = $("<canvas/>")
 	.prop({
-		width: Values.TILESIZE * Values.TILES_X,
-		height: Values.TILESIZE * Values.TILES_Y
+		width: values.TILESIZE * values.TILES_X,
+		height: values.TILESIZE * values.TILES_Y
 	});
 	$("#game").append($canvas);
 
