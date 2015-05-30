@@ -1,3 +1,5 @@
+if (!gm.Controllers) gm.Controllers = {};
+
 gm.Controllers.Player = function(params, body, sprite) {
 	this._behavior = new gm.Behaviors.Walker(params, body, sprite);
 };

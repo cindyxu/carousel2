@@ -1,5 +1,8 @@
 gm.Game = function() {
 
+	var X = gm.Constants.Dim.X;
+	var Y = gm.Constants.Dim.Y;
+
 	var Game = {
 		_activeLevel: undefined,
 
@@ -13,12 +16,12 @@ gm.Game = function() {
 	};
 
 	Game.init = function() {
-		this._camera = new gm.Camera({
-			sizeX: this._width, 
-			sizeY: this._height
+		Game._camera = new gm.Camera({
+			sizeX: Game._width, 
+			sizeY: Game._height
 		});
-		this._activeLevel = new gm.Level();
-		this._activeLevel.init();
+		Game._activeLevel = new gm.Level();
+		Game._activeLevel.init();
 	};
 
 	Game.play = function() {
@@ -28,7 +31,7 @@ gm.Game = function() {
 	};
 
 	Game.pause = function() {
-		this._playing = false;
+		Game._playing = false;
 		if (LOGGING) console.log("Game is paused");
 	};
 
@@ -56,7 +59,7 @@ gm.Game = function() {
 	};
 
 	Game.render = function(ctx) {
-		gm.Level.Renderer.render(ctx, this._activeLevel, this._camera);
+		gm.Level.Renderer.render(ctx, Game._activeLevel, Game._camera);
 	};
 
 	return Game;

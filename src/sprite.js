@@ -23,9 +23,15 @@ gm.Sprite.prototype.update = function(delta) {
 			// increment loop
 			if (sprite._frame >= animFrames.length) {
 				sprite._loopCount += Math.floor(sprite._frame / animFrames.length);
-				if (anim.loop) sprite._loopCount = Math.min(sprite._loopCount, anim.loop);
+				
+				if (anim.loop) {
+					sprite._loopCount = Math.min(sprite._loopCount, anim.loop);
+				}
 
-				if (sprite._loopCount >= anim.loop) sprite._frame = Math.min(sprite._frame, animFrames.length - 1);
+				if (sprite._loopCount >= anim.loop) {
+					sprite._frame = Math.min(sprite._frame, animFrames.length - 1);
+				}
+				
 				else sprite._frame %= animFrames.length;
 			}
 

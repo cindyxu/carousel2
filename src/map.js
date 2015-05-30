@@ -39,6 +39,7 @@ gm.Map.prototype.setParams = function(params) {
 		}
 	}
 	if (params.tilesize !== undefined) map.tilesize = params.tilesize;
+	
 	map.onChanged();
 };
 
