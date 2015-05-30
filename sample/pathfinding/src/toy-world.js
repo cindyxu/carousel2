@@ -1,25 +1,26 @@
 if (!gm.Sample) gm.Sample = {};
 if (!gm.Sample.Pathfinding) gm.Sample.Pathfinding = {};
 
-var TILES_X = 15;
-var TILES_Y = 15;
-var TILESIZE = 32;
-var SIZE_X = 48;
-var SIZE_Y = 48;
-var WALK_SPD = 60;
-var JUMP_SPD = 0.5 * 200;
-var TERMINAL_V = 200;
-var FALL_ACCEL = 200;
+gm.Sample.Pathfinding.ToyWorld = (function(Values) {
 
-var camera = new gm.Camera({
-	sizeX : TILES_X * TILESIZE, 
-	sizeY: TILES_Y * TILESIZE
-});
+	var TILES_X = Values.TILES_X;
+	var TILES_Y = Values.TILES_Y;
+	var TILESIZE = Values.TILESIZE;
+	var SIZE_X = Values.SIZE_X;
+	var SIZE_Y = Values.SIZE_Y;
+	var WALK_SPD = Values.WALK_SPD;
+	var JUMP_SPD = Values.JUMP_SPD;
+	var TERMINAL_V = Values.TERMINAL_V;
+	var FALL_ACCEL = Values.FALL_ACCEL;
 
-var level = new gm.Level();
+	var camera = new gm.Camera({
+		sizeX : TILES_X * TILESIZE, 
+		sizeY: TILES_Y * TILESIZE
+	});
 
-var layer;
-(function() {
+	var level = new gm.Level();
+
+	var layer;
 	var map = new gm.Map({
 		tilesX: TILES_X,
 		tilesY: TILES_Y,
@@ -29,10 +30,8 @@ var layer;
 	layer = new gm.Layer("map", layerMap, {
 		isCollision: true
 	});
-})();
 
-var entity;
-(function() {
+	var entity;
 	var body = new gm.Body({
 		sizeX: SIZE_X,
 		sizeY: SIZE_Y,
@@ -44,21 +43,23 @@ var entity;
 	entity = new gm.Entity("player");
 	entity.setBody(body);
 	entity.setRenderer(bodyRenderer);
-})();
 
-level.addLayer(layer);
-level.addEntity(entity, layer);
+	level.addLayer(layer);
+	level.addEntity(entity, layer);
 
-gm.Sample.Pathfinding.ToyWorld = {
-	_layer: layer,
-	_entity: entity,
-	_level: level,
-	_camera: camera
-};
+	var ToyWorld = {
+		_layer: layer,
+		_entity: entity,
+		_level: level,
+		_camera: camera
+	};
 
-gm.Sample.Pathfinding.ToyWorld.render = function(ctx) {
-	ctx.fillStyle = "black";
-	ctx.fillRect(0, 0, TILES_X * TILESIZE, TILES_Y * TILESIZE);
+	ToyWorld.render = function(ctx) {
+		ctx.fillStyle = "black";
+		ctx.fillRect(0, 0, TILES_X * TILESIZE, TILES_Y * TILESIZE);
 
-	gm.Level.Renderer.render(ctx, level, camera);
-};
+		gm.Level.Renderer.render(ctx, level, camera);
+	};
+
+	return ToyWorld;
+})(gm.Sample.Pathfinding.Values);

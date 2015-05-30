@@ -1,8 +1,6 @@
-var LOGGING = gm.Settings.LOGGING;
+gm.Level.Model = {};
 
-var model = gm.Level.Model = {};
-
-var assignLayerMapRenderer = function(layerMap, params, callback) {
+gm.Level.Model.assignLayerMapRenderer = function(layerMap, params, callback) {
 	var renderer;
 
 	var onRendererPrepared = function() {
@@ -26,38 +24,38 @@ var assignLayerMapRenderer = function(layerMap, params, callback) {
 	} else onRendererPrepared();
 };
 
-model.createLayer = function(params, callback) {
+gm.Level.Model.createLayer = function(params, callback) {
 
 	var map = new gm.Map(params.layerMap.map);
 	var layerMap = new gm.LayerMap(map, params.layerMap);
 	var layer = new gm.Layer(params.name, layerMap, params);
 
 	if (callback) {
-		assignLayerMapRenderer(layerMap, params, function() {
+		gm.Level.Model.assignLayerMapRenderer(layerMap, params, function() {
 			callback(layer);
 		});
 	} else {
-		assignLayerMapRenderer(layerMap, params);
+		gm.Level.Model.assignLayerMapRenderer(layerMap, params);
 	}
 	return layer;
 };
 
-model.updateLayer = function(layer, params, callback) {
+gm.Level.Model.updateLayer = function(layer, params, callback) {
 	layer.setParams(params);
 	layer._layerMap.setParams(params.layerMap);
 	layer._layerMap._map.setParams(params.layerMap.map);
 
-	assignLayerMapRenderer(layer._layerMap, params, callback);
+	gm.Level.Model.assignLayerMapRenderer(layer._layerMap, params, callback);
 };
 
-model.createEntity = function(className, name, callback) {
+gm.Level.Model.createEntity = function(className, name, callback) {
 	var entityClass = gm.EntityClasses[className];
 	if (!entityClass) {
 		if (LOGGING) console.log("!!! no such entity class", entityClass);
 		if (callback) callback();
 		return;
 	}
-	var entity = entityClass.create(name, callback);
+	var entity = new entityClass(name, callback);
 	entity.className = className;
 	return entity;
 };

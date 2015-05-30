@@ -1,5 +1,3 @@
-var LOGGING = gm.Settings.LOGGING;
-
 gm.LayerMap = function(map, renderer, params) {
 
 	if (arguments.length === 2 && !(renderer instanceof gm.Renderer)) {

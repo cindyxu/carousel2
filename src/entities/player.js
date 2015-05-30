@@ -1,29 +1,32 @@
-var spriteSrc = "images/spritesheets/player.png";
+if (!gm.EntityClasses) gm.EntityClasses = {};
 
-var bodyParams = {
-	sizeX: 16,
-	sizeY: 16,
-	maxVelX: 60,
-	maxVelY: 200,
-	dampX: 5,
-	dampY: 0,
-	weight: 200
-};
+gm.EntityClasses.Player = function() {
 
-var controllerParams = {
-	walkForce: 120,
-	jumpImpulse: 0.5,
-	maxJumps: 1
-};
+	var spriteSrc = "images/spritesheets/player.png";
 
-var entityParams = {
-	collideBodyType: gm.Constants.Collision.bodyTypes.ALL,
-	collideMapType: gm.Constants.Collision.mapTypes.STICKY,
-	drawIndex: -99
-};
+	var bodyParams = {
+		sizeX: 16,
+		sizeY: 16,
+		maxVelX: 60,
+		maxVelY: 120,
+		dampX: 5,
+		dampY: 0,
+		weight: 200
+	};
 
-gm.EntityClasses.Player = {
-	create: function(name, callback) {
+	var controllerParams = {
+		walkForce: 120,
+		jumpImpulse: 0.5,
+		maxJumps: 1
+	};
+
+	var entityParams = {
+		collideBodyType: gm.Constants.Collision.bodyTypes.ALL,
+		collideMapType: gm.Constants.Collision.mapTypes.STICKY,
+		drawIndex: -99
+	};
+
+	return function(name, callback) {
 		var body = new gm.Body(bodyParams);
 		//var renderer = new gm.Renderer.EntitySprite(body, sprite);
 		var controller = new gm.Controllers.Player(controllerParams, body);
@@ -37,5 +40,6 @@ gm.EntityClasses.Player = {
 			callback(entity);
 		}
 		return entity;
-	}
-};
+	};
+	
+}();

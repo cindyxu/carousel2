@@ -1,7 +1,3 @@
-var X = gm.Constants.Dim.X;
-var Y = gm.Constants.Dim.Y;
-var LOGGING = gm.Settings.LOGGING;
-
 gm.Level = function() {
 	var level = this;
 
@@ -70,7 +66,7 @@ gm.Level.prototype.addLayer = function(layer) {
 gm.Level.prototype.updateLayer = function(layer, params, callback) {
 	var level = this;
 	var layers = level._layers;
-	model.updateLayer(layer, params, function() {
+	gm.Level.Model.updateLayer(layer, params, function() {
 		if (LOGGING) console.log("updated layer");
 		
 		var coli = level._collisionLayers.indexOf(coli);
@@ -126,7 +122,6 @@ gm.Level.prototype.addNewEntity = function(className, name, layer, callback) {
 	gm.Level.Model.createEntity(className, name, function(entity) {
 		level.addEntity(entity, layer);
 		if (callback) callback(entity);
-
 	});
 };
 

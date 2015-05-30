@@ -1,35 +1,41 @@
-var states = {
-	IDLE: 0,
-	RUNNING: 1,
-	FINISHED: 2
-};
-
 gm.Cutscene = function() {
-	this.events = [];
-	this.eventIndex = 0;
-	this.state = states.IDLE;
-};
 
-gm.Cutscene.prototype.update = function(elapsed) {
-	if (this.state !== states.RUNNING) return;
+	var states = {
+		IDLE: 0,
+		RUNNING: 1,
+		FINISHED: 2
+	};
 
-	this.events[this.eventIndex].update(elapsed);
-	if (this.events[this.eventIndex].isFinished()) {
-		this.eventIndex++;
-		if (this.eventIndex >= this.events.length) {
-			this.state = states.FINISHED;
-			return;
+	var Cutscene = function() {
+		this.events = [];
+		this.eventIndex = 0;
+		this.state = states.IDLE;
+	};
+
+	Cutscene.prototype.update = function(elapsed) {
+		if (this.state !== states.RUNNING) return;
+
+		this.events[this.eventIndex].update(elapsed);
+		if (this.events[this.eventIndex].isFinished()) {
+			this.eventIndex++;
+			if (this.eventIndex >= this.events.length) {
+				this.state = states.FINISHED;
+				return;
+			}
+			this.events[this.eventIndex].start();
 		}
-		this.events[this.eventIndex].start();
-	}
-};
+	};
 
-gm.Cutscene.prototype.start = function() {
-	this.eventIndex = 0;
-	if (this.events.length > 0) {
-		this.state = states.RUNNING;
-		this.events[this.eventIndex].start();
-	} else {
-		this.state = states.FINISHED;
-	}
-};
+	Cutscene.prototype.start = function() {
+		this.eventIndex = 0;
+		if (this.events.length > 0) {
+			this.state = states.RUNNING;
+			this.events[this.eventIndex].start();
+		} else {
+			this.state = states.FINISHED;
+		}
+	};
+
+	return Cutscene;
+
+}();

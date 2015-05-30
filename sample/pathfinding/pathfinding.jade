@@ -33,19 +33,21 @@ html
 		script(src="/src/editor/tools/brush.js")
 		script(src="/src/editor/tools/erase.js")
 		script(src="/src/editor/tools/move.js")
+		script(src="/sample/pathfinding/src/values.js")
 		script(src="/sample/pathfinding/src/toy-world.js")
 		script(src="/sample/pathfinding/src/editor.js")
 		script(src="/sample/pathfinding/src/search.js")
 		script(src="/sample/pathfinding/src/page-binds.js")
 		
 	body
+		h1 PATHFINDING TEST
 		#editor
 			.option
-				button plan path
+				button#plan-path plan path
 			.option
-				label render map
-				input(type="checkbox")#toggle-collision-renderer
+				label render level
+				input(type="checkbox")#toggle-level-renderer
 			.option
 				label render navgrid
-				input(type="checkbox")#toggle-navgrid-renderer
+				input(type="checkbox")#toggle-nav-grid-renderer
 		#game

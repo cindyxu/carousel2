@@ -1,60 +1,64 @@
-var LOGGING = gm.Settings.LOGGING;
+gm.Game = function() {
 
-var game = gm.Game = {
-	_activeLevel: undefined,
+	var Game = {
+		_activeLevel: undefined,
 
-	_playing: false,
-	_lastRun: undefined,
+		_playing: false,
+		_lastRun: undefined,
 
-	_width : gm.Settings.Game.WIDTH,
-	_height : gm.Settings.Game.HEIGHT,
-	_tickStep : gm.Settings.Game.TICKSTEP,
-	_maxTicks : gm.Settings.Game.MAX_TICKS,
-};
+		_width : gm.Settings.Game.WIDTH,
+		_height : gm.Settings.Game.HEIGHT,
+		_tickStep : gm.Settings.Game.TICKSTEP,
+		_maxTicks : gm.Settings.Game.MAX_TICKS,
+	};
 
-gm.Game.init = function() {
-	this._camera = new gm.Camera({
-		sizeX: this._width, 
-		sizeY: this._height
-	});
-	this._activeLevel = new gm.Level();
-	this._activeLevel.init();
-};
+	Game.init = function() {
+		this._camera = new gm.Camera({
+			sizeX: this._width, 
+			sizeY: this._height
+		});
+		this._activeLevel = new gm.Level();
+		this._activeLevel.init();
+	};
 
-gm.Game.play = function() {
-	game._playing = true;
-	game._lastRun = Date.now();
-	if (LOGGING) console.log("game is playing");
-};
+	Game.play = function() {
+		Game._playing = true;
+		Game._lastRun = Date.now();
+		if (LOGGING) console.log("Game is playing");
+	};
 
-gm.Game.pause = function() {
-	this._playing = false;
-	if (LOGGING) console.log("game is paused");
-};
+	Game.pause = function() {
+		this._playing = false;
+		if (LOGGING) console.log("Game is paused");
+	};
 
-gm.Game.update = function() {
-	if (!game._playing) return;
+	Game.update = function() {
+		if (!Game._playing) return;
 
-	var now = Date.now();
+		var now = Date.now();
 
-	var targetTicks = Math.min(game._maxTicks, 
-		Math.floor((now - game._lastRun) / game._tickStep));
+		var targetTicks = Math.min(Game._maxTicks, 
+			Math.floor((now - Game._lastRun) / Game._tickStep));
 
-	var level = game._activeLevel;
+		var level = Game._activeLevel;
 
-	level.preUpdate();
+		level.preUpdate();
 
-	for (var i = 0; i < targetTicks; i++) {
-		level.updateStep(game._tickStep, X);
-		level.updateStep(game._tickStep, Y);
-	}
+		for (var i = 0; i < targetTicks; i++) {
+			level.updateStep(Game._tickStep, X);
+			level.updateStep(Game._tickStep, Y);
+		}
 
-	var deltaTime = targetTicks * game._tickStep;
-	level.postUpdate(deltaTime);
-	
-	game._lastRun += deltaTime;
-};
+		var deltaTime = targetTicks * Game._tickStep;
+		level.postUpdate(deltaTime);
+		
+		Game._lastRun += deltaTime;
+	};
 
-gm.Game.render = function(ctx) {
-	gm.Level.Renderer.render(ctx, this._activeLevel, this._camera);
-};
+	Game.render = function(ctx) {
+		gm.Level.Renderer.render(ctx, this._activeLevel, this._camera);
+	};
+
+	return Game;
+
+}();

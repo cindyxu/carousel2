@@ -1,104 +1,100 @@
 if (!gm.Editor) gm.Editor = {};
-var editor = gm.Editor;
 
-var editorSettings = gm.Settings.Editor,
-	editorDefaults = gm.Settings.Editor.Defaults;
+gm.Editor._level = undefined;
+gm.Editor._layer = undefined;
+gm.Editor._entity = undefined;
 
-editor._level = undefined;
-editor._layer = undefined;
-editor._entity = undefined;
-
-editor.init = function() {
-	editor._level = gm.Game._activeLevel;
-	editor.renderer.init();
+gm.Editor.init = function() {
+	gm.Editor._level = gm.Game._activeLevel;
+	gm.Editor._renderer.init();
 };
 
-editor.addNewLayer = function(params, callback) {
-	var level = editor._level;
+gm.Editor.addNewLayer = function(params, callback) {
+	var level = gm.Editor._level;
 	var layer = level.addNewLayer(params, function(layer) {
-		editor.onLayerParamsChanged(layer);
+		gm.Editor.onLayerParamsChanged(layer);
 		if (callback) callback(layer);
 	});
 	return layer;
 };
 
-editor.updateLayer = function(layer, params, callback) {
-	var level = editor._level;
+gm.Editor.updateLayer = function(layer, params, callback) {
+	var level = gm.Editor._level;
 	level.updateLayer(layer, params, function() {
-		editor.onLayerParamsChanged(layer);
+		gm.Editor.onLayerParamsChanged(layer);
 		// force refresh
 		level.resolveLevelChange();
 		if (callback) callback(true);
 	});
 };
 
-editor.onLayerParamsChanged = function(layer) {
-	editor.renderer.onLayerParamsChanged(layer);
-	editor.toolbox.onLayerChanged(layer);
+gm.Editor.onLayerParamsChanged = function(layer) {
+	gm.Editor._renderer.onLayerParamsChanged(layer);
+	gm.Editor._toolbox.onLayerChanged(layer);
 };
 
-editor.onEntityChanged = function(entity) {
-	editor.renderer.onEntityChanged(entity);
+gm.Editor.onEntityChanged = function(entity) {
+	gm.Editor._renderer.onEntityChanged(entity);
 };
 
-editor.selectLayer = function(layer) {
-	editor._layer = layer;
-	editor.toolbox.onLayerSwitched(layer);
+gm.Editor.selectLayer = function(layer) {
+	gm.Editor._layer = layer;
+	gm.Editor._toolbox.onLayerSwitched(layer);
 };
 
-editor.selectEntity = function(entity) {
-	editor._entity = entity;
+gm.Editor.selectEntity = function(entity) {
+	gm.Editor._entity = entity;
 };
 
-editor.addNewEntity = function(className, name, callback) {
-	var level = editor._level;
+gm.Editor.addNewEntity = function(className, name, callback) {
+	var level = gm.Editor._level;
 	
-	if (!editor._layer) {
+	if (!gm.Editor._layer) {
 		if (callback) callback(); 
 		return;
 	}
-	var entity = level.addNewEntity(className, name, editor._layer, function(entity) {
+	var entity = level.addNewEntity(className, name, gm.Editor._layer, function(entity) {
 		if (!entity) {
 			if (callback) callback(); 
 			return;
 		}
-		editor.onEntityChanged(entity);
+		gm.Editor.onEntityChanged(entity);
 		if (callback) callback(entity);
 	});
 };
 
-editor.playGame = function() {
+gm.Editor.playGame = function() {
 	gm.Game.play();
 };
 
-editor.pauseGame = function() {
+gm.Editor.pauseGame = function() {
 	gm.Game.pause();
 };
 
-editor.update = function() {
+gm.Editor.update = function() {
 	if (gm.Game._playing) {
 		if (gm.Input.pressed[gm.Settings.Editor.keyBinds.TOGGLE_PLAY]) {
-			editor.pauseGame();
+			gm.Editor.pauseGame();
 		}
 		else return;
 	} else {
 		if (gm.Input.pressed[gm.Settings.Editor.keyBinds.TOGGLE_PLAY]) {
-			editor.playGame();
+			gm.Editor.playGame();
 			return;
 		}
 	}
 
-	if (editor._layer) {
-		editor.toolbox.action(gm.Game._camera);
+	if (gm.Editor._layer) {
+		gm.Editor._toolbox.action(gm.Game._camera);
 	}
 };
 
-editor.render = function(ctx) {
+gm.Editor.render = function(ctx) {
 	// if (gm.Game._playing) return;
 
 	var camera = gm.Game._camera;
 	var bbox = camera._body.getBbox();
 
-	editor.renderer.render(ctx, bbox);
-	editor.toolbox.render(ctx, camera);
+	gm.Editor._renderer.render(ctx, bbox);
+	gm.Editor._toolbox.render(ctx, camera);
 };

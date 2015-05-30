@@ -1,5 +1,3 @@
-var LOGGING = gm.Settings.LOGGING;
-
 gm.Body = function(params) {
 	var body = this;
 	
@@ -194,6 +192,8 @@ gm.Body.prototype.updateStepY = function(delta) {
 	body.vy += (body.ay - (body.vy * body._dampY)) * delta;
 	if (body.vy < -body._maxVelY) body.vy = -body._maxVelY;
 	else if (body.vy > body._maxVelY) body.vy = body._maxVelY;
+
+	console.log(body.vy);
 
 	body._measurementsDirty = true;
 };

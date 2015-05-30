@@ -1,8 +1,3 @@
-var LOGGING = gm.Settings.LOGGING;
-
-var X = gm.Constants.Dim.X,
-	Y = gm.Constants.Dim.Y;
-
 gm.Map = function(params) {
 	var map = this;
 	
@@ -63,7 +58,7 @@ gm.Map.prototype.clampTile = function(tx, ty, res) {
 };
 
 gm.Map.prototype.clampTileDim = function(td, dim) {
-	if (dim === X) return Math.min(Math.max(td, 0), this._tilesX);
+	if (dim === gm.Constants.Dim.X) return Math.min(Math.max(td, 0), this._tilesX);
 	else return Math.min(Math.max(td, 0), this._tilesY);
 };
 

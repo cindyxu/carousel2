@@ -2,20 +2,32 @@
 	box-sizing: border-box
 
 body
-	background-color: #ffffaa
+	background-color: #aaeedd
 	width: 100%
 	height: 100%
 	font-family: Helvetica
-	font-size: 10px
+	font-size: 14px
 	overflow-y: hidden
+	padding: 2rem
+
+button
+	font-family: Helvetica
+	font-size: 14px
+	font-weight: bold
 
 #editor
 	float: left
-	padding: 2rem
+	padding-top: 1rem
+	padding-bottom: 1rem
+	padding-right: 2rem
 	
 #game
+	padding-top: 1rem
+	padding-bottom: 1rem
 	float: left
-	padding: 2rem
 	
 .option
 	margin: 0.2rem 0
+	
+h1
+	font-size: 28px

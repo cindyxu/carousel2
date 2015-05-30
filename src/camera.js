@@ -15,7 +15,7 @@ gm.Camera.prototype.update = function(delta) {
 };
 
 gm.Camera.prototype.track = function(target) {
-	this._controller = createTrackController(this, target);
+	this._controller = this.createTrackController(this, target);
 };
 
 gm.Camera.prototype.canvasToWorldPos = function(cx, cy, res) {
@@ -28,7 +28,7 @@ gm.Camera.prototype.worldToCanvasPos = function(wx, wy, res) {
 	res.y = wy - this._body._y;
 };
 
-var createTrackController = function(camera, target) {
+gm.Camera.prototype.createTrackController = function(camera, target) {
 	return {
 		update: function(delta) {
 			var tcenter = target.getCenter();

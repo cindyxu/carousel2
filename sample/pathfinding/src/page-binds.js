@@ -1,20 +1,15 @@
-var Pathfinding = gm.Sample.Pathfinding;
-var ToyWorld = Pathfinding.ToyWorld;
-var Editor = Pathfinding.Editor;
-var Search = Pathfinding.Search;
+$(function(Values, Toyworld, Editor, Search) {
 
-$(function() {
+	var $planPathButton = $("#plan-path");
+	var $toggleLevelRendererCheckbox = $("#toggle-level-renderer");
+	var $toggleNavGridRendererCheckbox = $("#toggle-nav-grid-renderer");
+
 	var $canvas = $("<canvas/>")
 	.prop({
-		width: TILESIZE * TILES_X,
-		height: TILESIZE * TILES_Y
+		width: Values.TILESIZE * Values.TILES_X,
+		height: Values.TILESIZE * Values.TILES_Y
 	});
 	$("#game").append($canvas);
-
-	var render = function() {
-		Pathfinding.ToyWorld.render(ctx);
-		Pathfinding.Editor.render(ctx);
-	};
 
 	gm.Input.bind($canvas);
 	gm.Input.setListener('mousedown', function() {
@@ -46,6 +41,17 @@ $(function() {
 		render();
 	});
 
+	$("#plan-path").click(function(e) {
+		Search.planPath();
+		render();
+	});
+
+	var render = function() {
+		ToyWorld.render(ctx);
+		Editor.render(ctx);
+	};
+
 	ctx = $canvas[0].getContext("2d");
 	render();
-});
+
+})(gm.Sample.Pathfinding.Values, gm.Sample.Pathfinding.ToyWorld, gm.Sample.Pathfinding.Editor, gm.Sample.Pathfinding.Search);

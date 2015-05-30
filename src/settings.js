@@ -2,6 +2,8 @@ gm.Settings = {
 	LOGGING: true
 };
 
+LOGGING = gm.Settings.LOGGING;
+
 gm.Settings.Game = {
 	WIDTH: 800,
 	HEIGHT: 600,
