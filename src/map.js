@@ -16,8 +16,6 @@ gm.Map.prototype.onChanged = function() {
 	if (LOGGING) {
 		if (isNaN(this._tilesX) || isNaN(this._tilesY) || isNaN(this.tilesize)) {
 			console.log("!!! map - tilesX:", this._tilesX, "tilesY:", this._tilesY, ", tilesize", this.tilesize);
-			var err = new Error();
-			console.log(err.stack);
 		}
 	}
 	if (this.listener) this.listener.onMapChanged();

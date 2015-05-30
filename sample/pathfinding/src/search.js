@@ -18,18 +18,17 @@ gm.Sample.Pathfinding.Search = function() {
 
 		navGrid.fromLayers(ToyWorld._level._layers);
 
-		var body = ToyWorld._body;
+		// var body = ToyWorld._body;
 
-
-		platformSearch = new gm.Pathfinder.Walker.PlatformSearch(
-			navGrid._platformMap,
-			values.SIZE_X,
-			values.SIZE_Y, 
-			values.WALK_SPD,
-			values.JUMP_SPD,
-			values.FALL_ACCEL,
-			values.TERMINAL_V,
-			originPlatform);
+		// platformSearch = new gm.Pathfinder.Walker.PlatformSearch(
+		// 	navGrid._platformMap,
+		// 	values.SIZE_X,
+		// 	values.SIZE_Y, 
+		// 	values.WALK_SPD,
+		// 	values.JUMP_SPD,
+		// 	values.FALL_ACCEL,
+		// 	values.TERMINAL_V,
+		// 	originPlatform);
 	};
 
 	Search.render = function(ctx) {

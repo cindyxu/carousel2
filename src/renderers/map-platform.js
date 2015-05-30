@@ -12,12 +12,14 @@ gm.Renderer.PlatformMap.prototype.applyStyle = function(ctx) {
 };
 
 gm.Renderer.PlatformMap.prototype.renderTileFn = function(ctx, map, tx, ty) {
-	var ti = map._tiles[ty * map._tilesX + tx];
+	var platform = map._tiles[ty * map._tilesX + tx];
 	var tilesize = map.tilesize;
-	if (!ti) {
+	var ti;
+	if (!platform) {
 		ti = "~";
 		ctx.fillStyle = "gray";
 	} else {
+		ti = platform.index;
 		ctx.fillStyle = "white";
 	}
 	ctx.strokeText(ti, (tx+0.5) * tilesize, (ty+0.5) * tilesize);

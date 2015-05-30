@@ -27,7 +27,7 @@ gm.NavGrid.prototype.removeListener = function(listener) {
 
 gm.NavGrid.prototype.fromLayers = function(layers) {
 	if (layers.length > 0) {
-		var combinedMap = this.generateCombinedLayerMap(layers);
+		var combinedMap = this._generateCombinedLayerMap(layers);
 		this.fromCombinedLayerMap(combinedMap);
 	} else {
 		this.reset();
@@ -37,9 +37,10 @@ gm.NavGrid.prototype.fromLayers = function(layers) {
 gm.NavGrid.prototype.reset = function() {
 	this._tx = this._ty = 0;
 	this._platformMap.resize(0, 0);
+	this._platforms.length = 0;
 };
 
-gm.NavGrid.prototype.generateCombinedLayerMap = function(layers) {
+gm.NavGrid.prototype._generateCombinedLayerMap = function(layers) {
 
 	var tx = 0;
 	var ty = 0;
@@ -94,7 +95,7 @@ gm.NavGrid.prototype._fillCombinedMap = function(combinedMap, tx, ty, layers) {
 				var ctile = combinedMap.tileAt(tx, ty);
 				var otile = map.tileAt(tx0 + tx, ty0 + ty);
 				if (ctile !== undefined || otile !== undefined) {
-					combinedMap.set(tx, ty, ctile | otile);
+					combinedMap.setTile(tx, ty, ctile | otile);
 				}
 			}
 		}
@@ -130,17 +131,28 @@ gm.NavGrid.prototype.fromCombinedLayerMap = function(combinedLayerMap) {
 	this._platformMap.resize(combinedMap._tilesX, combinedMap._tilesY);
 	this._platformMap.tilesize = tilesize;
 
+	this._platforms.length = 0;
+
 	var platformMap = this._platformMap;
 	var pstart = -1;
+	var ptile;
 	for (var ty = 0; ty < platformMap._tilesY; ty++) {
 		for (var tx = 0; tx < platformMap._tilesX; tx++) {
-			if (combinedMap.tileAt(tx, ty) && (pstart < 0)) {
-				pstart = tx;
-			} else if (!combinedMap.tileAt(tx, ty) && pstart >= 0) {
+
+			var ntile = combinedMap.tileAt(tx, ty);
+
+			var shouldFinishPlatform = (pstart >= 0 && !(ntile & gm.Constants.Dir.UP));
+			if (shouldFinishPlatform) {
 				this._addNewPlatform(pstart, tx, ty);
 				pstart = -1;
 			}
+
+			if (ntile && pstart < 0) {
+				pstart = tx;
+				ptile = combinedMap.tileAt(tx, ty);
+			}
 		}
+
 		if (pstart >= 0) {
 			this._addNewPlatform(pstart, platformMap._tilesX, ty);
 			pstart = -1;
@@ -152,7 +164,8 @@ gm.NavGrid.prototype._addNewPlatform = function(tx0, tx1, ty) {
 	var platform = {
 		tx0: tx0,
 		tx1: tx1,
-		ty: ty
+		ty: ty,
+		index: this._platforms.length + 1
 	};
 	this._platforms.push(platform);
 	for (var tx = tx0; tx < tx1; tx++) {

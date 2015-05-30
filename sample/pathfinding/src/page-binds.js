@@ -53,6 +53,7 @@ $(function() {
 
 	var render = function() {
 		ToyWorld.render(ctx);
+		Search.render(ctx);
 		Editor.render(ctx);
 	};
 
