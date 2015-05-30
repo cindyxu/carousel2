@@ -73,19 +73,19 @@ gm.EntityPhysics = function() {
 		var collided = false;
 		var collideDir;
 
-
 		if (dim === X) {
 			if (!body.vx) return;
 
 			var sx = (body.vx < 0 ? bbox.x0 : bbox.x1);
 			layerMap.posToTile(sx, bbox.y0, tres);
+			
 			stileX = tres.tx;
+			if (!map.inRangeX(stileX)) return;
+			
 			stileY = map.clampTileDim(tres.ty, Y);
 
 			layerMap.posToTile(sx, bbox.y1, tres);
 			etileY = map.clampTileDim(tres.ty, Y);
-
-			if (!map.inRange(stileX, stileY) && !map.inRange(stileX, etileY)) return;
 
 			// we only want to intersect tiles strictly < y1
 			layerMap.tileToPos(stileX, etileY, pres0);
@@ -105,17 +105,18 @@ gm.EntityPhysics = function() {
 			
 			var sy = (body.vy < 0 ? bbox.y0 : bbox.y1);
 			layerMap.posToTile(body._x, sy, tres);
+
 			stileY = tres.ty;
+			if (!map.inRangeY(stileY)) return;
+
 			stileX = map.clampTileDim(tres.tx, X);
 
 			layerMap.posToTile(bbox.x1, sy, tres);
 			etileX = map.clampTileDim(tres.tx, X);
 
-			if (!map.inRange(stileX, stileY) && !map.inRange(etileX, stileY)) return;
-
 			// we only want to intersect tiles strictly < x1
-			layerMap.tileToPos(etileX, stileY, pres);
-			if (pres.x >= bbox.x1) etileX--;
+			layerMap.tileToPos(etileX, stileY, pres0);
+			if (pres0.x >= bbox.x1) etileX--;
 
 			for (var x = stileX; x <= etileX; x++) {
 				collided = collided || EntityPhysics.collideBodyWithTile(body, layerMap, x, stileY, dim);

@@ -68,6 +68,14 @@ gm.Map.prototype.inRange = function(tx, ty) {
 		ty >= 0 && ty < this._tilesY;
 };
 
+gm.Map.prototype.inRangeX = function(tx) {
+	return tx >= 0 && tx < this._tilesX;
+};
+
+gm.Map.prototype.inRangeY = function(ty) {
+	return ty >= 0 && ty < this._tilesY;
+};
+
 gm.Map.prototype.tileAt = function(tx, ty) {
 	return this._tiles[ty * this._tilesX + tx];
 };
