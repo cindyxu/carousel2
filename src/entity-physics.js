@@ -62,6 +62,7 @@ gm.EntityPhysics = function() {
 
 	var tres = {};
 	var pres0 = {};
+	var tbbox = {};
 	EntityPhysics.collideEntityWithLayer = function(entity, layer, dim) {
 
 		var tile, stileX, stileY, etileX, etileY;
@@ -76,22 +77,15 @@ gm.EntityPhysics = function() {
 		if (dim === X) {
 			if (!body.vx) return;
 
-			var sx = (body.vx < 0 ? bbox.x0 : bbox.x1);
-			layerMap.posToTile(sx, bbox.y0, tres);
-			
-			stileX = tres.tx;
+			layerMap.getOverlappingTileBbox(bbox, tbbox);
+
+			stileX = (body.vx < 0 ? tbbox.tx0 : tbbox.tx1 - 1);
 			if (!map.inRangeX(stileX)) return;
 			
-			stileY = map.clampTileDim(tres.ty, Y);
+			stileY = map.clampTileDim(tbbox.ty0, Y);
+			etileY = map.clampTileDim(tbbox.ty1, Y);
 
-			layerMap.posToTile(sx, bbox.y1, tres);
-			etileY = map.clampTileDim(tres.ty, Y);
-
-			// we only want to intersect tiles strictly < y1
-			layerMap.tileToPos(stileX, etileY, pres0);
-			if (pres0.y >= bbox.y1) etileY--;
-
-			for (var y = stileY; y <= etileY; y++) {
+			for (var y = stileY; y < etileY; y++) {
 				collided = collided || EntityPhysics.collideBodyWithTile(body, layerMap, stileX, y, dim);
 			}
 
@@ -103,22 +97,15 @@ gm.EntityPhysics = function() {
 		} else {
 			if (!body.vy) return;
 			
-			var sy = (body.vy < 0 ? bbox.y0 : bbox.y1);
-			layerMap.posToTile(body._x, sy, tres);
+			layerMap.getOverlappingTileBbox(bbox, tbbox);
 
-			stileY = tres.ty;
-			if (!map.inRangeY(stileY)) return;
+			stileY = (body.vy < 0 ? tbbox.ty0 : tbbox.ty1 - 1);
+			if (!map.inRangeX(stileY)) return;
+			
+			stileX = map.clampTileDim(tbbox.tx0, X);
+			etileX = map.clampTileDim(tbbox.tx1, X);
 
-			stileX = map.clampTileDim(tres.tx, X);
-
-			layerMap.posToTile(bbox.x1, sy, tres);
-			etileX = map.clampTileDim(tres.tx, X);
-
-			// we only want to intersect tiles strictly < x1
-			layerMap.tileToPos(etileX, stileY, pres0);
-			if (pres0.x >= bbox.x1) etileX--;
-
-			for (var x = stileX; x <= etileX; x++) {
+			for (var x = stileX; x < etileX; x++) {
 				collided = collided || EntityPhysics.collideBodyWithTile(body, layerMap, x, stileY, dim);
 			}
 

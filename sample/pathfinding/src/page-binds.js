@@ -6,6 +6,7 @@ $(function() {
 	var Search = gm.Sample.Pathfinding.Search;
 
 	var $planPathButton = $("#plan-path");
+	var $planPathStepButton = $("#plan-path-step");
 	var $toggleLevelRendererCheckbox = $("#toggle-level-renderer");
 	var $toggleNavGridRendererCheckbox = $("#toggle-nav-grid-renderer");
 
@@ -48,6 +49,11 @@ $(function() {
 
 	$("#plan-path").click(function(e) {
 		Search.planPath();
+		render();
+	});
+
+	$("#plan-path-step").click(function(e) {
+		Search.step();
 		render();
 	});
 

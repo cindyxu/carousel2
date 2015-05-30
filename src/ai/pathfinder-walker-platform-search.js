@@ -1,3 +1,6 @@
+if (!gm.Pathfinder) gm.Pathfinder = {};
+if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
+
 gm.Pathfinder.Walker.PlatformSearch = function() {
 
 	var DOWN = gm.Constants.Dir.DOWN;
@@ -61,9 +64,9 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		});
 	};
 
-	PlatformSearch.prototype.render = function(x, y, ctx) {
+	PlatformSearch.prototype.render = function(ctx, bbox) {
 		ctx.save();
-		ctx.translate(x, y);
+		ctx.translate(bbox.x0, bbox.y0);
 		ctx.fillStyle = "rgba(0, 255, 100, 0.3)";
 		ctx.strokeStyle = "rgba(0, 255, 100, 1)";
 		for (var a = 0; a < this._currentAreas.length; a++) {

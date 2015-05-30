@@ -74,6 +74,14 @@ gm.Map.prototype.inRangeY = function(ty) {
 	return ty >= 0 && ty < this._tilesY;
 };
 
+gm.Map.prototype.getOverlappingTileBbox = function(bbox, res) {
+	res.tx0 = Math.floor(bbox.x0 / this.tilesize);
+	res.ty0 = Math.floor(bbox.y0 / this.tilesize);
+
+	res.tx1 = Math.ceil(bbox.x1 / this.tilesize);
+	res.ty1 = Math.ceil(bbox.y1 / this.tilesize);
+};
+
 gm.Map.prototype.tileAt = function(tx, ty) {
 	return this._tiles[ty * this._tilesX + tx];
 };

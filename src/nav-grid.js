@@ -160,6 +160,27 @@ gm.NavGrid.prototype.fromCombinedLayerMap = function(combinedLayerMap) {
 	}
 };
 
+var tres;
+gm.NavGrid.prototype.getPlatformUnderBody = function(body) {
+
+	var bbox = body.getBbox();
+	
+	this.posToTile(bbox.x0, bbox.y1, tres);
+	var stx = tres.tx;
+	stx = this._platformMap.clampTileDim(stx, X);
+	var ty = tres.ty;
+
+	this.posToTile(bbox.x1, bbox.y1, tres);
+	var etx = tres.tx;
+	etx = this._platformMap.clampTileDim(etx, X);
+
+	for (var y = ty; y < this._platformMap._sizeY; y++) {
+		for (var x = stx; x < etx; x++) {
+			
+		}
+	}
+};
+
 gm.NavGrid.prototype._addNewPlatform = function(tx0, tx1, ty) {
 	var platform = {
 		tx0: tx0,
