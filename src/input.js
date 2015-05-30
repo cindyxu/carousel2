@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 var input = gm.Input = {
 	mousedown: false,
 	mouseX: 0,
@@ -112,8 +114,10 @@ input.keydownEvt = function(e) {
 
 	var kstr = input.keyToString(e);
 	input.pressed[kstr] = true;
+	var wasDown = input.down[kstr];
 	input.down[kstr] = true;
-	if (input.bindings.keydown[kstr]) {
+
+	if (!wasDown && input.bindings.keydown[kstr]) {
 		input.bindings.keydown[kstr]();
 	}
 };
@@ -131,15 +135,22 @@ input.keyupEvt = function(e) {
 input.setListener = function(eventType, args0, args1) {
 	var callback, eventParam;
 	// mouse
-	if (eventType.indexOf('mouse') >= 0) {
+	if (eventType === 'mousedown' || 
+		eventType === 'mousemove' || 
+		eventType === 'mouseup') {
+
 		callback = args0;
 		input.bindings[eventType] = callback;
 	}
 	// key
-	else {
+	else if (eventType === 'keydown' || eventType === 'keyup') {
 		eventParam = args0;
 		callback = args1;
+		if (LOGGING && typeof eventParam !== 'string') console.log("!!! input - set listener - no key specified");
 		input.bindings[eventType][eventParam] = callback;
+
+	} else {
+		if (LOGGING) console.log("!!! input - listen event", eventType, "not supported");
 	}
 };
 

@@ -13,7 +13,7 @@ gm.Renderer.DebugEntity.prototype.setSprite = function(sprite) {
 
 gm.Renderer.DebugEntity.prototype.render = function(ctx, x, y) {
 	ctx.save();
-	ctx.strokeStyle = "#FF0055";
+	ctx.strokeStyle = "#00FFFF";
 	ctx.strokeRect(x, y, this._body._sizeX, this._body._sizeY);
 	ctx.restore();
 };

@@ -1,3 +1,5 @@
+var LOGGING = gm.Settings.LOGGING;
+
 gm.Body = function(params) {
 	var body = this;
 	
@@ -56,6 +58,21 @@ gm.Body.prototype.setParams = function(params) {
 		body._measurementsDirty = true;
 	}
 	if (body._measurementsDirty) body.recalculateMeasurements();
+
+	if (LOGGING) {
+		if (isNaN(body._sizeX) || isNaN(body._sizeY)) {
+			console.log("!!! body - size:", body._sizeX, ",", body._sizeY);
+		}
+		if (isNaN(body._maxVelX) || isNaN(body._maxVelY)) {
+			console.log("!!! body - maxvel:", body._maxVelX, ",", body._maxVelY);
+		}
+		if (isNaN(body._dampX) || isNaN(body._dampY)) {
+			console.log("!!! body - damp:", body._dampX, ",", body._dampY);
+		}
+		if (isNaN(body._weight)) {
+			console.log("!!! body - weight:", body._weight);
+		}
+	}
 };
 
 gm.Body.prototype.writeState = function(state) {
@@ -89,6 +106,10 @@ gm.Body.prototype.moveTo = function(x, y) {
 	body._y = y;
 
 	body._measurementsDirty = true;
+
+	if (LOGGING && (isNaN(body._x) || isNaN(body._y))) {
+		console.log("!!! body - moved to", body._x, body._y);
+	}
 };
 
 gm.Body.prototype.resetAccel = function() {
@@ -99,11 +120,19 @@ gm.Body.prototype.resetAccel = function() {
 gm.Body.prototype.addForce = function(gx, gy) {
 	this.ax += gx * this._weight;
 	this.ay += gy * this._weight;
+
+	if (LOGGING && (isNaN(gx) || isNaN(gy))) {
+		console.log("!!! body - added force", gx, gy);
+	}
 };
 
 gm.Body.prototype.addImpulse = function(ix, iy) {
 	this.vx += ix * this._weight;
 	this.vy += iy * this._weight;
+	
+	if (LOGGING && (isNaN(ix) || isNaN(iy))) {
+		console.log("!!! body - added force", ix, iy);
+	}
 };
 
 gm.Body.prototype.clampVelLeft = function() {
@@ -206,4 +235,9 @@ gm.Body.prototype.overlapsAxisX = function(other) {
 gm.Body.prototype.overlapsAxis = function(other) {
 	return body._y < other._y + other._sizeY &&
 	other._y < body._y + body._sizeY;
+};
+
+gm.Body.prototype.overlapsPoint = function(x, y) {
+	var bbox = this.getBbox();
+	return (bbox.x0 <= x && bbox.y0 <= y && bbox.x1 > x && bbox.y1 > y);
 };

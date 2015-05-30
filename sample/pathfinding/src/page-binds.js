@@ -17,24 +17,32 @@ $(function() {
 	};
 
 	gm.Input.bind($canvas);
-	gm.Input.setListener('mousedown', function(mx, my) {
-		Editor.onMouseDown(mx, my);
+	gm.Input.setListener('mousedown', function() {
+		Editor.onMouseDown();
 		render();
 	});
-	gm.Input.setListener('mouseup', function(mx, my) {
-		Editor.onMouseUp(mx, my);
+	gm.Input.setListener('mouseup', function() {
+		Editor.onMouseUp();
 		render();
 	});
 	gm.Input.setListener('mousemove', function(mx, my) {
 		Editor.onMouseMove(mx, my);
 		render();
 	});
-	gm.Input.setListener('keydown', function() {
-		Editor.onKeyDown();
+	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.MOVE, function() {
+		Editor.onMoveKeyDown();
 		render();
 	});
-	gm.Input.setListener('keyup', function() {
-		Editor.onKeyUp();
+	gm.Input.setListener('keyup', gm.Settings.Editor.keyBinds.MOVE, function() {
+		Editor.onMoveKeyUp();
+		render();
+	});
+	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.BRUSH, function() {
+		Editor.onBrushKeyDown();
+		render();
+	});
+	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.ERASE, function() {
+		Editor.onEraseKeyDown();
 		render();
 	});
 
