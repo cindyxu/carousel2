@@ -11,3 +11,9 @@ gm.Constants.Dir = {
 	UP: 1 << 2,
 	DOWN: 1 << 3
 };
+
+gm.Constants.Ineq = {
+	LEQ: -1,
+	EQUAL: 0,
+	GEQ: 1
+};

@@ -32,10 +32,12 @@ gm.Behaviors.Walker = function() {
 		if (!body) return;
 
 		if (input.down.left) {
+			console.log("!!!");
 			body.addForce(-this._walkForce, 0);
 			this._facing = Dir.LEFT;
 		} 
 		else if (input.down.right) {
+			console.log("!!!");
 			body.addForce(this._walkForce, 0);
 			this._facing = Dir.RIGHT;
 		}

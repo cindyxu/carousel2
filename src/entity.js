@@ -64,11 +64,11 @@ gm.Entity = function() {
 	};
 
 	Entity.prototype.preUpdate = function() {
-		if (this.controller) this.controller.control();
+		if (this._controller) this._controller.control();
 	};
 
 	Entity.prototype.postUpdate = function() {
-		if (this.controller && this.controller.post) this.controller.post();
+		if (this._controller && this._controller.post) this._controller.post();
 	};
 
 	Entity.prototype.render = function(ctx, bbox) {

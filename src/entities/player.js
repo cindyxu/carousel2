@@ -7,11 +7,11 @@ gm.EntityClasses.Player = function() {
 	var bodyParams = {
 		sizeX: 16,
 		sizeY: 16,
-		maxVelX: 60,
+		maxVelX: 30,
 		maxVelY: 120,
 		dampX: 5,
 		dampY: 0,
-		weight: 200
+		weight: 100
 	};
 
 	var controllerParams = {
