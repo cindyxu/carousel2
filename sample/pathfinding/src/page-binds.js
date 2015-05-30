@@ -1,4 +1,9 @@
-$(function(Values, Toyworld, Editor, Search) {
+$(function() {
+
+	var Values = gm.Sample.Pathfinding.Values;
+	var ToyWorld = gm.Sample.Pathfinding.ToyWorld;
+	var Editor = gm.Sample.Pathfinding.Editor;
+	var Search = gm.Sample.Pathfinding.Search;
 
 	var $planPathButton = $("#plan-path");
 	var $toggleLevelRendererCheckbox = $("#toggle-level-renderer");
@@ -54,4 +59,4 @@ $(function(Values, Toyworld, Editor, Search) {
 	ctx = $canvas[0].getContext("2d");
 	render();
 
-})(gm.Sample.Pathfinding.Values, gm.Sample.Pathfinding.ToyWorld, gm.Sample.Pathfinding.Editor, gm.Sample.Pathfinding.Search);
+});
