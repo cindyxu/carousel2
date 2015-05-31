@@ -6,6 +6,12 @@ gm.NavGrid = function() {
 		tilesize: 0
 	});
 
+	this._combinedLayerMap = new gm.LayerMap(new gm.Map({
+		tilesX: 0,
+		tilesY: 0,
+		tilesize: 0
+	}));
+
 	this._platforms = [];
 
 	this._tx = 0;
@@ -27,8 +33,8 @@ gm.NavGrid.prototype.removeListener = function(listener) {
 
 gm.NavGrid.prototype.fromLayers = function(layers) {
 	if (layers.length > 0) {
-		var combinedMap = this._generateCombinedLayerMap(layers);
-		this.fromCombinedLayerMap(combinedMap);
+		this._generateCombinedLayerMap(layers);
+		this._generatePlatformMap();
 	} else {
 		this.reset();
 	}
@@ -65,23 +71,22 @@ gm.NavGrid.prototype._generateCombinedLayerMap = function(layers) {
 		tilesY = Math.max(map._tilesY, oty + tilesY);
 	}
 
-	var combinedMap = new gm.Map({
-		tilesX: tilesX,
-		tilesY: tilesY,
-		tilesize: map.tilesize
+	var combinedMap = this._combinedLayerMap._map;
+
+	combinedMap.resize(tilesX, tilesY);
+	combinedMap.tilesize = map.tilesize;
+
+	this._fillCombinedMap(tx, ty, layers);
+
+	this._combinedLayerMap.setParams({
+		offsetX: tx * map.tilesize, 
+		offsetY: ty * map.tilesize
 	});
-
-	this._fillCombinedMap(combinedMap, tx, ty, layers);
-
-	var combinedLayerMap = new gm.LayerMap(combinedMap, {
-			offsetX: tx * map.tilesize, 
-			offsetY: ty * map.tilesize
-		});
-	
-	return combinedLayerMap;
 };
 
-gm.NavGrid.prototype._fillCombinedMap = function(combinedMap, tx, ty, layers) {
+gm.NavGrid.prototype._fillCombinedMap = function(tx, ty, layers) {
+	var combinedMap = this._combinedLayerMap._map;
+
 	for (l = 0; l < layers.length; l++) {
 		layer = layers[l];
 		layerMap = layer._layerMap;
@@ -120,8 +125,9 @@ gm.NavGrid.prototype.tileToPos = function(tx, ty, res) {
 	res.y += offsety;
 };
 
-gm.NavGrid.prototype.fromCombinedLayerMap = function(combinedLayerMap) {
+gm.NavGrid.prototype._generatePlatformMap = function() {
 
+	var combinedLayerMap = this._combinedLayerMap;
 	var combinedMap = combinedLayerMap._map;
 	var tilesize = combinedMap.tilesize;
 
@@ -160,23 +166,26 @@ gm.NavGrid.prototype.fromCombinedLayerMap = function(combinedLayerMap) {
 	}
 };
 
-var tres;
+var obbox = {};
+var tbbox = {};
 gm.NavGrid.prototype.getPlatformUnderBody = function(body) {
 
+	var platformMap = this._platformMap;
+	var tilesize = this._platformMap.tilesize;
 	var bbox = body.getBbox();
+
+	obbox.x0 = bbox.x0 + (this._tx * tilesize);
+	obbox.y0 = bbox.y0 + (this._ty * tilesize);
+	obbox.x1 = bbox.x1 + (this._tx * tilesize);
+	obbox.y1 = bbox.y1 + (this._ty * tilesize);
 	
-	this.posToTile(bbox.x0, bbox.y1, tres);
-	var stx = tres.tx;
-	stx = this._platformMap.clampTileDim(stx, X);
-	var ty = tres.ty;
+	platformMap.getOverlappingTileBbox(obbox, tbbox);
 
-	this.posToTile(bbox.x1, bbox.y1, tres);
-	var etx = tres.tx;
-	etx = this._platformMap.clampTileDim(etx, X);
-
-	for (var y = ty; y < this._platformMap._sizeY; y++) {
-		for (var x = stx; x < etx; x++) {
-			
+	var platform;
+	for (var ty = tbbox.ty1; ty < platformMap._tilesY; ty++) {
+		for (var tx = tbbox.tx0; tx < tbbox.tx1; tx++) {
+			platform = platformMap.tileAt(tx, ty);
+			if (platform) return platform;
 		}
 	}
 };

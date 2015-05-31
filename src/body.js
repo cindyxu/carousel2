@@ -126,8 +126,13 @@ gm.Body.prototype.addForce = function(gx, gy) {
 
 gm.Body.prototype.addImpulse = function(ix, iy) {
 	this.vx += ix * this._weight;
+	if (this.vx < -this._maxVelX) this.vx = -this._maxVelX;
+	else if (this.vx > this._maxVelX) this.vx = this._maxVelX;
+
 	this.vy += iy * this._weight;
-	
+	if (this.vy < -this._maxVelY) this.vy = -this._maxVelY;
+	else if (this.vy > this._maxVelY) this.vy = this._maxVelY;
+
 	if (LOGGING && (isNaN(ix) || isNaN(iy))) {
 		console.log("!!! body - added force", ix, iy);
 	}

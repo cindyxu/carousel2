@@ -46,9 +46,33 @@ gm.Map.prototype.posToTile = function(x, y, res) {
 	res.ty = Math.floor(y / this.tilesize);
 };
 
+gm.Map.prototype.posToTileX = function(x) {
+	return Math.floor(x / this.tilesize);
+};
+
+gm.Map.prototype.posToTileY = function(y) {
+	return Math.floor(y / this.tilesize);
+};
+
+gm.Map.prototype.posToTileCeilX = function(x) {
+	return Math.ceil(x / this.tilesize);
+};
+
+gm.Map.prototype.posToTileCeilY = function(y) {
+	return Math.ceil(y / this.tilesize);
+};
+
 gm.Map.prototype.tileToPos = function(tx, ty, res) {
 	res.x = tx * this.tilesize;
 	res.y = ty * this.tilesize;
+};
+
+gm.Map.prototype.tileToPosX = function(tx) {
+	return tx * this.tilesize;
+};
+
+gm.Map.prototype.tileToPosY = function(ty) {
+	return ty * this.tilesize;
 };
 
 gm.Map.prototype.clampTile = function(tx, ty, res) {
