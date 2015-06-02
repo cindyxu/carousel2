@@ -9,21 +9,24 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	var RIGHT = gm.Constants.Dir.RIGHT;
 
 	var PlatformSearch = function(
-		platformMap, sizeX, sizeY, runSpd, jumpSpd, fallAccel, terminalV, originPlatform) {
+		platformMap, combinedMap, sizeX, sizeY, runSpd, jumpSpd, fallAccel, terminalV, originPlatform, params) {
 
 		this._platformMap = platformMap;
+		this._combinedMap = combinedMap;
 		this._sizeX = sizeX;
 		this._sizeY = sizeY;
-		this._runSpd = runSpd;
-		this._jumpSpd = jumpSpd;
-		this._fallAccel = fallAccel;
-		this._terminalV = terminalV;
+
+		this._kinematics = new gm.Pathfinder.Walker.Kinematics(runSpd, jumpSpd, fallAccel, terminalV);
+
+		this._renderSpecifics = false;
+		if (params) this.setParams(params);
 
 		console.log("sizeX", sizeX, "sizeY", sizeY);
 		console.log("runSpd", runSpd, "jumpSpd", jumpSpd, "fallAccel", fallAccel, "terminalV", terminalV);
 
 		if (LOGGING) {
-			if (!platformMap) console.log("!!! platformSearch - no platformMap");
+			if (!platformMap) console.log("!!! platformSearch - no platform map");
+			if (!combinedMap) console.log("!!! platformSearch - no combined map");
 			if (isNaN(sizeX) || isNaN(sizeY)) console.log("!!! platformSearch - body dimensions were", sizeX, ",", sizeY);
 			if (isNaN(runSpd)) console.log("!!! platformSearch - runSpd was", runSpd);
 			if (isNaN(jumpSpd)) console.log("!!! platformSearch - jumpSpd was", jumpSpd);
@@ -35,55 +38,8 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		this.beginSearch(originPlatform);
 	};
 
-	PlatformSearch.prototype.getDeltaYFromVyFinal = function(vyi, vyf) {
-		if (LOGGING && vyf > this._terminalV) {
-			console.log("!!! platformSearch - end velocity", vyf, 
-				"greater than terminal velocity", this._terminalV, 
-				" - result will be inaccurate");
-		}
-		var dt = (vyf - vyi) / this._fallAccel;
-		return (vyi + vyf) / 2 * dt;
-	};
-
-	PlatformSearch.prototype.getVyFinalFromDeltaY = function(vyi, dy) {
-		// if we hit terminalv before reaching dy,
-		// then deltav is really just delta to terminalv
-		if (vyi === this._terminalV) {
-			return vyi;
-		}
-		var dyTerminal = this.getDeltaYFromVyFinal(vyi, this._terminalV);
-		if (dyTerminal < dy) {
-			return this._terminalV;
-		}
-
-		// there are always two possibilities for vyf
-		// we will take the one closest to vyi, after vyi
-		var absVyf = Math.sqrt(vyi * vyi + 2 * this._fallAccel * dy);
-		var vyf = vyi < -absVyf ? -absVyf : absVyf;
-		vyf = Math.min(this._terminalV, vyf);
-
-		return vyf;
-	};
-
-	PlatformSearch.prototype.getAbsDeltaXFromDeltaY = function(vyi, dy) {
-		if (vyi >= this._terminalV) {
-			return dy / this._terminalV * this._runSpd;
-		}
-
-		var dyTerminal = this.getDeltaYFromVyFinal(vyi, this._terminalV);
-		if (dyTerminal < dy) {
-			var dxPreTerm = this.getAbsDeltaXFromDeltaY(vyi, dyTerminal);
-			var dxPostTerm = this.getAbsDeltaXFromDeltaY(this._terminalV, (dy - dyTerminal));
-			return dxPreTerm + dxPostTerm;
-		}
-
-		// there are two potential solutions for time.
-		// we will use the smallest positive time
-		var dtdeterminant = Math.sqrt(vyi * vyi + 2 * this._fallAccel * dy);
-		var dt = (-vyi - dtdeterminant) / this._fallAccel;
-		if (dt < 0) dt = (-vyi + dtdeterminant) / this._fallAccel;
-
-		return dt * this._runSpd;	
+	PlatformSearch.prototype.setParams = function(params) {
+		if (params.renderSpecifics !== undefined) this._renderSpecifics = params.renderSpecifics;
 	};
 
 	PlatformSearch.prototype.beginSearch = function(originPlatform) {
@@ -95,8 +51,8 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		var stubArea = {
 			parent: undefined,
 
-			vyi: Math.max(-this._jumpSpd, -this._terminalV),
-			vyo: Math.max(-this._jumpSpd, -this._terminalV),
+			vyi: Math.max(-this._kinematics._jumpSpd, -this._kinematics._terminalV),
+			vyo: Math.max(-this._kinematics._jumpSpd, -this._kinematics._terminalV),
 
 			pxli: originPlatform.tx0 * this._platformMap.tilesize,
 			pxri: originPlatform.tx1 * this._platformMap.tilesize,
@@ -107,21 +63,27 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 			pyi: originPlatform.ty * this._platformMap.tilesize,
 			pyo: originPlatform.ty * this._platformMap.tilesize,
 		};
+		if (this._renderSpecifics) stubArea.debug = {};
 
 		this._currentAreas.push(stubArea);
 	};
 
 	PlatformSearch.prototype.getInitialChild = function(parentArea) {
-		return {
+		var childArea = {
 			vyi: parentArea.vyo,
 			pxli: parentArea.pxlo,
 			pxri: parentArea.pxro,
 			pyi: parentArea.pyo,
 			parent: parentArea
 		};
+		if (this._renderSpecifics) childArea.debug = {};
+		return childArea;
 	};
 
 	PlatformSearch.prototype.getTentativeAltitude = function(childArea) {
+
+		var tilesize = this._platformMap.tilesize;
+		var kinematics = this._kinematics;
 
 		var pyo;
 		var vyo;
@@ -129,16 +91,26 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		var pyiBottom = childArea.pyi;
 		var pyiTop = childArea.pyi - this._sizeY;
 
+		var bodyExtend = this._sizeY % tilesize;
+
 		// going up
 		if (childArea.vyi < 0) {
-			var tyoTop = this._platformMap.posToTileY(pyiTop);
+			var tyTop = this._platformMap.posToTileY(pyiTop);
 			// for going up only - if the top of our body is exactly aligned
 			// with the top of this tile row, we still want to end on the row above it
-			if (this._platformMap.tileToPosY(tyoTop) === pyiTop) tyoTop--;
+			if (this._platformMap.tileToPosY(tyTop) === pyiTop) tyTop--;
+
+			var ptyoTop = this._platformMap.tileToPosY(tyTop);
 			
-			var pyoTop = this._platformMap.tileToPosY(tyoTop);
+			var pyoTop = ptyoTop + Math.max(bodyExtend, tilesize - bodyExtend);
+			if (pyiTop <= pyoTop) {
+				pyoTop = ptyoTop + Math.min(bodyExtend, tilesize - bodyExtend);
+				if (pyiTop <= pyoTop) {
+					pyoTop = ptyoTop;
+				}
+			}
 			var dyTarget = pyoTop - pyiTop;
-			var dyTerminal = this.getDeltaYFromVyFinal(childArea.vyi, 0);
+			var dyTerminal = kinematics.getDeltaYFromVyFinal(childArea.vyi, 0);
 
 			// if the zenith of our trajectory happens before we reach the next row,
 			// we cut off the area at the zenith
@@ -147,16 +119,23 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 				pyoTop = pyiTop + dyTerminal;
 				vyo = 0;
 			} else {
-				vyo = this.getVyFinalFromDeltaY(childArea.vyi, dyTarget);
+				vyo = kinematics.getVyFinalFromDeltaY(childArea.vyi, dyTarget);
 			}
 			pyo = pyoTop + this._sizeY;
 		}
 		// going down
 		else {
 			var tyoBottom = this._platformMap.posToTileY(pyiBottom);
-			var pyoBottom = this._platformMap.tileToPosY(tyoBottom + 1);
-			vyo = this.getVyFinalFromDeltaY(childArea.vyi, pyoBottom - pyiBottom);
-			console.log("pyoBottom", pyoBottom, "pyiBottom", pyiBottom);
+			var ptyoBottom = this._platformMap.tileToPosY(tyoBottom);
+
+			var pyoBottom = ptyoBottom + Math.min(bodyExtend, tilesize - bodyExtend);
+			if (pyiBottom >= pyoBottom) {
+				pyoBottom = ptyoBottom + Math.max(bodyExtend, tilesize - bodyExtend);
+				if (pyiBottom >= pyoBottom) {
+					pyoBottom = this._platformMap.tileToPosY(tyoBottom+1);
+				}
+			}
+			vyo = kinematics.getVyFinalFromDeltaY(childArea.vyi, pyoBottom - pyiBottom);
 			pyo = pyoBottom;
 		}
 		childArea.vyo = vyo;
@@ -164,43 +143,74 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype.getTentativeSpread = function(childArea) {
-		var deltaX = this.getAbsDeltaXFromDeltaY(childArea.vyi, childArea.pyo - childArea.pyi);
+		var deltaX = this._kinematics.getAbsDeltaXFromDeltaY(childArea.vyi, childArea.pyo - childArea.pyi);
 		childArea.pxlo = childArea.pxli - deltaX;
 		childArea.pxro = childArea.pxri + deltaX;
 	};
 
 	PlatformSearch.prototype.clampSpread = function(childArea) {
 		var platformMap = this._platformMap;
-
-		var ty;
-		if (childArea.vyi < 0) {
-			ty = platformMap.posToTileY(childArea.pyo);
-		} else {
-			ty = platformMap.posToTileY(childArea.pyi);
-		}
 		
-		var tli = platformMap.posToTileX(childArea.pxli);
-		var tlo = platformMap.posToTileX(childArea.pxlo);
+		var txli = platformMap.posToTileX(childArea.pxli)-1;
+		var txlo = platformMap.posToTileX(childArea.pxlo)-1;
+		var txri = platformMap.posToTileCeilX(childArea.pxri);
+		var txro = platformMap.posToTileCeilX(childArea.pxro);
+
+		if (this._renderSpecifics) {
+			childArea.debug.xpts = {};
+		}
 
 		var tx;
-		for (tx = tli-1; tx > tlo; tx--) {
-			if (platformMap.tileAt(tx, ty) & RIGHT) {
-				childArea.pxlo = platformMap.tileToPosX(tx+1);
-				break;
-			}
+		for (tx = txli; tx > txlo; tx--) {
+			if (this.clampSpreadColumn(childArea, tx, LEFT)) break;
 		}
-		
-		var tri = platformMap.posToTileCeilX(childArea.pxri);
-		var tro = platformMap.posToTileCeilX(childArea.pxro);
 
-		for (tx = tri; tx < tro; tx++) {
-			console.log("tile", platformMap.tileAt(tx, ty));
-			if (platformMap.tileAt(tx, ty) & LEFT) {
-				childArea.pxro = platformMap.tileToPosX(tx);
-				break;
+		for (tx = txri; tx < txro; tx++) {
+			if (this.clampSpreadColumn(childArea, tx, RIGHT)) break;
+		}
+	};
+
+	PlatformSearch.prototype.clampSpreadColumn = function(childArea, tx, dir) {
+		var platformMap = this._platformMap;
+		var combinedMap = this._combinedMap;
+
+		var px = platformMap.tileToPosX(dir === LEFT ? tx+1 : tx);
+		var dx = px - (dir === LEFT ? childArea.pxli : childArea.pxri);
+		var dy = this._kinematics.getDeltaYFromDeltaX(childArea.vyi, dx);
+
+		if (this._renderSpecifics) {
+			childArea.debug.xpts[platformMap.tileToPosX(tx)] = childArea.pyi + dy;
+		}
+
+		var tyBottom = platformMap.posToTileCeilY(childArea.pyi + dy);
+		var tyTop = platformMap.posToTileY(childArea.pyi + dy - this._sizeY);
+
+		for (var ty = tyTop; ty < tyBottom; ty++) {
+			if (combinedMap.tileAt(tx, ty) & dir) {
+				if (dir === LEFT) childArea.pxlo = platformMap.tileToPosX(tx+1);
+				else childArea.pxro = platformMap.tileToPosX(tx);
+				return true;
 			}
 		}
-		console.log(tri, tro, ty);
+	};
+
+	PlatformSearch.prototype.splitArea = function(childArea) {
+		var platformMap = this._platformMap;
+		var combinedMap = this._combinedMap;
+		var ltx = platformMap.posToTileX(childArea.pxli);
+		var rtx = platformMap.posToTileCeilX(childArea.pxri);
+		var ty = platformMap.posToTileY(childArea.pyi);
+		var vyi = childArea.vyi;
+
+		// first check for DOWN and UP
+		for (var tx = ltx; tx < rtx; tx++) {
+			var tile = combinedMap.tileAt(tx, ty);
+			if (vyi < 0 && (tile & UP)) {
+
+			} else if (vyi >= 0 && (tile & DONW)) {
+
+			}
+		}
 	};
 
 	PlatformSearch.prototype.step = function() {
@@ -231,7 +241,15 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		for (var a = 0; a < this._currentAreas.length; a++) {
 			var currentArea = this._currentAreas[a];
 			for (var i = 0; i < 3; i++) {
-				this.renderArea(ctx, currentArea, trueAreasOff, detectionAreasOff);
+				if (!trueAreasOff) {
+					this.renderArea(ctx, currentArea);
+				}
+				if (!detectionAreasOff) {
+					this.renderArea(ctx, currentArea, true);
+					if (this._renderSpecifics) {
+						this.renderAreaSpecifics(ctx, currentArea);
+					}
+				}
 				ctx.globalAlpha *= 0.6;
 				currentArea = currentArea.parent;
 				if (!currentArea) break;
@@ -241,22 +259,18 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		ctx.restore();
 	};
 
-	PlatformSearch.prototype.renderArea = function(ctx, area, trueAreasOff, detectionAreasOff) {
-		if (!trueAreasOff) {
-			ctx.fillStyle = "rgba(100, 255, 0, 0.3)";
-			ctx.strokeStyle = "rgba(100, 255, 0, 1)";
-			this.renderAreaLocal(ctx, area);
-		}
-		if (!detectionAreasOff) {
+	PlatformSearch.prototype.renderArea = function(ctx, area, isDetectionArea) {
+		ctx.save();
+
+		if (isDetectionArea) {
 			ctx.fillStyle = "rgba(200, 200, 0, 0.3)";
 			ctx.strokeStyle = "rgba(200, 200, 0, 1)";
 			if (area.vyi < 0) ctx.translate(0, -this._sizeY);
-			this.renderAreaLocal(ctx, area);
-			if (area.vyi < 0) ctx.translate(0, this._sizeY);
+		} else {
+			ctx.fillStyle = "rgba(100, 255, 0, 0.3)";
+			ctx.strokeStyle = "rgba(100, 255, 0, 1)";
 		}
-	};
 
-	PlatformSearch.prototype.renderAreaLocal = function(ctx, area) {
 		var tilesize = this._platformMap.tilesize;
 
 		if (area.pyo < area.pyi) {
@@ -278,6 +292,23 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		ctx.lineTo(area.pxro, area.pyo);
 		ctx.closePath();
 		ctx.stroke();
+
+		ctx.restore();
+	};
+
+	PlatformSearch.prototype.renderAreaSpecifics = function(ctx, area) {
+		ctx.save();
+		ctx.fillStyle = "rgba(255, 100, 100, 0.5)";
+		var xpts = area.debug.xpts;
+		if (xpts) {
+			var tilesize = this._platformMap.tilesize;
+		
+			for (var px in xpts) {
+				var pyBottom = xpts[px];
+				ctx.fillRect(px, pyBottom - this._sizeY, tilesize, this._sizeY);
+			}
+		}
+		ctx.restore();
 	};
 
 	return PlatformSearch;

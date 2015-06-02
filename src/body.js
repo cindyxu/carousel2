@@ -179,22 +179,24 @@ gm.Body.prototype.recalculateMeasurements = function() {
 	body._measurementsDirty = false;
 };
 
-gm.Body.prototype.updateStepX = function(delta) {
+gm.Body.prototype.updateStepX = function(dt) {
 	var body = this;
 
-	body._x += body.vx * delta;
-	body.vx += (body.ax - (body.vx * body._dampX)) * delta;
+	var dmpax = body.ax - (body.vx * body._dampX);
+	body._x += body.vx * dt;
+	body.vx += dmpax * dt;
 	if (body.vx < -body._maxVelX) body.vx = -body._maxVelX;
 	else if (body.vx > body._maxVelX) body.vx = body._maxVelX;
 
 	body._measurementsDirty = true;
 };
 
-gm.Body.prototype.updateStepY = function(delta) {
+gm.Body.prototype.updateStepY = function(dt) {
 	var body = this;
 
-	body._y += body.vy * delta;
-	body.vy += (body.ay - (body.vy * body._dampY)) * delta;
+	var dmpay = body.ay - (body.vy * body._dampY);
+	body._y += body.vy * dt;
+	body.vy += dmpay * dt;
 	if (body.vy < -body._maxVelY) body.vy = -body._maxVelY;
 	else if (body.vy > body._maxVelY) body.vy = body._maxVelY;
 
