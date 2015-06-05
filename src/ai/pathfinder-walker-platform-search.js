@@ -68,9 +68,9 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		this._currentAreas.push(stubArea);
 	};
 
-	PlatformSearch.prototype.getInitialChild = function(parentArea, pxli, pxri) {
+	PlatformSearch.prototype.getInitialChild = function(parentArea, pxli, pxri, vyi) {
 		var childArea = {
-			vyi: parentArea.vyo,
+			vyi: vyi !== undefined ? vyi : parentArea.vyo,
 			pxli: pxli !== undefined ? pxli : parentArea.pxlo,
 			pxri: pxri !== undefined ? pxri : parentArea.pxro,
 			pyi: parentArea.pyo,
@@ -182,8 +182,14 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 			childArea.debug.xpts[platformMap.tileToPosX(tx)] = childArea.pyi + dy;
 		}
 
-		var tyBottom = platformMap.posToTileCeilY(childArea.pyi + dy);
-		var tyTop = platformMap.posToTileY(childArea.pyi + dy - this._sizeY);
+		var tyTop, tyBottom;
+		if (childArea.vyi < 0) {
+			tyTop = platformMap.posToTileCeilY(childArea.pyi + dy - this._sizeY) - 1;
+			tyBottom = platformMap.posToTileCeilY(childArea.pyi + dy);
+		} else {
+			tyTop = platformMap.posToTileY(childArea.pyi + dy - this._sizeY);
+			tyBottom = platformMap.posToTileY(childArea.pyi + dy) + 1;
+		}
 
 		for (var ty = tyTop; ty < tyBottom; ty++) {
 			if (combinedMap.tileAt(tx, ty) & dir) {
@@ -195,15 +201,19 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype.getSplitSeeds = function(childArea) {
+		console.log(childArea);
+
 		var platformMap = this._platformMap;
 		var combinedMap = this._combinedMap;
+
 		var ltx = platformMap.posToTileX(childArea.pxli);
 		var rtx = platformMap.posToTileCeilX(childArea.pxri);
 		var vyi = childArea.vyi;
 		var ty, fty;
+		
 		if (vyi < 0) {
-			fty = platformMap.posToTileY(childArea.pyi);
-			ty = platformMap.posToTileY(childArea.pyo);
+			fty = platformMap.posToTileY(childArea.pyi - this._sizeY);
+			ty = platformMap.posToTileY(childArea.pyo - this._sizeY);
 			if (fty === ty) return;
 		} else {
 			fty = platformMap.posToTileCeilY(childArea.pyo);
@@ -216,50 +226,80 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		var txStart = -1;
 		var splitSeeds = [];
 
-		for (var tx = ltx; tx < rtx; tx++) {
+		for (var tx = ltx; tx < rtx; ) {
 			var tile = combinedMap.tileAt(tx, ty);
-			if ((tile & UP) && vyi < 0) {
+			if ((tile & DOWN) && vyi < 0) {
 				if (txStart >= 0) {
-					splitSeeds.push([txStart * tilesize, tx * tilesize]);
-					txStart = -1;
+					splitSeeds.push(this.getInitialChild(
+						childArea.parent, txStart * tilesize, tx * tilesize));
 				}
-			} else if ((tile & DOWN) && vyi >= 0) {
+				var utxStart = tx;
+				while(true) {
+					tile = combinedMap.tileAt(tx, ty);
+					if ((tile & DOWN) && tx < rtx) tx++;
+					else {
+						splitSeeds.push(this.getInitialChild(
+							childArea.parent, utxStart * tilesize, tx * tilesize, 0));
+						break;
+					}
+				}
+				txStart = -1;
+
+			} else if ((tile & UP) && vyi >= 0) {
 				if (txStart >= 0) {
-					splitSeeds.push([txStart * tilesize, tx * tilesize]);
+					splitSeeds.push(this.getInitialChild(
+						childArea.parent, txStart * tilesize, tx * tilesize));
 					// add platform to reachable.
-					txStart = -1;
 				}
+				while(tx < rtx) {
+					tile = combinedMap.tileAt(tx, ty);
+					if (tile & UP) tx++;
+					else break;
+				}
+				txStart = -1;
+				
 			} else {
 				if (tile & LEFT) {
 					if (txStart >= 0) {
-						splitSeeds.push([txStart * tilesize, tx * tilesize]);
+						splitSeeds.push(this.getInitialChild(
+						childArea.parent, txStart * tilesize, tx * tilesize));
 					}
 				}
 				if (txStart < 0) txStart = tx;
 				if (tile & RIGHT) {
-					splitSeeds.push([txStart * tilesize, (tx+1) * tilesize]);
+					splitSeeds.push(this.getInitialChild(
+						childArea.parent, txStart * tilesize, (tx+1) * tilesize));
 					txStart = -1;
 				}	
+				tx++;
 			}
 		}
 
-		console.log(txStart);
-
 		if (txStart >= 0) {
 			if (txStart === ltx) return;
-			splitSeeds.push([txStart * tilesize, tx * tilesize]);
+			splitSeeds.push(this.getInitialChild(
+						childArea.parent, txStart * tilesize, tx * tilesize));
 		}
+
+		splitSeeds[0].pxli = Math.max(splitSeeds[0].pxli, childArea.pxli);
+		var e = splitSeeds.length-1;
+		splitSeeds[e].pxri = Math.min(splitSeeds[e].pxri, childArea.pxri);
+
+		console.log(splitSeeds);
+		
 		return splitSeeds;
 	};
 
 	PlatformSearch.prototype.step = function() {
 		console.log("STEP *******************************");
 		var parentArea = this._currentAreas.pop();
-		this.addChildren(parentArea);
+		if (parentArea) {
+			var childArea = this.getInitialChild(parentArea);
+			this.addChildren(childArea);
+		}
 	};
 
-	PlatformSearch.prototype.addChildren = function(parentArea, pxli, pxri) {
-		var childArea = this.getInitialChild(parentArea, pxli, pxri);
+	PlatformSearch.prototype.addChildren = function(childArea) {
 		this.getTentativeAltitude(childArea);
 		this.getTentativeSpread(childArea);
 		this.clampSpread(childArea);
@@ -272,10 +312,9 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		var splitSeeds = this.getSplitSeeds(childArea);
 
 		if (splitSeeds !== undefined) {
-			console.log(splitSeeds);
 			for (var s = 0; s < splitSeeds.length; s++) {
 				var seed = splitSeeds[s];
-				this.addChildren(parentArea, seed[0], seed[1]);
+				this.addChildren(seed);
 			}
 		} else {
 			this._currentAreas.push(childArea);
