@@ -16,7 +16,6 @@ html
 		script(src="/src/layer-map.js")
 		script(src="/src/layer.js")
 		script(src="/src/entity.js")
-		script(src="/src/nav-grid.js")
 		script(src="/src/body.js")
 		script(src="/src/camera.js")
 		script(src="/src/level.js")
@@ -33,6 +32,8 @@ html
 		script(src="/src/editor/tools/brush.js")
 		script(src="/src/editor/tools/erase.js")
 		script(src="/src/editor/tools/move.js")
+		script(src="/src/ai/pathfinder/combined-map.js")
+		script(src="/src/ai/pathfinder/walker/platform-map.js")
 		script(src="/src/ai/pathfinder/walker/kinematics.js")
 		script(src="/src/ai/pathfinder/walker/platform-search/search.js")
 		script(src="/src/ai/pathfinder/walker/platform-search/renderer.js")
@@ -53,8 +54,8 @@ html
 				label render level
 				input(type="checkbox")#toggle-level-renderer
 			.option
-				label render navgrid
-				input(type="checkbox")#toggle-nav-grid-renderer
+				label render platforms
+				input(type="checkbox")#toggle-platform-renderer
 			.option
 				label render areas
 				input(type="checkbox")#toggle-area-renderer

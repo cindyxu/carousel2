@@ -9,10 +9,10 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	var RIGHT = gm.Constants.Dir.RIGHT;
 
 	var PlatformSearch = function(
-		platformMap, combinedMap, sizeX, sizeY, runSpd, jumpSpd, fallAccel, terminalV, originPlatform) {
+		cmap, pmap, sizeX, sizeY, runSpd, jumpSpd, fallAccel, terminalV, originPlatform) {
 
-		this._platformMap = platformMap;
-		this._combinedMap = combinedMap;
+		this._pmap = pmap;
+		this._cmap = cmap;
 		this._sizeX = sizeX;
 		this._sizeY = sizeY;
 
@@ -24,8 +24,8 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		console.log("runSpd", runSpd, "jumpSpd", jumpSpd, "fallAccel", fallAccel, "terminalV", terminalV);
 
 		if (LOGGING) {
-			if (!platformMap) console.log("!!! platformSearch - no platform map");
-			if (!combinedMap) console.log("!!! platformSearch - no combined map");
+			if (!pmap) console.log("!!! platformSearch - no platform map");
+			if (!cmap) console.log("!!! platformSearch - no combined map");
 			if (isNaN(sizeX) || isNaN(sizeY)) console.log("!!! platformSearch - body dimensions were", sizeX, ",", sizeY);
 			if (isNaN(runSpd)) console.log("!!! platformSearch - runSpd was", runSpd);
 			if (isNaN(jumpSpd)) console.log("!!! platformSearch - jumpSpd was", jumpSpd);
@@ -43,9 +43,9 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		this._reachablePlatforms = [];
 		this._currentAreas = [];
 
-		var py = this._platformMap.tileToPosY(originPlatform.ty);
-		pxlo = this._platformMap.tileToPosX(originPlatform.tx0) - this._sizeX;
-		pxro = this._platformMap.tileToPosX(originPlatform.tx1) + this._sizeX;
+		var py = this._pmap.tileToPosY(originPlatform.ty);
+		pxlo = this._pmap.tileToPosX(originPlatform.tx0) - this._sizeX;
+		pxro = this._pmap.tileToPosX(originPlatform.tx1) + this._sizeX;
 
 		if (pxro <= pxlo) return;
 
@@ -127,7 +127,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 
 	PlatformSearch.prototype._getTentativeAltitude = function(childArea) {
 
-		var tilesize = this._platformMap.tilesize;
+		var tilesize = this._pmap.tilesize;
 		var kinematics = this._kinematics;
 
 		var pyo;
@@ -140,12 +140,12 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 
 		// going up
 		if (childArea.vyi < 0) {
-			var tyTop = this._platformMap.posToTileY(pyiTop);
+			var tyTop = this._pmap.posToTileY(pyiTop);
 			// for going up only - if the top of our body is exactly aligned
 			// with the top of this tile row, we still want to end on the row above it
-			if (this._platformMap.tileToPosY(tyTop) === pyiTop) tyTop--;
+			if (this._pmap.tileToPosY(tyTop) === pyiTop) tyTop--;
 
-			var ptyoTop = this._platformMap.tileToPosY(tyTop);
+			var ptyoTop = this._pmap.tileToPosY(tyTop);
 			
 			var pyoTop = ptyoTop + Math.max(bodyExtend, tilesize - bodyExtend);
 			if (pyiTop <= pyoTop) {
@@ -170,14 +170,14 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		}
 		// going down
 		else {
-			var tyoBottom = this._platformMap.posToTileY(pyiBottom);
-			var ptyoBottom = this._platformMap.tileToPosY(tyoBottom);
+			var tyoBottom = this._pmap.posToTileY(pyiBottom);
+			var ptyoBottom = this._pmap.tileToPosY(tyoBottom);
 
 			var pyoBottom = ptyoBottom + Math.min(bodyExtend, tilesize - bodyExtend);
 			if (pyiBottom >= pyoBottom) {
 				pyoBottom = ptyoBottom + Math.max(bodyExtend, tilesize - bodyExtend);
 				if (pyiBottom >= pyoBottom) {
-					pyoBottom = this._platformMap.tileToPosY(tyoBottom+1);
+					pyoBottom = this._pmap.tileToPosY(tyoBottom+1);
 				}
 			}
 			vyo = kinematics.getVyFinalFromDeltaY(childArea.vyi, pyoBottom - pyiBottom);
@@ -194,12 +194,12 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype._clampSpread = function(childArea) {
-		var platformMap = this._platformMap;
+		var pmap = this._pmap;
 		
-		var txli = platformMap.posToTileX(childArea.pxli)-1;
-		var txlo = platformMap.posToTileX(childArea.pxlo)-1;
-		var txri = platformMap.posToTileCeilX(childArea.pxri);
-		var txro = platformMap.posToTileCeilX(childArea.pxro);
+		var txli = pmap.posToTileX(childArea.pxli)-1;
+		var txlo = pmap.posToTileX(childArea.pxlo)-1;
+		var txri = pmap.posToTileCeilX(childArea.pxri);
+		var txro = pmap.posToTileCeilX(childArea.pxro);
 
 		var tx;
 		for (tx = txli; tx > txlo; tx--) {
@@ -212,57 +212,57 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype._clampSpreadColumn = function(childArea, tx, dir) {
-		var platformMap = this._platformMap;
-		var combinedMap = this._combinedMap;
+		var pmap = this._pmap;
+		var cmap = this._cmap;
 
-		var px = platformMap.tileToPosX(dir === LEFT ? tx+1 : tx);
+		var px = pmap.tileToPosX(dir === LEFT ? tx+1 : tx);
 		var dx = px - (dir === LEFT ? childArea.pxli : childArea.pxri);
 		var dy = this._kinematics.getDeltaYFromDeltaX(childArea.vyi, dx);
 
 		var tyTop, tyBottom;
 		if (childArea.vyi < 0) {
-			tyTop = platformMap.posToTileCeilY(childArea.pyi + dy - this._sizeY) - 1;
-			tyBottom = platformMap.posToTileCeilY(childArea.pyi + dy);
+			tyTop = pmap.posToTileCeilY(childArea.pyi + dy - this._sizeY) - 1;
+			tyBottom = pmap.posToTileCeilY(childArea.pyi + dy);
 		} else {
-			tyTop = platformMap.posToTileY(childArea.pyi + dy - this._sizeY);
-			tyBottom = platformMap.posToTileY(childArea.pyi + dy) + 1;
+			tyTop = pmap.posToTileY(childArea.pyi + dy - this._sizeY);
+			tyBottom = pmap.posToTileY(childArea.pyi + dy) + 1;
 		}
 
 		for (var ty = tyTop; ty < tyBottom; ty++) {
-			if (combinedMap.tileAt(tx, ty) & dir) {
-				if (dir === LEFT) childArea.pxlo = platformMap.tileToPosX(tx+1);
-				else childArea.pxro = platformMap.tileToPosX(tx);
+			if (cmap.tileAt(tx, ty) & dir) {
+				if (dir === LEFT) childArea.pxlo = pmap.tileToPosX(tx+1);
+				else childArea.pxro = pmap.tileToPosX(tx);
 				return true;
 			}
 		}
 	};
 
 	PlatformSearch.prototype._getSplitSeeds = function(childArea) {
-		var platformMap = this._platformMap;
-		var combinedMap = this._combinedMap;
+		var pmap = this._pmap;
+		var cmap = this._cmap;
 
-		var ltx = platformMap.posToTileX(childArea.pxli);
-		var rtx = platformMap.posToTileCeilX(childArea.pxri);
+		var ltx = pmap.posToTileX(childArea.pxli);
+		var rtx = pmap.posToTileCeilX(childArea.pxri);
 		var vyi = childArea.vyi;
 		var ty, fty;
 		
 		if (vyi < 0) {
-			fty = platformMap.posToTileY(childArea.pyi - this._sizeY);
-			ty = platformMap.posToTileY(childArea.pyo - this._sizeY);
+			fty = pmap.posToTileY(childArea.pyi - this._sizeY);
+			ty = pmap.posToTileY(childArea.pyo - this._sizeY);
 			if (fty === ty) return;
 		} else {
-			fty = platformMap.posToTileCeilY(childArea.pyo);
-			ty = platformMap.posToTileCeilY(childArea.pyi);
+			fty = pmap.posToTileCeilY(childArea.pyo);
+			ty = pmap.posToTileCeilY(childArea.pyi);
 			if (fty === ty) return;
 		}
 
-		var tilesize = platformMap.tilesize;
+		var tilesize = pmap.tilesize;
 
 		var txStart = -1;
 		var splitSeeds = [];
 
 		for (var tx = ltx; tx < rtx; ) {
-			var tile = combinedMap.tileAt(tx, ty);
+			var tile = cmap.tileAt(tx, ty);
 			if ((tile & DOWN) && vyi < 0) {
 				if (txStart >= 0) {
 					splitSeeds.push(this._getInitialSeed(
@@ -272,7 +272,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 				// then we bounce off with velocity = 0.
 				var utxStart = tx;
 				while(true) {
-					tile = combinedMap.tileAt(tx, ty);
+					tile = cmap.tileAt(tx, ty);
 					if ((tile & DOWN) && tx < rtx) tx++;
 					else {
 						splitSeeds.push(this._getInitialSeed(
@@ -288,7 +288,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 						childArea.parent, txStart * tilesize, tx * tilesize));
 				}
 
-				var platform = this._platformMap.tileAt(tx, ty);
+				var platform = this._pmap.tileAt(tx, ty);
 				if (platform) {
 					this._addReachablePlatform(childArea.parent, platform);
 					tx = platform.tx1;		
@@ -331,10 +331,10 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype._addReachablePlatform = function(area, platform) {
-		var platformMap = this._platformMap;
+		var pmap = this._pmap;
 		var endArea = this._getInitialSeed(area,
-			Math.max(platformMap.tileToPosX(platform.tx0), area.pxlo),
-			Math.min(platformMap.tileToPosX(platform.tx1), area.pxro));
+			Math.max(pmap.tileToPosX(platform.tx0), area.pxlo),
+			Math.min(pmap.tileToPosX(platform.tx1), area.pxro));
 		this._clipHierarchy(endArea);
 		endArea.platform = platform;
 		this._reachablePlatforms.push(endArea);

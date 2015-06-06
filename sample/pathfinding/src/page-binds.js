@@ -8,7 +8,7 @@ $(function() {
 	var $planPathButton = $("#plan-path");
 	var $planPathStepButton = $("#plan-path-step");
 	var $toggleLevelRendererCheckbox = $("#toggle-level-renderer");
-	var $toggleNavGridRendererCheckbox = $("#toggle-nav-grid-renderer");
+	var $togglePlatformRendererCheckbox = $("#toggle-platform-renderer");
 
 	var $canvas = $("<canvas/>")
 	.prop({

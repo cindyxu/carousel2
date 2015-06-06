@@ -3,8 +3,10 @@ gm.Sample.Pathfinding.Search = function() {
 	var values = gm.Sample.Pathfinding.values;
 	var ToyWorld = gm.Sample.Pathfinding.ToyWorld;
 
-	var navGrid = new gm.NavGrid();
-	navGrid.fromLayers(ToyWorld._level._layers);
+	var combinedMap = new gm.Pathfinder.CombinedMap(ToyWorld._level._layers);
+
+	var body = ToyWorld._entity._body;
+	var platformMap = new gm.Pathfinder.Walker.PlatformMap(body._sizeX, body._sizeY, combinedMap);
 
 	var platformSearch;
 
@@ -13,15 +15,15 @@ gm.Sample.Pathfinding.Search = function() {
 	Search.planPath = function() {
 
 		platformSearch = undefined;		
-		navGrid.fromLayers(ToyWorld._level._layers);
+		combinedMap.fromLayers(ToyWorld._level._layers);
+		platformMap.fromCombinedMap(combinedMap);
 
-		var body = ToyWorld._entity._body;
-		var originPlatform = navGrid.getPlatformUnderBody(body);
+		var originPlatform = platformMap.getPlatformUnderBody(body);
 
 		if (originPlatform) {
 			platformSearch = new gm.Pathfinder.Walker.PlatformSearch(
-				navGrid._platformMap,
-				navGrid._combinedLayerMap._map,
+				combinedMap._map,
+				platformMap._map,
 				values.SIZE_X,
 				values.SIZE_Y, 
 				values.WALK_SPD,
@@ -38,7 +40,7 @@ gm.Sample.Pathfinding.Search = function() {
 
 	Search.render = function(ctx) {
 		var bbox = ToyWorld._camera._body.getBbox();
-		navGrid.render(ctx, bbox);
+		platformMap.render(ctx, bbox);
 		if (platformSearch) platformSearch.render(ctx, bbox);
 	};
 
