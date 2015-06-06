@@ -19,7 +19,6 @@ gm.Sample.Pathfinding.Search = function() {
 		var originPlatform = navGrid.getPlatformUnderBody(body);
 
 		if (originPlatform) {
-			console.log(navGrid);
 			platformSearch = new gm.Pathfinder.Walker.PlatformSearch(
 				navGrid._platformMap,
 				navGrid._combinedLayerMap._map,
@@ -29,10 +28,7 @@ gm.Sample.Pathfinding.Search = function() {
 				values.JUMP_SPD,
 				values.FALL_ACCEL,
 				values.TERMINAL_V,
-				originPlatform,
-				{
-					renderSpecifics: true
-				});
+				originPlatform);
 		}
 	};
 

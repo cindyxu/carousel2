@@ -107,6 +107,8 @@ gm.Map.prototype.getOverlappingTileBbox = function(bbox, res) {
 };
 
 gm.Map.prototype.tileAt = function(tx, ty) {
+	if (tx < 0 || tx >= this._tilesX) return;
+	if (ty < 0 || ty >= this._tilesY) return;
 	return this._tiles[ty * this._tilesX + tx];
 };
 
