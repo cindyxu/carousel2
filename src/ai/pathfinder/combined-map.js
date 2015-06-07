@@ -90,19 +90,35 @@ gm.Pathfinder.CombinedMap.prototype._generateCombinedMap = function(layers) {
 };
 
 gm.Pathfinder.CombinedMap.prototype.posToTile = function(x, y, res) {
-	var combinedMap = this._map;
-	var offsetX = this._oftx * combinedMap.tilesize;
-	var offsetY = this._ofty * combinedMap.tilesize;
+	var cmap = this._map;
+	var offsetX = this._oftx * cmap.tilesize;
+	var offsetY = this._ofty * cmap.tilesize;
 
-	combinedMap.posToTile(x - offsetX, y - offsetY, res);
+	cmap.posToTile(x - offsetX, y - offsetY, res);
+};
+
+gm.Pathfinder.CombinedMap.prototype.posToTileX = function(x) {
+	return this._map.posToTile(x - (this._oftx * this._map.tilesize));
+};
+
+gm.Pathfinder.CombinedMap.prototype.posToTileY = function(y) {
+	return this._map.posToTile(y - (this._ofty * this._map.tilesize));
 };
 
 gm.Pathfinder.CombinedMap.prototype.tileToPos = function(tx, ty, res) {
-	var combinedMap = this._map;
-	var offsetX = this._oftx * combinedMap.tilesize;
-	var offsetY = this._ofty * combinedMap.tilesize;
+	var cmap = this._map;
+	var offsetX = this._oftx * cmap.tilesize;
+	var offsetY = this._ofty * cmap.tilesize;
 	
-	combinedMap.tileToPos(tx, ty, res);
+	cmap.tileToPos(tx, ty, res);
 	res.x += offsetX;
 	res.y += offsety;
+};
+
+gm.Pathfinder.CombinedMap.prototype.tileToPosX = function(tx) {
+	return this._map.tileToPosX(tx) + (this._oftx * this._map.tilesize);
+};
+
+gm.Pathfinder.CombinedMap.prototype.tileToPosY = function(ty) {
+	return this._map.tileToPosY(ty) + (this._ofty * this._map.tilesize);
 };

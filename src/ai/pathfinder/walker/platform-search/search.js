@@ -9,9 +9,8 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	var RIGHT = gm.Constants.Dir.RIGHT;
 
 	var PlatformSearch = function(
-		cmap, pmap, sizeX, sizeY, runSpd, jumpSpd, fallAccel, terminalV, originPlatform) {
+		cmap, sizeX, sizeY, runSpd, jumpSpd, fallAccel, terminalV) {
 
-		this._pmap = pmap;
 		this._cmap = cmap;
 		this._sizeX = sizeX;
 		this._sizeY = sizeY;
@@ -24,7 +23,6 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		console.log("runSpd", runSpd, "jumpSpd", jumpSpd, "fallAccel", fallAccel, "terminalV", terminalV);
 
 		if (LOGGING) {
-			if (!pmap) console.log("!!! platformSearch - no platform map");
 			if (!cmap) console.log("!!! platformSearch - no combined map");
 			if (isNaN(sizeX) || isNaN(sizeY)) console.log("!!! platformSearch - body dimensions were", sizeX, ",", sizeY);
 			if (isNaN(runSpd)) console.log("!!! platformSearch - runSpd was", runSpd);
@@ -33,30 +31,19 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 			else if (fallAccel <= 0) console.log("!!! fallAccel", fallAccel, "<= 0. this will have unexpected results");
 			if (isNaN(terminalV)) console.log("!!! platformSearch - terminalV was", terminalV);
 		}
-
-		this._beginSearch(originPlatform);
 	};
 
-	PlatformSearch.prototype._beginSearch = function(originPlatform) {
-		this._originPlatform = originPlatform;
-
-		this._reachablePlatforms = [];
+	PlatformSearch.prototype.beginSearch = function(pxlo, pxro, pyo) {
+		this._reachablePatches = [];
 		this._currentAreas = [];
-
-		var py = this._pmap.tileToPosY(originPlatform.ty);
-		pxlo = this._pmap.tileToPosX(originPlatform.tx0) - this._sizeX;
-		pxro = this._pmap.tileToPosX(originPlatform.tx1) + this._sizeX;
 
 		if (pxro <= pxlo) return;
 
 		var stubArea = {
 			vyo: Math.max(-this._kinematics._jumpSpd, -this._kinematics._terminalV),
-
 			pxlo: pxlo,
 			pxro: pxro,
-			
-			pyo: py,
-
+			pyo: pyo,
 			parent: undefined,
 		};
 
@@ -86,7 +73,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	PlatformSearch.prototype._addChildrenFromSeed = function(childArea) {
 		if (childArea.pxri - childArea.pxli < this._sizeX) return;
 
-		this._getTentativeAltitude(childArea);
+		this._getAltitude(childArea);
 		this._getTentativeSpread(childArea);
 		this._clampSpread(childArea);
 
@@ -125,9 +112,9 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		};
 	};
 
-	PlatformSearch.prototype._getTentativeAltitude = function(childArea) {
+	PlatformSearch.prototype._getAltitude = function(childArea) {
 
-		var tilesize = this._pmap.tilesize;
+		var tilesize = this._cmap.tilesize;
 		var kinematics = this._kinematics;
 
 		var pyo;
@@ -140,12 +127,12 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 
 		// going up
 		if (childArea.vyi < 0) {
-			var tyTop = this._pmap.posToTileY(pyiTop);
+			var tyTop = this._cmap.posToTileY(pyiTop);
 			// for going up only - if the top of our body is exactly aligned
 			// with the top of this tile row, we still want to end on the row above it
-			if (this._pmap.tileToPosY(tyTop) === pyiTop) tyTop--;
+			if (this._cmap.tileToPosY(tyTop) === pyiTop) tyTop--;
 
-			var ptyoTop = this._pmap.tileToPosY(tyTop);
+			var ptyoTop = this._cmap.tileToPosY(tyTop);
 			
 			var pyoTop = ptyoTop + Math.max(bodyExtend, tilesize - bodyExtend);
 			if (pyiTop <= pyoTop) {
@@ -170,14 +157,14 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		}
 		// going down
 		else {
-			var tyoBottom = this._pmap.posToTileY(pyiBottom);
-			var ptyoBottom = this._pmap.tileToPosY(tyoBottom);
+			var tyoBottom = this._cmap.posToTileY(pyiBottom);
+			var ptyoBottom = this._cmap.tileToPosY(tyoBottom);
 
 			var pyoBottom = ptyoBottom + Math.min(bodyExtend, tilesize - bodyExtend);
 			if (pyiBottom >= pyoBottom) {
 				pyoBottom = ptyoBottom + Math.max(bodyExtend, tilesize - bodyExtend);
 				if (pyiBottom >= pyoBottom) {
-					pyoBottom = this._pmap.tileToPosY(tyoBottom+1);
+					pyoBottom = this._cmap.tileToPosY(tyoBottom+1);
 				}
 			}
 			vyo = kinematics.getVyFinalFromDeltaY(childArea.vyi, pyoBottom - pyiBottom);
@@ -194,12 +181,12 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype._clampSpread = function(childArea) {
-		var pmap = this._pmap;
+		var cmap = this._cmap;
 		
-		var txli = pmap.posToTileX(childArea.pxli)-1;
-		var txlo = pmap.posToTileX(childArea.pxlo)-1;
-		var txri = pmap.posToTileCeilX(childArea.pxri);
-		var txro = pmap.posToTileCeilX(childArea.pxro);
+		var txli = cmap.posToTileX(childArea.pxli)-1;
+		var txlo = cmap.posToTileX(childArea.pxlo)-1;
+		var txri = cmap.posToTileCeilX(childArea.pxri);
+		var txro = cmap.posToTileCeilX(childArea.pxro);
 
 		var tx;
 		for (tx = txli; tx > txlo; tx--) {
@@ -212,54 +199,71 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype._clampSpreadColumn = function(childArea, tx, dir) {
-		var pmap = this._pmap;
 		var cmap = this._cmap;
 
-		var px = pmap.tileToPosX(dir === LEFT ? tx+1 : tx);
+		var px = cmap.tileToPosX(dir === LEFT ? tx+1 : tx);
 		var dx = px - (dir === LEFT ? childArea.pxli : childArea.pxri);
 		var dy = this._kinematics.getDeltaYFromDeltaX(childArea.vyi, dx);
 
 		var tyTop, tyBottom;
 		if (childArea.vyi < 0) {
-			tyTop = pmap.posToTileCeilY(childArea.pyi + dy - this._sizeY) - 1;
-			tyBottom = pmap.posToTileCeilY(childArea.pyi + dy);
+			tyTop = cmap.posToTileCeilY(childArea.pyi + dy - this._sizeY) - 1;
+			tyBottom = cmap.posToTileCeilY(childArea.pyi + dy);
 		} else {
-			tyTop = pmap.posToTileY(childArea.pyi + dy - this._sizeY);
-			tyBottom = pmap.posToTileY(childArea.pyi + dy) + 1;
+			tyTop = cmap.posToTileY(childArea.pyi + dy - this._sizeY);
+			tyBottom = cmap.posToTileY(childArea.pyi + dy) + 1;
 		}
 
 		for (var ty = tyTop; ty < tyBottom; ty++) {
 			if (cmap.tileAt(tx, ty) & dir) {
-				if (dir === LEFT) childArea.pxlo = pmap.tileToPosX(tx+1);
-				else childArea.pxro = pmap.tileToPosX(tx);
+				if (dir === LEFT) childArea.pxlo = cmap.tileToPosX(tx+1);
+				else childArea.pxro = cmap.tileToPosX(tx);
 				return true;
 			}
 		}
 	};
 
+	PlatformSearch.prototype._findXBarrierEnd = function(ltx, ty, dir, etx) {
+		var cmap = this._cmap;
+		if (etx === undefined) etx = cmap._tilesX;
+		var rtx = ltx;
+		for (rtx = ltx; rtx < etx; rtx++) {
+			tile = cmap.tileAt(rtx, ty);
+			if (!(tile & dir)) break;
+		}
+		return rtx;
+	};
+
+	/* checks if there are any nonempty tiles in the area
+	 * and splits the area based on the following rules:
+	 ** if there is a DOWN tile, add it to reachable patches
+	 ** if there is an UP tile, create a area with vyi=0
+	 ** if there is a LEFT tile, split the area at tx-1
+	 ** if there is a RIGHT tile, split the area at tx
+	 */
 	PlatformSearch.prototype._getSplitSeeds = function(childArea) {
-		var pmap = this._pmap;
 		var cmap = this._cmap;
 
-		var ltx = pmap.posToTileX(childArea.pxli);
-		var rtx = pmap.posToTileCeilX(childArea.pxri);
+		var ltx = cmap.posToTileX(childArea.pxli);
+		var rtx = cmap.posToTileCeilX(childArea.pxri);
 		var vyi = childArea.vyi;
 		var ty, fty;
 		
 		if (vyi < 0) {
-			fty = pmap.posToTileY(childArea.pyi - this._sizeY);
-			ty = pmap.posToTileY(childArea.pyo - this._sizeY);
+			fty = cmap.posToTileY(childArea.pyi - this._sizeY);
+			ty = cmap.posToTileY(childArea.pyo - this._sizeY);
 			if (fty === ty) return;
 		} else {
-			fty = pmap.posToTileCeilY(childArea.pyo);
-			ty = pmap.posToTileCeilY(childArea.pyi);
+			fty = cmap.posToTileCeilY(childArea.pyo);
+			ty = cmap.posToTileCeilY(childArea.pyi);
 			if (fty === ty) return;
 		}
 
-		var tilesize = pmap.tilesize;
+		var tilesize = cmap.tilesize;
 
 		var txStart = -1;
 		var splitSeeds = [];
+		var artx;
 
 		for (var tx = ltx; tx < rtx; ) {
 			var tile = cmap.tileAt(tx, ty);
@@ -268,31 +272,26 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 					splitSeeds.push(this._getInitialSeed(
 						childArea.parent, txStart * tilesize, tx * tilesize));
 				}
+
 				// if we've collided with something above,
 				// then we bounce off with velocity = 0.
-				var utxStart = tx;
-				while(true) {
-					tile = cmap.tileAt(tx, ty);
-					if ((tile & DOWN) && tx < rtx) tx++;
-					else {
-						splitSeeds.push(this._getInitialSeed(
-							childArea.parent, utxStart * tilesize, tx * tilesize, 0));
-						break;
-					}
-				}
+				artx = this._findXBarrierEnd(tx, ty, DOWN, rtx);
+				splitSeeds.push(this._getInitialSeed(
+					childArea.parent, tx * tilesize, rtx * tilesize, 0));
+				tx = artx;
+
 				txStart = -1;
 
 			} else if ((tile & UP) && vyi >= 0) {
+
 				if (txStart >= 0) {
 					splitSeeds.push(this._getInitialSeed(
 						childArea.parent, txStart * tilesize, tx * tilesize));
 				}
 
-				var platform = this._pmap.tileAt(tx, ty);
-				if (platform) {
-					this._addReachablePlatform(childArea.parent, platform);
-					tx = platform.tx1;		
-				} else tx++;
+				artx = this._findXBarrierEnd(tx, ty, UP, rtx);
+				this._addReachablePatch(childArea.parent, tx, artx);
+				tx = artx;
 
 				txStart = -1;
 				
@@ -330,16 +329,19 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		return splitSeeds;
 	};
 
-	PlatformSearch.prototype._addReachablePlatform = function(area, platform) {
-		var pmap = this._pmap;
+	PlatformSearch.prototype._addReachablePatch = function(area, tx0, tx1) {
+		var cmap = this._cmap;
 		var endArea = this._getInitialSeed(area,
-			Math.max(pmap.tileToPosX(platform.tx0), area.pxlo),
-			Math.min(pmap.tileToPosX(platform.tx1), area.pxro));
+			Math.max(cmap.tileToPosX(tx0), area.pxlo),
+			Math.min(cmap.tileToPosX(tx1), area.pxro));
 		this._clipHierarchy(endArea);
-		endArea.platform = platform;
-		this._reachablePlatforms.push(endArea);
+
+		this._reachablePatches.push(endArea);
 	};
 
+	// if the child range is smaller than the parent range,
+	// creates a clipped version of the parent that matches the child range.
+	// this propagates back up the parent chain.
 	PlatformSearch.prototype._clipHierarchy = function(childArea) {
 		var parentArea = childArea.parent;
 		if (!parentArea) return;
