@@ -45,7 +45,7 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 
 				var shouldFinishPlatform = (pstart >= 0 && !(ntile & gm.Constants.Dir.UP));
 				if (shouldFinishPlatform) {
-					this._addNewPlatform(pstart, tx, ty);
+					this._addNewPlatforms(pstart, tx, ty);
 					pstart = -1;
 				}
 
@@ -56,36 +56,46 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 			}
 
 			if (pstart >= 0) {
-				this._addNewPlatform(pstart, platformMap._tilesX, ty);
+				this._addNewPlatforms(pstart, platformMap._tilesX, ty);
 				pstart = -1;
 			}
 		}
 	};
 
-	var obbox = {};
-	var tbbox = {};
-	PlatformMap.prototype.getPlatformUnderBody = function(body) {
+	PlatformMap.prototype._splitPlatform = function(platform) {
+		var cmap = this._combinedMap._map;
+		var maxTy = platform.ty;
+		var minTy = cmap.posToTileY(cmap.tileToPosY(platform.ty) - this._sizeY);
 
-		var platformMap = this._map;
-		var tilesize = this._map.tilesize;
-		var bbox = body.getBbox();
-		var oftx = this._combinedMap._oftx, 
-			ofty = this._combinedMap._ofty;
-
-		obbox.x0 = bbox.x0 + (oftx * tilesize);
-		obbox.y0 = bbox.y0 + (ofty * tilesize);
-		obbox.x1 = bbox.x1 + (oftx * tilesize);
-		obbox.y1 = bbox.y1 + (ofty * tilesize);
+		var splitPlatforms = [];
 		
-		platformMap.getOverlappingTileBbox(obbox, tbbox);
-
-		var platform;
-		for (var ty = tbbox.ty1; ty < platformMap._tilesY; ty++) {
-			for (var tx = tbbox.tx0; tx < tbbox.tx1; tx++) {
-				platform = platformMap.tileAt(tx, ty);
-				if (platform) return platform;
+		for (var tx = platform.tx0; tx < platform.tx1; tx++) {
+			var splitLeft = false;
+			var splitRight = false;
+			for (ty = minTy; ty < maxTy; ty++) {
+				var tile = cmap.tileAt(tx, ty);
+				splitLeft = splitLeft || (tile & LEFT);
+				splitRight = splitRight || (tile & RIGHT);
+			}
+			if (splitLeft && tx > platform.tx0) {
+				splitPlatforms.push(platform);
+				platform = this._splitPlatformAt(platform, tx);
+			} if (splitRight && tx < platform.tx1-1) {
+				splitPlatforms.push(platform);
+				platform = this._splitPlatformAt(platform, tx+1);
 			}
 		}
+
+		splitPlatforms.push(platform);
+		return splitPlatforms;
+	};
+
+	PlatformMap.prototype._splitPlatformAt = function(platform, tx) {
+		if (tx < platform.tx0 || tx >= platform.tx1) return;
+		var tx1 = platform.tx1;
+		platform.tx1 = tx;
+		var nplatform = this._createNewPlatformObject(tx, tx1, platform.ty);
+		return nplatform;
 	};
 
 	PlatformMap.prototype._getPlatformExtents = function(platform) {
@@ -126,24 +136,55 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		return {
 			tx0: tx0,
 			tx1: tx1,
-			ty: ty,
-			index: this._platforms.length + 1
+			ty: ty
 		};
 	};
 
-	PlatformMap.prototype._addNewPlatform = function(tx0, tx1, ty) {
-		var platform = this._createNewPlatformObject(tx0, tx1, ty);
-		this._getPlatformExtents(platform);
+	PlatformMap.prototype._addNewPlatforms = function(tx0, tx1, ty) {
+		var initPlatform = this._createNewPlatformObject(tx0, tx1, ty);
+		var splitPlatforms = this._splitPlatform(initPlatform);
 
-		this._platforms.push(platform);
-		for (var tx = tx0; tx < tx1; tx++) {
-			this._map.setTile(tx, ty, platform);
+		for (var s = 0; s < splitPlatforms.length; s++) {
+			var platform = splitPlatforms[s];
+
+			this._getPlatformExtents(platform);
+			platform.index = this._platforms.length;
+			this._platforms.push(platform);
+			for (var tx = platform.tx0; tx < platform.tx1; tx++) {
+				this._map.setTile(tx, ty, platform);
+			}
 		}
 	};
 
 	PlatformMap.prototype.render = function(ctx, bbox) {
 		var tilesize = this._map.tilesize;
 		this._renderer.render(ctx, this._combinedMap._oftx * tilesize, this._combinedMap._ofty * tilesize, bbox);
+	};
+
+	var obbox = {};
+	var tbbox = {};
+	PlatformMap.prototype.getPlatformUnderBody = function(body) {
+
+		var platformMap = this._map;
+		var tilesize = this._map.tilesize;
+		var bbox = body.getBbox();
+		var oftx = this._combinedMap._oftx, 
+			ofty = this._combinedMap._ofty;
+
+		obbox.x0 = bbox.x0 + (oftx * tilesize);
+		obbox.y0 = bbox.y0 + (ofty * tilesize);
+		obbox.x1 = bbox.x1 + (oftx * tilesize);
+		obbox.y1 = bbox.y1 + (ofty * tilesize);
+		
+		platformMap.getOverlappingTileBbox(obbox, tbbox);
+
+		var platform;
+		for (var ty = tbbox.ty1; ty < platformMap._tilesY; ty++) {
+			for (var tx = tbbox.tx0; tx < tbbox.tx1; tx++) {
+				platform = platformMap.tileAt(tx, ty);
+				if (platform) return platform;
+			}
+		}
 	};
 
 	return PlatformMap;
