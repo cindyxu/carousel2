@@ -23,7 +23,7 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 
 	PlatformScan.prototype.beginSearch = function(pxlo, pxro, pyo) {
 
-		console.log("begin search: pxlo", pxlo, "pxro:", pxro, "pyo:", pyo);
+		if (LOGGING) console.log("platformscan - begin search: pxlo", pxlo, "pxro:", pxro, "pyo:", pyo);
 		this._reachablePatches = [];
 		this._currentAreas = [];
 
@@ -41,7 +41,7 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 	};
 
 	PlatformScan.prototype.step = function() {
-		console.log("STEP *******************************");
+		if (LOGGING) console.log("STEP *******************************");
 		var parentArea = this._currentAreas.pop();
 		if (parentArea) {
 			var childArea = this._getInitialSeed(parentArea);
@@ -70,10 +70,12 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 		this._getTentativeSpread(childArea);
 		this._clampSpread(childArea);
 
-		console.log("vyi", childArea.vyi, "vyo", childArea.vyo);
-		console.log("pyi", childArea.pyi, "pyo", childArea.pyo);
-		console.log("pxli", childArea.pxli, "pxlo", childArea.pxlo);
-		console.log("pxri", childArea.pxri, "pxro", childArea.pxro);
+		if (LOGGING) {
+			console.log("vyi", childArea.vyi, "vyo", childArea.vyo);
+			console.log("pyi", childArea.pyi, "pyo", childArea.pyo);
+			console.log("pxli", childArea.pxli, "pxlo", childArea.pxlo);
+			console.log("pxri", childArea.pxri, "pxro", childArea.pxro);
+		}
 
 		var splitSeeds = this._getSplitSeeds(childArea);
 
@@ -339,7 +341,7 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 		var parentArea = childArea.parent;
 		if (!parentArea) return;
 
-		var dx = this._kinematics.getAbsDeltaXFromDeltaY(parentArea.pyo - parentArea.pyi);
+		var dx = this._kinematics.getAbsDeltaXFromDeltaY(parentArea.vyi, parentArea.pyo - parentArea.pyi);
 		if (parentArea.pxlo < childArea.pxli || parentArea.pxro > childArea.pxri) {
 
 			var cloneParent = this._cloneArea(parentArea);

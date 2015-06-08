@@ -142,8 +142,6 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 
 		gm.Pathfinder.Walker.PlatformGenerator.generatePlatforms(this);
 		gm.Pathfinder.Walker.PlatformScanner.scanPlatforms(this);
-
-		console.log(this._platforms);
 	};
 
 	PlatformMap.prototype.render = function(ctx, bbox) {
