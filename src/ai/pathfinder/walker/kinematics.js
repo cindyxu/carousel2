@@ -3,11 +3,11 @@ if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
 
 gm.Pathfinder.Walker.Kinematics = function() {
 
-	var Kinematics = function(runSpd, jumpSpd, fallAccel, terminalV) {
-		this._runSpd = runSpd;
-		this._jumpSpd = jumpSpd;
-		this._fallAccel = fallAccel;
-		this._terminalV = terminalV;
+	var Kinematics = function(params) {
+		this._walkSpd = params.walkSpd;
+		this._jumpSpd = params.jumpSpd;
+		this._fallAccel = params.fallAccel;
+		this._terminalV = params.terminalV;
 	};
 
 	Kinematics.prototype.getDeltaYFromVyFinal = function(vyi, vyf) {
@@ -37,7 +37,7 @@ gm.Pathfinder.Walker.Kinematics = function() {
 
 	Kinematics.prototype.getAbsDeltaXFromDeltaY = function(vyi, dy) {
 		if (vyi >= this._terminalV) {
-			return dy / this._terminalV * this._runSpd;
+			return dy / this._terminalV * this._walkSpd;
 		}
 
 		var dyTerminal = this.getDeltaYFromVyFinal(vyi, this._terminalV);
@@ -53,7 +53,7 @@ gm.Pathfinder.Walker.Kinematics = function() {
 		var dt = (-vyi - dtdeterminant) / this._fallAccel;
 		if (dt < 0) dt = (-vyi + dtdeterminant) / this._fallAccel;
 
-		return dt * this._runSpd;	
+		return dt * this._walkSpd;	
 	};
 
 	Kinematics.prototype.getDeltaTimeFromVyFinal = function(vyi, vyf) {
@@ -66,7 +66,7 @@ gm.Pathfinder.Walker.Kinematics = function() {
 	};
 
 	Kinematics.prototype.getDeltaYFromDeltaX = function(vyi, dx) {
-		return this.getDeltaYFromDeltaTime(vyi, Math.abs(dx / this._runSpd));
+		return this.getDeltaYFromDeltaTime(vyi, Math.abs(dx / this._walkSpd));
 	};
 
 	Kinematics.prototype.getDeltaYFromDeltaTime = function(vyi, dt) {

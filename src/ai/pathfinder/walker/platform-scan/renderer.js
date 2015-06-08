@@ -1,7 +1,7 @@
-gm.Pathfinder.Walker.PlatformSearch.Renderer = function() {
+gm.Pathfinder.Walker.PlatformScan.Renderer = function() {
 
-	var Renderer = function(platformSearch) {
-		this._platformSearch = platformSearch;
+	var Renderer = function(platformScan) {
+		this._platformScan = platformScan;
 	};
 
 	Renderer.prototype.render = function(ctx, bbox) {
@@ -16,7 +16,7 @@ gm.Pathfinder.Walker.PlatformSearch.Renderer = function() {
 	};
 
 	Renderer.prototype._renderAreas = function(ctx, bbox) {
-		var currentAreas = this._platformSearch._currentAreas;
+		var currentAreas = this._platformScan._currentAreas;
 		if (!currentAreas) return;
 
 		var globalAlpha = ctx.globalAlpha;
@@ -36,7 +36,7 @@ gm.Pathfinder.Walker.PlatformSearch.Renderer = function() {
 	};
 
 	Renderer.prototype._renderReachablePatches = function(ctx, bbox) {
-		var reachablePatches = this._platformSearch._reachablePatches;
+		var reachablePatches = this._platformScan._reachablePatches;
 		if (!reachablePatches) return;
 
 		ctx.save();
@@ -44,7 +44,7 @@ gm.Pathfinder.Walker.PlatformSearch.Renderer = function() {
 
 		for (var p = 0; p < reachablePatches.length; p++) {
 			var patch = reachablePatches[p];
-			ctx.fillRect(patch.pxli, patch.pyi, patch.pxri - patch.pxli, this._platformSearch._cmap.tilesize);
+			ctx.fillRect(patch.pxli, patch.pyi, patch.pxri - patch.pxli, this._platformScan._cmap.tilesize);
 		}
 
 		ctx.restore();
@@ -52,8 +52,8 @@ gm.Pathfinder.Walker.PlatformSearch.Renderer = function() {
 
 	Renderer.prototype._renderArea = function(ctx, area, isDetectionArea) {
 		
-		var sizeY = this._platformSearch._sizeY;
-		var tilesize = this._platformSearch._cmap.tilesize;
+		var sizeY = this._platformScan._sizeY;
+		var tilesize = this._platformScan._cmap.tilesize;
 
 		ctx.save();
 

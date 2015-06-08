@@ -2,9 +2,9 @@ if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
 
 gm.Pathfinder.Walker.PlatformMap = function() {
 
-	var PlatformMap = function(sizeX, sizeY, combinedMap) {
-		this._sizeX = sizeX;
-		this._sizeY = sizeY;
+	var PlatformMap = function(walkerParams, combinedMap) {
+		this._walkerParams = walkerParams;
+
 		this._platforms = [];
 
 		this._map = new gm.Map({
@@ -14,6 +14,30 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		});
 		this._renderer = new gm.Renderer.PlatformMap(this._map);
 		if (combinedMap) this.fromCombinedMap(combinedMap);
+
+		if (LOGGING) {
+			if (isNaN(walkerParams.sizeX) || isNaN(walkerParams.sizeY)) {
+				console.log("!!! PlatformMap - body dimensions were", sizeX, ",", walkerParams.sizeY);
+			}
+			
+			if (isNaN(walkerParams.walkSpd)) {
+				console.log("!!! PlatformMap - walkSpd was", walkerParams.walkSpd);
+			}
+			
+			if (isNaN(walkerParams.jumpSpd)) {
+				console.log("!!! PlatformMap - jumpSpd was", walkerParams.jumpSpd);
+			}
+
+			if (isNaN(walkerParams.fallAccel)) {
+				console.log("!!! PlatformMap - fallAccel was", walkerParams.fallAccel);
+			} else if (walkerParams.fallAccel <= 0) {
+				console.log("!!! fallAccel", walkerParams.fallAccel, "<= 0. this will have unexpected results");
+			}
+			
+			if (isNaN(walkerParams.terminalV)) {
+				console.log("!!! PlatformMap - terminalV was", walkerParams.terminalV);
+			}
+		}
 	};
 
 	PlatformMap._Platform = function(tx0, tx1, ty) {
@@ -24,23 +48,24 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		this._pxli = -1;
 		this._pxri = -1;
 
+		this._reachable = {};
 		this._index = -1;
 	};
 
 	PlatformMap.prototype.extendPlatformLeft = function(platform, pxli) {
-		if (platform._tx0 * this._map.tilesize < pxli) return;
+		if (this._map.tileToPosX(platform._tx0) < pxli) return;
 		platform._pxli = pxli;
 	};
 
 	PlatformMap.prototype.extendPlatformRight = function(platform, pxri) {
-		if (platform._tx1 * this._map.tilesize > pxri) return;
+		if (this._map.tileToPosX(platform._tx1) > pxri) return;
 		platform._pxri = pxri;
 	};
 
 	PlatformMap.prototype.newPlatformObject = function(tx0, tx1, ty) {
 		var platform = new PlatformMap._Platform(tx0, tx1, ty);
-		this.extendPlatformLeft(platform, tx0 * this._map.tilesize);
-		this.extendPlatformRight(platform, tx1 * this._map.tilesize);
+		this.extendPlatformLeft(platform, this._map.tileToPosX(platform._tx0));
+		this.extendPlatformRight(platform, this._map.tileToPosX(platform._tx1));
 		return platform;
 	};
 
@@ -98,6 +123,14 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		}
 	};
 
+	PlatformMap.prototype.addReachableLink = function(originPlatform, reachedPlatform, patch) {
+		var patches = originPlatform._reachable[reachedPlatform._index];
+		if (!patches) {
+			patches = originPlatform._reachable[reachedPlatform._index] = [];
+		}
+		patches.push(patch);
+	};
+
 	PlatformMap.prototype.fromCombinedMap = function(combinedMap) {
 		this._combinedMap = combinedMap;
 		var cmap = combinedMap._map;
@@ -108,6 +141,9 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		this._platforms.length = 0;
 
 		gm.Pathfinder.Walker.PlatformGenerator.generatePlatforms(this);
+		gm.Pathfinder.Walker.PlatformScanner.scanPlatforms(this);
+
+		console.log(this._platforms);
 	};
 
 	PlatformMap.prototype.render = function(ctx, bbox) {

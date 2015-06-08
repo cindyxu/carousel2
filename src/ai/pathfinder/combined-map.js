@@ -97,14 +97,6 @@ gm.Pathfinder.CombinedMap.prototype.posToTile = function(x, y, res) {
 	cmap.posToTile(x - offsetX, y - offsetY, res);
 };
 
-gm.Pathfinder.CombinedMap.prototype.posToTileX = function(x) {
-	return this._map.posToTile(x - (this._oftx * this._map.tilesize));
-};
-
-gm.Pathfinder.CombinedMap.prototype.posToTileY = function(y) {
-	return this._map.posToTile(y - (this._ofty * this._map.tilesize));
-};
-
 gm.Pathfinder.CombinedMap.prototype.tileToPos = function(tx, ty, res) {
 	var cmap = this._map;
 	var offsetX = this._oftx * cmap.tilesize;

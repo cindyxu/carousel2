@@ -1,39 +1,29 @@
 if (!gm.Pathfinder) gm.Pathfinder = {};
 if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
 
-gm.Pathfinder.Walker.PlatformSearch = function() {
+gm.Pathfinder.Walker.PlatformScan = function() {
 
 	var DOWN = gm.Constants.Dir.DOWN;
 	var UP = gm.Constants.Dir.UP;
 	var LEFT = gm.Constants.Dir.LEFT;
 	var RIGHT = gm.Constants.Dir.RIGHT;
 
-	var PlatformSearch = function(
-		cmap, sizeX, sizeY, runSpd, jumpSpd, fallAccel, terminalV) {
+	var PlatformScan = function(cmap, walkerParams) {
 
 		this._cmap = cmap;
-		this._sizeX = sizeX;
-		this._sizeY = sizeY;
 
-		this._kinematics = new gm.Pathfinder.Walker.Kinematics(runSpd, jumpSpd, fallAccel, terminalV);
+		this._sizeX = walkerParams.sizeX;
+		this._sizeY = walkerParams.sizeY;
+		this._kinematics = new gm.Pathfinder.Walker.Kinematics(walkerParams);
 
-		this._renderer = new gm.Pathfinder.Walker.PlatformSearch.Renderer(this);
+		this._renderer = new gm.Pathfinder.Walker.PlatformScan.Renderer(this);
 
-		console.log("sizeX", sizeX, "sizeY", sizeY);
-		console.log("runSpd", runSpd, "jumpSpd", jumpSpd, "fallAccel", fallAccel, "terminalV", terminalV);
-
-		if (LOGGING) {
-			if (!cmap) console.log("!!! platformSearch - no combined map");
-			if (isNaN(sizeX) || isNaN(sizeY)) console.log("!!! platformSearch - body dimensions were", sizeX, ",", sizeY);
-			if (isNaN(runSpd)) console.log("!!! platformSearch - runSpd was", runSpd);
-			if (isNaN(jumpSpd)) console.log("!!! platformSearch - jumpSpd was", jumpSpd);
-			if (isNaN(fallAccel)) console.log("!!! platformSearch - fallAccel was", fallAccel);
-			else if (fallAccel <= 0) console.log("!!! fallAccel", fallAccel, "<= 0. this will have unexpected results");
-			if (isNaN(terminalV)) console.log("!!! platformSearch - terminalV was", terminalV);
-		}
+		if (LOGGING && !cmap) console.log("!!! platformScan - no combined map");
 	};
 
-	PlatformSearch.prototype.beginSearch = function(pxlo, pxro, pyo) {
+	PlatformScan.prototype.beginSearch = function(pxlo, pxro, pyo) {
+
+		console.log("begin search: pxlo", pxlo, "pxro:", pxro, "pyo:", pyo);
 		this._reachablePatches = [];
 		this._currentAreas = [];
 
@@ -50,16 +40,18 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		this._currentAreas.push(stubArea);
 	};
 
-	PlatformSearch.prototype.step = function() {
+	PlatformScan.prototype.step = function() {
 		console.log("STEP *******************************");
 		var parentArea = this._currentAreas.pop();
 		if (parentArea) {
 			var childArea = this._getInitialSeed(parentArea);
 			this._addChildrenFromSeed(childArea);
+			return true;
 		}
+		return false;
 	};
 
-	PlatformSearch.prototype._getInitialSeed = function(parentArea, pxli, pxri, vyi) {
+	PlatformScan.prototype._getInitialSeed = function(parentArea, pxli, pxri, vyi) {
 		var childArea = {
 			vyi: vyi !== undefined ? vyi : parentArea.vyo,
 			pxli: pxli !== undefined ? pxli : parentArea.pxlo,
@@ -70,8 +62,9 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		return childArea;
 	};
 
-	PlatformSearch.prototype._addChildrenFromSeed = function(childArea) {
+	PlatformScan.prototype._addChildrenFromSeed = function(childArea) {
 		if (childArea.pxri - childArea.pxli < this._sizeX) return;
+		if (!this._cmap.inRangeY(this._cmap.posToTileY(childArea.pyi))) return;
 
 		this._getAltitude(childArea);
 		this._getTentativeSpread(childArea);
@@ -94,7 +87,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		}
 	};
 
-	PlatformSearch.prototype._cloneArea = function(area) {
+	PlatformScan.prototype._cloneArea = function(area) {
 		return {
 			vyi: area.vyi,
 			vyo: area.vyo,
@@ -112,7 +105,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		};
 	};
 
-	PlatformSearch.prototype._getAltitude = function(childArea) {
+	PlatformScan.prototype._getAltitude = function(childArea) {
 
 		var tilesize = this._cmap.tilesize;
 		var kinematics = this._kinematics;
@@ -174,13 +167,13 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		childArea.pyo = pyo;
 	};
 
-	PlatformSearch.prototype._getTentativeSpread = function(childArea) {
+	PlatformScan.prototype._getTentativeSpread = function(childArea) {
 		var deltaX = this._kinematics.getAbsDeltaXFromDeltaY(childArea.vyi, childArea.pyo - childArea.pyi);
 		childArea.pxlo = childArea.pxli - deltaX;
 		childArea.pxro = childArea.pxri + deltaX;
 	};
 
-	PlatformSearch.prototype._clampSpread = function(childArea) {
+	PlatformScan.prototype._clampSpread = function(childArea) {
 		var cmap = this._cmap;
 		
 		var txli = cmap.posToTileX(childArea.pxli)-1;
@@ -198,7 +191,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		}
 	};
 
-	PlatformSearch.prototype._clampSpreadColumn = function(childArea, tx, dir) {
+	PlatformScan.prototype._clampSpreadColumn = function(childArea, tx, dir) {
 		var cmap = this._cmap;
 
 		var px = cmap.tileToPosX(dir === LEFT ? tx+1 : tx);
@@ -223,7 +216,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		}
 	};
 
-	PlatformSearch.prototype._findXBarrierEnd = function(ltx, ty, dir, etx) {
+	PlatformScan.prototype._findXBarrierEnd = function(ltx, ty, dir, etx) {
 		var cmap = this._cmap;
 		if (etx === undefined) etx = cmap._tilesX;
 		var rtx = ltx;
@@ -241,7 +234,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	 ** if there is a LEFT tile, split the area at tx-1
 	 ** if there is a RIGHT tile, split the area at tx
 	 */
-	PlatformSearch.prototype._getSplitSeeds = function(childArea) {
+	PlatformScan.prototype._getSplitSeeds = function(childArea) {
 		var cmap = this._cmap;
 
 		var ltx = cmap.posToTileX(childArea.pxli);
@@ -329,7 +322,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		return splitSeeds;
 	};
 
-	PlatformSearch.prototype._addReachablePatch = function(area, tx0, tx1) {
+	PlatformScan.prototype._addReachablePatch = function(area, tx0, tx1) {
 		var cmap = this._cmap;
 		var endArea = this._getInitialSeed(area,
 			Math.max(cmap.tileToPosX(tx0), area.pxlo),
@@ -342,7 +335,7 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	// if the child range is smaller than the parent range,
 	// creates a clipped version of the parent that matches the child range.
 	// this propagates back up the parent chain.
-	PlatformSearch.prototype._clipHierarchy = function(childArea) {
+	PlatformScan.prototype._clipHierarchy = function(childArea) {
 		var parentArea = childArea.parent;
 		if (!parentArea) return;
 
@@ -360,10 +353,10 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		}
 	};
 
-	PlatformSearch.prototype.render = function(ctx, bbox) {
+	PlatformScan.prototype.render = function(ctx, bbox) {
 		this._renderer.render(ctx, bbox);
 	};
 
-	return PlatformSearch;
+	return PlatformScan;
 
 }();
