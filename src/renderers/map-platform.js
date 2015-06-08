@@ -22,7 +22,7 @@ gm.Renderer.PlatformMap.prototype.renderTileFn = function(ctx, map, tx, ty) {
 		ti = "~";
 		ctx.fillStyle = "gray";
 	} else {
-		ti = platform.index;
+		ti = platform._index;
 		ctx.fillStyle = "white";
 	}
 	

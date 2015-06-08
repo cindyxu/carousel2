@@ -2,9 +2,6 @@ if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
 
 gm.Pathfinder.Walker.PlatformMap = function() {
 
-	var LEFT = gm.Constants.Dir.LEFT;
-	var RIGHT = gm.Constants.Dir.RIGHT;
-
 	var PlatformMap = function(sizeX, sizeY, combinedMap) {
 		this._sizeX = sizeX;
 		this._sizeY = sizeY;
@@ -19,8 +16,89 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		if (combinedMap) this.fromCombinedMap(combinedMap);
 	};
 
-	PlatformMap.prototype.fromCombinedMap = function(combinedMap) {
+	PlatformMap._Platform = function(tx0, tx1, ty) {
+		this._tx0 = tx0;
+		this._tx1 = tx1;
+		this._ty = ty;
 
+		this._pxli = -1;
+		this._pxri = -1;
+
+		this._index = -1;
+	};
+
+	PlatformMap.prototype.extendPlatformLeft = function(platform, pxli) {
+		if (platform._tx0 * this._map.tilesize < pxli) return;
+		platform._pxli = pxli;
+	};
+
+	PlatformMap.prototype.extendPlatformRight = function(platform, pxri) {
+		if (platform._tx1 * this._map.tilesize > pxri) return;
+		platform._pxri = pxri;
+	};
+
+	PlatformMap.prototype.newPlatformObject = function(tx0, tx1, ty) {
+		var platform = new PlatformMap._Platform(tx0, tx1, ty);
+		this.extendPlatformLeft(platform, tx0 * this._map.tilesize);
+		this.extendPlatformRight(platform, tx1 * this._map.tilesize);
+		return platform;
+	};
+
+	PlatformMap.prototype.setPlatformLeftTile = function(platform, tx0) {
+		var ptx0 = tx0;
+		platform._tx0 = tx0;
+		platform._pxli = platform._tx0 * this._map.tilesize;
+		
+		var pi = this._platforms.indexOf(platform);
+		if (pi >= 0) {
+			var map = this._map;
+			var tx;
+			for (tx = ptx0; tx < tx0; tx++) {
+				map.setTile(tx, ty, undefined);
+			}
+			for (tx = ptx0-1; tx >= tx0; tx--) {
+				map.setTile(tx, ty, platform);
+			}
+		}
+	};
+
+	PlatformMap.prototype.setPlatformRightTile = function(platform, tx1) {
+		var map = this._map;
+		platform._tx1 = tx1;
+		platform._pxri = platform._tx1 * map.tilesize;
+
+		var pi = this._platforms.indexOf(platform);
+		if (pi >= 0) {
+			var tx;
+			for (tx = ptx1; tx < tx1; tx++) {
+				map.setTile(tx, ty, platform);
+			}
+			for (tx = ptx1-1; tx >= tx1; tx--) {
+				map.setTile(tx, ty, undefined);
+			}
+		}
+	};
+
+	PlatformMap.prototype.splitPlatformAt = function(platform, tx) {
+		if (tx < platform._tx0 || tx >= platform._tx1) return;
+		var tx1 = platform._tx1;
+		this.setPlatformRightTile(platform, tx);
+		var nplatform = new PlatformMap._Platform(tx, tx1, platform._ty);
+		return nplatform;
+	};
+
+	PlatformMap.prototype.addPlatform = function(platform) {
+		if (this._platforms.indexOf(platform) >= 0) return;
+
+		platform._index = this._platforms.length;
+		this._platforms.push(platform);
+		
+		for (var tx = platform._tx0; tx < platform._tx1; tx++) {
+			this._map.setTile(tx, ty, platform);
+		}
+	};
+
+	PlatformMap.prototype.fromCombinedMap = function(combinedMap) {
 		this._combinedMap = combinedMap;
 		var cmap = combinedMap._map;
 		var tilesize = cmap.tilesize;
@@ -29,131 +107,7 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		this._map.tilesize = tilesize;
 		this._platforms.length = 0;
 
-		this._fillPlatformMap();
-	};
-
-	PlatformMap.prototype._fillPlatformMap = function() {
-		var cmap = this._combinedMap._map;
-		var platformMap = this._map;
-		var pstart = -1;
-		var ptile;
-
-		for (var ty = 0; ty < platformMap._tilesY; ty++) {
-			for (var tx = 0; tx < platformMap._tilesX; tx++) {
-
-				var ntile = cmap.tileAt(tx, ty);
-
-				var shouldFinishPlatform = (pstart >= 0 && !(ntile & gm.Constants.Dir.UP));
-				if (shouldFinishPlatform) {
-					this._addNewPlatforms(pstart, tx, ty);
-					pstart = -1;
-				}
-
-				if (ntile && pstart < 0) {
-					pstart = tx;
-					ptile = cmap.tileAt(tx, ty);
-				}
-			}
-
-			if (pstart >= 0) {
-				this._addNewPlatforms(pstart, platformMap._tilesX, ty);
-				pstart = -1;
-			}
-		}
-	};
-
-	PlatformMap.prototype._splitPlatform = function(platform) {
-		var cmap = this._combinedMap._map;
-		var maxTy = platform.ty;
-		var minTy = cmap.posToTileY(cmap.tileToPosY(platform.ty) - this._sizeY);
-
-		var splitPlatforms = [];
-		
-		for (var tx = platform.tx0; tx < platform.tx1; tx++) {
-			var splitLeft = false;
-			var splitRight = false;
-			for (ty = minTy; ty < maxTy; ty++) {
-				var tile = cmap.tileAt(tx, ty);
-				splitLeft = splitLeft || (tile & LEFT);
-				splitRight = splitRight || (tile & RIGHT);
-			}
-			if (splitLeft && tx > platform.tx0) {
-				splitPlatforms.push(platform);
-				platform = this._splitPlatformAt(platform, tx);
-			} if (splitRight && tx < platform.tx1-1) {
-				splitPlatforms.push(platform);
-				platform = this._splitPlatformAt(platform, tx+1);
-			}
-		}
-
-		splitPlatforms.push(platform);
-		return splitPlatforms;
-	};
-
-	PlatformMap.prototype._splitPlatformAt = function(platform, tx) {
-		if (tx < platform.tx0 || tx >= platform.tx1) return;
-		var tx1 = platform.tx1;
-		platform.tx1 = tx;
-		var nplatform = this._createNewPlatformObject(tx, tx1, platform.ty);
-		return nplatform;
-	};
-
-	PlatformMap.prototype._getPlatformExtents = function(platform) {
-		var cmap = this._combinedMap._map;
-		var maxTy = platform.ty;
-		var minTy = cmap.posToTileY(cmap.tileToPosY(platform.ty) - this._sizeY);
-		var ty, tile;
-		
-		var minPxli = cmap.tileToPosX(platform.tx0) - this._sizeX;
-		var minLtx = cmap.posToTileX(minPxli);
-		var ltx;
-		lxloop:
-		for (ltx = platform.tx0; ltx >= minLtx; ltx--) {
-			lyloop:
-			for (ty = minTy; ty < maxTy; ty++) {
-				tile = cmap.tileAt(ltx-1, ty);
-				if (tile & RIGHT) break lxloop;
-			}
-		}
-
-		var maxPxri = cmap.tileToPosX(platform.tx1) + this._sizeX;
-		var maxRtx = cmap.posToTileCeilX(maxPxri);
-		var rtx;
-		rxloop:
-		for (rtx = platform.tx1; rtx < maxRtx; rtx++) {
-			ryloop:
-			for (ty = minTy; ty < maxTy; ty++) {
-				tile = cmap.tileAt(rtx, ty);
-				if (tile & LEFT) break rxloop;
-			}
-		}
-
-		platform.pxli = Math.max(minPxli, cmap.tileToPosX(ltx));
-		platform.pxri = Math.min(maxPxri, cmap.tileToPosX(rtx));
-	};
-
-	PlatformMap.prototype._createNewPlatformObject = function(tx0, tx1, ty) {
-		return {
-			tx0: tx0,
-			tx1: tx1,
-			ty: ty
-		};
-	};
-
-	PlatformMap.prototype._addNewPlatforms = function(tx0, tx1, ty) {
-		var initPlatform = this._createNewPlatformObject(tx0, tx1, ty);
-		var splitPlatforms = this._splitPlatform(initPlatform);
-
-		for (var s = 0; s < splitPlatforms.length; s++) {
-			var platform = splitPlatforms[s];
-
-			this._getPlatformExtents(platform);
-			platform.index = this._platforms.length;
-			this._platforms.push(platform);
-			for (var tx = platform.tx0; tx < platform.tx1; tx++) {
-				this._map.setTile(tx, ty, platform);
-			}
-		}
+		gm.Pathfinder.Walker.PlatformGenerator.generatePlatforms(this);
 	};
 
 	PlatformMap.prototype.render = function(ctx, bbox) {

@@ -29,7 +29,9 @@ gm.Sample.Pathfinding.Search = function() {
 				values.JUMP_SPD,
 				values.FALL_ACCEL,
 				values.TERMINAL_V);
-			platformSearch.beginSearch(originPlatform.pxli, originPlatform.pxri, combinedMap.tileToPosY(originPlatform.ty));
+			platformSearch.beginSearch(originPlatform._pxli, 
+				originPlatform._pxri, 
+				combinedMap.tileToPosY(originPlatform._ty));
 		}
 	};
 
