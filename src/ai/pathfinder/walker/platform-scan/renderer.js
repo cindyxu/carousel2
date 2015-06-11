@@ -10,7 +10,7 @@ gm.Pathfinder.Walker.PlatformScan.Renderer = function() {
 		ctx.translate(bbox.x0, bbox.y0);
 
 		this._renderAreas(ctx, bbox);
-		this._renderReachablePatches(ctx, bbox);
+		this._renderPatches(ctx, bbox);
 
 		ctx.restore();
 	};
@@ -28,14 +28,14 @@ gm.Pathfinder.Walker.PlatformScan.Renderer = function() {
 				this._renderArea(ctx, currentArea, true);
 
 				ctx.globalAlpha *= 0.6;
-				currentArea = currentArea.parent;
+				currentArea = currentArea._parent;
 				if (!currentArea) break;
 			}
 			ctx.globalAlpha = globalAlpha;
 		}
 	};
 
-	Renderer.prototype._renderReachablePatches = function(ctx, bbox) {
+	Renderer.prototype._renderPatches = function(ctx, bbox) {
 		var reachablePatches = this._platformScan._reachablePatches;
 		if (!reachablePatches) return;
 
@@ -44,7 +44,7 @@ gm.Pathfinder.Walker.PlatformScan.Renderer = function() {
 
 		for (var p = 0; p < reachablePatches.length; p++) {
 			var patch = reachablePatches[p];
-			ctx.fillRect(patch.pxli, patch.pyi, patch.pxri - patch.pxli, this._platformScan._cmap.tilesize);
+			ctx.fillRect(patch._pxli, patch._pyi, patch._pxri - patch._pxli, this._platformScan._cmap.tilesize);
 		}
 
 		ctx.restore();
@@ -66,23 +66,23 @@ gm.Pathfinder.Walker.PlatformScan.Renderer = function() {
 			ctx.strokeStyle = "rgba(100, 255, 0, 1)";
 		}
 
-		if (area.pyo < area.pyi) {
-			ctx.fillRect(area.pxlo, area.pyo, 
-				area.pxro - area.pxlo, area.pyi - area.pyo);
+		if (area._pyo < area._pyi) {
+			ctx.fillRect(area._pxlo, area._pyo, 
+				area._pxro - area._pxlo, area._pyi - area._pyo);
 		} else {
-			ctx.fillRect(area.pxlo, area.pyi, 
-				area.pxro - area.pxlo, area.pyo - area.pyi);
+			ctx.fillRect(area._pxlo, area._pyi, 
+				area._pxro - area._pxlo, area._pyo - area._pyi);
 		}
 
 		ctx.beginPath();
-		ctx.moveTo(area.pxli, area.pyi);
-		ctx.lineTo(area.pxlo, area.pyo);
+		ctx.moveTo(area._pxli, area._pyi);
+		ctx.lineTo(area._pxlo, area._pyo);
 		ctx.closePath();
 		ctx.stroke();
 		
 		ctx.beginPath();
-		ctx.moveTo(area.pxri, area.pyi);
-		ctx.lineTo(area.pxro, area.pyo);
+		ctx.moveTo(area._pxri, area._pyi);
+		ctx.lineTo(area._pxro, area._pyo);
 		ctx.closePath();
 		ctx.stroke();
 

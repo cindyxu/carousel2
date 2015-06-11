@@ -2,8 +2,6 @@ gm.Sample.Pathfinding.Search = function() {
 
 	var values = gm.Sample.Pathfinding.values;
 	var walkerParams = {
-		sizeX: values.SIZE_X,
-		sizeY: values.SIZE_Y, 
 		walkSpd: values.WALK_SPD,
 		jumpSpd: values.JUMP_SPD,
 		fallAccel: values.FALL_ACCEL,
@@ -15,7 +13,7 @@ gm.Sample.Pathfinding.Search = function() {
 	var combinedMap = new gm.Pathfinder.CombinedMap(ToyWorld._level._layers);
 
 	var body = ToyWorld._entity._body;
-	var platformMap = new gm.Pathfinder.Walker.PlatformMap(walkerParams, combinedMap);
+	var platformMap = new gm.Pathfinder.Walker.PlatformMap(body, walkerParams, combinedMap);
 
 	var platformScan;
 
@@ -32,7 +30,9 @@ gm.Sample.Pathfinding.Search = function() {
 		if (originPlatform) {
 			platformScan = new gm.Pathfinder.Walker.PlatformScan(
 				combinedMap._map,
-				walkerParams);
+				platformMap._body._sizeX,
+				platformMap._body._sizeY,
+				platformMap._kinematics);
 			platformScan.beginSearch(originPlatform._pxli, 
 				originPlatform._pxri, 
 				combinedMap.tileToPosY(originPlatform._ty));

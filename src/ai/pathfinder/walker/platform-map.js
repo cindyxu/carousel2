@@ -2,8 +2,9 @@ if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
 
 gm.Pathfinder.Walker.PlatformMap = function() {
 
-	var PlatformMap = function(walkerParams, combinedMap) {
-		this._walkerParams = walkerParams;
+	var PlatformMap = function(body, walkerParams, combinedMap) {
+		this._body = body;
+		this._kinematics = new gm.Pathfinder.Walker.Kinematics(walkerParams);
 
 		this._platforms = [];
 
@@ -16,8 +17,8 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		if (combinedMap) this.fromCombinedMap(combinedMap);
 
 		if (LOGGING) {
-			if (isNaN(walkerParams.sizeX) || isNaN(walkerParams.sizeY)) {
-				console.log("!!! PlatformMap - body dimensions were", sizeX, ",", walkerParams.sizeY);
+			if (!body) {
+				console.log("!!! PlatformMap - no body");
 			}
 			
 			if (isNaN(walkerParams.walkSpd)) {

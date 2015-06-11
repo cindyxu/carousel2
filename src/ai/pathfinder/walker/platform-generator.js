@@ -40,10 +40,10 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 		var cmap = platformMap._combinedMap._map;
 
 		var maxTy = platform._ty;
-		var minTy = cmap.posToTileY(cmap.tileToPosY(platform._ty) - platformMap._walkerParams.sizeY);
+		var minTy = cmap.posToTileY(cmap.tileToPosY(platform._ty) - platformMap._body._sizeY);
 		var ty, tile;
 		
-		var minPxli = cmap.tileToPosX(platform._tx0) - platformMap._walkerParams.sizeX;
+		var minPxli = cmap.tileToPosX(platform._tx0) - platformMap._body._sizeX;
 		var minLtx = cmap.posToTileX(minPxli);
 		var ltx;
 		lxloop:
@@ -55,7 +55,7 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 			}
 		}
 
-		var maxPxri = cmap.tileToPosX(platform._tx1) + platformMap._walkerParams.sizeX;
+		var maxPxri = cmap.tileToPosX(platform._tx1) + platformMap._body._sizeX;
 		var maxRtx = cmap.posToTileCeilX(maxPxri);
 		var rtx;
 		rxloop:
@@ -88,7 +88,7 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 		var cmap = platformMap._combinedMap._map;
 
 		var maxTy = platform._ty;
-		var minTy = cmap.posToTileY(cmap.tileToPosY(platform._ty) - platformMap._walkerParams.sizeY);
+		var minTy = cmap.posToTileY(cmap.tileToPosY(platform._ty) - platformMap._body._sizeY);
 
 		var splitPlatforms = [];
 		

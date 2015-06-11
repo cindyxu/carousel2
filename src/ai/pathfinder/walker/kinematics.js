@@ -28,32 +28,39 @@ gm.Pathfinder.Walker.Kinematics = function() {
 
 		// there are always two possibilities for vyf
 		// we will take the one closest to vyi, after vyi
-		var absVyf = Math.sqrt(vyi * vyi + 2 * this._fallAccel * dy);
+		var absVyf = Math.sqrt(Math.max(0, vyi * vyi + 2 * this._fallAccel * dy));
 		var vyf = vyi < -absVyf ? -absVyf : absVyf;
 		vyf = Math.min(this._terminalV, vyf);
 
 		return vyf;
 	};
 
-	Kinematics.prototype.getAbsDeltaXFromDeltaY = function(vyi, dy) {
+	Kinematics.prototype.getAbsDeltaXFromDeltaY = function(vyi, dy, longer) {
+		var dt = this.getDeltaTimeFromDeltaY(vyi, dy, longer);
+		return dt * this._walkSpd;
+	};
+
+	Kinematics.prototype.getDeltaTimeFromDeltaY = function(vyi, dy, longer) {
 		if (vyi >= this._terminalV) {
-			return dy / this._terminalV * this._walkSpd;
+			return dy / this._terminalV;
 		}
 
 		var dyTerminal = this.getDeltaYFromVyFinal(vyi, this._terminalV);
 		if (dyTerminal < dy) {
-			var dxPreTerm = this.getAbsDeltaXFromDeltaY(vyi, dyTerminal);
-			var dxPostTerm = this.getAbsDeltaXFromDeltaY(this._terminalV, (dy - dyTerminal));
-			return dxPreTerm + dxPostTerm;
+			var dtPreTerm = this.getDeltaTimeFromDeltaY(vyi, dyTerminal, longer);
+			var dtPostTerm = this.getDeltaTimeFromDeltaY(this._terminalV, (dy - dyTerminal));
+			return dtPreTerm + dtPostTerm;
 		}
 
 		// there are two potential solutions for time.
-		// we will use the smallest positive time
-		var dtdeterminant = Math.sqrt(vyi * vyi + 2 * this._fallAccel * dy);
-		var dt = (-vyi - dtdeterminant) / this._fallAccel;
-		if (dt < 0) dt = (-vyi + dtdeterminant) / this._fallAccel;
-
-		return dt * this._walkSpd;	
+		var dtdeterminant = Math.sqrt(Math.max(0, vyi * vyi + 2 * this._fallAccel * dy));
+		var dt;
+		if (longer) dt = (-vyi + dtdeterminant) / this._fallAccel;
+		else {
+			dt = (-vyi - dtdeterminant) / this._fallAccel;
+			if (dt < 0) dt = (-vyi + dtdeterminant) / this._fallAccel;
+		}
+		return dt;
 	};
 
 	Kinematics.prototype.getDeltaTimeFromVyFinal = function(vyi, vyf) {
