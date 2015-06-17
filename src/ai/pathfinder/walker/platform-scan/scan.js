@@ -15,21 +15,19 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 		this._sizeY = sizeY;
 		this._kinematics = kinematics;
 
-		this._renderer = new gm.Pathfinder.Walker.PlatformScan.Renderer(this);
-
 		if (LOGGING && !cmap) console.log("!!! platformScan - no combined map");
 	};
 
-	PlatformScan.prototype.beginSearch = function(pxlo, pxro, pyo) {
+	PlatformScan.prototype.beginScan = function(jumped, pxli, pxri, pyi) {
 
-		if (LOGGING) console.log("platformscan - begin search: pxlo", pxlo, "pxro:", pxro, "pyo:", pyo);
+		if (LOGGING) console.log("platformscan - begin search: pxli", pxli, "pxri:", pxri, "pyi:", pyi);
 		this._reachablePatches = [];
 		this._currentAreas = [];
 
-		if (pxro <= pxlo) return;
+		if (pxri <= pxli) return;
 
-		var vyo = Math.max(-this._kinematics._jumpSpd, -this._kinematics._terminalV);
-		var beginArea = PlatformArea.fromPlatform(vyo, pxlo, pxro, pyo);
+		var vyi = jumped ? -this._kinematics._jumpSpd : 0;
+		var beginArea = PlatformArea.fromPlatform(vyi, pxli, pxri, pyi);
 
 		this._currentAreas.push(beginArea);
 	};
@@ -138,6 +136,8 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 		childArea.setSpread(childArea._pxli - deltaX, childArea._pxri + deltaX);
 	};
 
+	// clamps pxlo and pxro on whether there are any blocking RIGHT tiles to the left
+	// or LEFT tiles to the right.
 	PlatformScan.prototype._clampSpread = function(childArea) {
 		var cmap = this._cmap;
 		
@@ -185,7 +185,7 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 
 	// starting from (ltx, ty) and up to (etx, ty), finds a straight line of tiles 
 	// that have a wall in direction dir where dir is UP or DOWN.
-	PlatformScan.prototype._findXBarrierEnd = function(ltx, ty, dir, etx) {
+	PlatformScan.prototype._findHorizontalBarrierEnd = function(ltx, ty, dir, etx) {
 		var cmap = this._cmap;
 		if (etx === undefined) etx = cmap._tilesX;
 		var rtx = ltx;
@@ -223,66 +223,97 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 
 		var tilesize = cmap.tilesize;
 
-		var txStart = -1;
+		var txStart = ltx-1;
 		var splitSeeds = [];
 		var artx;
 
 		var tile;
+		var area;
+
 		for (var tx = ltx; tx < rtx; ) {
+
 			tile = cmap.tileAt(tx, ty);
 			if ((tile & DOWN) && vyi < 0) {
-				if (txStart >= 0) {
-					splitSeeds.push(PlatformArea.fromArea(
-						childArea._parent, txStart * tilesize, tx * tilesize));
+				if (txStart >= ltx) {
+					area = this._createSplitSeed(childArea._parent, txStart, tx, ty);
+					splitSeeds.push(area);
 				}
 
 				// if we've collided with something above,
 				// then we bounce off with velocity = 0.
-				artx = this._findXBarrierEnd(tx, ty, DOWN, rtx);
-				splitSeeds.push(PlatformArea.fromArea(
-					childArea._parent, tx * tilesize, rtx * tilesize, 0));
+				artx = this._findHorizontalBarrierEnd(tx, ty, DOWN, rtx);
+				area = PlatformArea.fromArea(childArea._parent, 
+					tx * tilesize - this._sizeX, 
+					artx * tilesize + this._sizeX, 
+					0);
+				this._clipHierarchy(area);
+				splitSeeds.push(area);
+				
 				tx = artx;
-
-				txStart = -1;
+				txStart = ltx-1;
 
 			} else if ((tile & UP) && vyi >= 0) {
 
-				if (txStart >= 0) {
-					splitSeeds.push(PlatformArea.fromArea(
-						childArea._parent, txStart * tilesize, tx * tilesize));
+				if (txStart >= ltx) {
+					area = this._createSplitSeed(childArea._parent, txStart, tx, ty);
+					splitSeeds.push(area);
 				}
 
-				artx = this._findXBarrierEnd(tx, ty, UP, rtx);
+				artx = this._findHorizontalBarrierEnd(tx, ty, UP, rtx);
 				this._addReachablePatch(childArea._parent, tx, artx);
-				tx = artx;
 
-				txStart = -1;
+				tx = artx;
+				txStart = ltx-1;
 				
 			} else {
 				if (tile & LEFT) {
-					if (txStart >= 0) {
-						splitSeeds.push(PlatformArea.fromArea(
-						childArea._parent, txStart * tilesize, tx * tilesize));
+					if (txStart >= ltx) {
+						area = this._createSplitSeed(childArea._parent, txStart, tx, ty);
+						splitSeeds.push(area);
 					}
 				}
-				if (txStart < 0) txStart = tx;
+				if (txStart < ltx) txStart = tx;
 				if (tile & RIGHT) {
-					splitSeeds.push(PlatformArea.fromArea(
-						childArea._parent, txStart * tilesize, (tx+1) * tilesize));
-					txStart = -1;
+					area = this._createSplitSeed(childArea._parent, txStart, tx+1, ty);
+					splitSeeds.push(area);
+					txStart = ltx-1;
 				}	
 				tx++;
 			}
 		}
 
-		if (txStart >= 0) {
+		if (txStart >= ltx) {
 			// we haven't changed anything. child is fine as is
 			if (txStart === ltx) return;
-			splitSeeds.push(PlatformArea.fromArea(
-						childArea._parent, txStart * tilesize, rtx * tilesize));
+			area = this._createSplitSeed(childArea._parent, txStart, rtx, ty);
+			splitSeeds.push(area);
 		}
 
 		return splitSeeds;
+	};
+
+	PlatformScan.prototype._createSplitSeed = function(parent, ltx, rtx, ty) {
+		var cmap = this._cmap;
+		var sltx = cmap.posToTileX(cmap.tileToPosX(ltx) - this._sizeX);
+		var srtx = cmap.posToTileCeilX(cmap.tileToPosX(rtx) + this._sizeX);
+
+		var pxli, pxri;
+
+		var tx;
+		for (tx = ltx-1; tx >= sltx; tx--) {
+			if (cmap.tileAt(tx, ty) & RIGHT) break;
+		}
+		pxli = cmap.tileToPosX(tx+1);
+
+		for (tx = rtx; tx < srtx; tx++) {
+			if (cmap.tileAt(tx, ty) & LEFT) break;
+		}
+		pxri = cmap.tileToPosX(tx);
+		
+		var area = PlatformArea.fromArea(parent, pxli, pxri);
+		this._clipHierarchy(area);
+
+		return area;
 	};
 
 	PlatformScan.prototype._addReachablePatch = function(area, tx0, tx1) {
@@ -290,52 +321,10 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 		var cmap = this._cmap;
 		
 		var patch = PlatformArea.fromArea(area,
-			cmap.tileToPosX(tx0),
-			cmap.tileToPosX(tx1));
+			cmap.tileToPosX(tx0) - this._sizeX,
+			cmap.tileToPosX(tx1) + this._sizeX);
 		this._clipHierarchy(patch);
 		this._reachablePatches.push(patch);
-	};
-
-	PlatformScan.prototype.getPatchesByPlatform = function(pmap) {
-		var platformPatches = [];
-		
-		var currentPlatform, nextPlatform;
-		var txStart;
-		var ppatch;
-
-		var patch;
-		var ltx, rtx, ty;
-
-		for (var p = 0; p < this._reachablePatches.length; p++) {
-			patch = this._reachablePatches[p];
-			ltx = pmap.posToTileX(patch._pxli);
-			rtx = pmap.posToTileCeilX(patch._pxri);
-			ty = pmap.posToTileY(patch._pyi);
-
-			currentPlatform = undefined;
-			txStart = -1;
-
-			for (var tx = ltx; tx < rtx; tx++) {
-				nextPlatform = pmap.tileAt(tx, ty);
-				if (currentPlatform && nextPlatform !== currentPlatform) {
-					ppatch = patch.clone();
-					ppatch.clip(pmap.tileToPosX(txStart), pmap.tileToPosX(tx));
-					this._clipHierarchy(ppatch);
-					platformPatches.push(ppatch);
-					txStart = -1;
-				}
-				currentPlatform = nextPlatform;
-				if (txStart < 0 && currentPlatform) txStart = tx;
-			}
-			if (currentPlatform) {
-				ppatch = patch.clone();
-				ppatch.clip(pmap.tileToPosX(txStart), pmap.tileToPosX(tx));
-				this._clipHierarchy(ppatch);
-				platformPatches.push(ppatch);
-			}
-		}
-
-		return platformPatches;
 	};
 
 	// if the child range is smaller than the parent range,
@@ -359,8 +348,36 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 		}
 	};
 
-	PlatformScan.prototype.render = function(ctx, bbox) {
-		this._renderer.render(ctx, bbox);
+	// splits patches by platform.
+	PlatformScan.prototype.getPatchesByPlatform = function(pmap) {
+		var platformPatches = [];
+		
+		var nextPlatform;
+		var txStart;
+		var ppatch;
+
+		var patch;
+		var ltx, rtx, ty;
+
+		for (var p = 0; p < this._reachablePatches.length; p++) {
+			patch = this._reachablePatches[p];
+			ltx = pmap.posToTileX(patch._pxli);
+			rtx = pmap.posToTileCeilX(patch._pxri);
+			ty = pmap.posToTileY(patch._pyi);
+
+			for (var tx = ltx; tx < rtx; ) {
+				nextPlatform = pmap.tileAt(tx, ty);
+				if (nextPlatform) {
+					ppatch = patch.clone();
+					ppatch.clip(nextPlatform._pxli, nextPlatform._pxri);
+					this._clipHierarchy(ppatch);
+					platformPatches.push(ppatch);
+					tx = nextPlatform._tx1;
+				} else tx++;
+			}
+		}
+
+		return platformPatches;
 	};
 
 	return PlatformScan;

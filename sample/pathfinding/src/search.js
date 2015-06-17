@@ -12,20 +12,29 @@ gm.Sample.Pathfinding.Search = function() {
 
 	var combinedMap = new gm.Pathfinder.CombinedMap(ToyWorld._level._layers);
 
-	var body = ToyWorld._entity._body;
-	var platformMap = new gm.Pathfinder.Walker.PlatformMap(body, walkerParams, combinedMap);
+	var startBody = ToyWorld._startEntity._body;
+	var endBody = ToyWorld._endEntity._body;
 
-	var platformScan;
+	var platformMap = new gm.Pathfinder.Walker.PlatformMap(startBody, walkerParams, combinedMap);
+
+	var platformScan, platformScanRenderer;
+	var platformSearch, platformSearchRenderer;
 
 	var Search = {};
 
-	Search.planPath = function() {
+	Search.regeneratePlatforms = function() {
 
-		platformScan = undefined;		
+		platformSearch = undefined;
+		platformSearchRenderer = undefined;
+		platformScan = undefined;
+		platformScanRenderer = undefined;
+	
 		combinedMap.fromLayers(ToyWorld._level._layers);
 		platformMap.fromCombinedMap(combinedMap);
+	};
 
-		var originPlatform = platformMap.getPlatformUnderBody(body);
+	Search.startScan = function() {
+		var originPlatform = platformMap.getPlatformUnderBody(startBody);
 
 		if (originPlatform) {
 			platformScan = new gm.Pathfinder.Walker.PlatformScan(
@@ -33,20 +42,38 @@ gm.Sample.Pathfinding.Search = function() {
 				platformMap._body._sizeX,
 				platformMap._body._sizeY,
 				platformMap._kinematics);
-			platformScan.beginSearch(originPlatform._pxli, 
+			platformScan.beginScan(true, originPlatform._pxli, 
 				originPlatform._pxri, 
 				combinedMap.tileToPosY(originPlatform._ty));
+
+			platformScanRenderer = new gm.Pathfinder.Walker.PlatformScan.Renderer(platformScan);
+		}
+	};
+
+	Search.startSearch = function() {
+
+		var originPlatform = platformMap.getPlatformUnderBody(startBody);
+		if (originPlatform) {
+			platformSearch = new gm.Pathfinder.Walker.PlatformSearch(
+				platformMap, 
+				startBody,
+				endBody._x,
+				endBody._y);
+			platformSearchRenderer = new gm.Pathfinder.Walker.PlatformSearch.Renderer(platformSearch);
 		}
 	};
 
 	Search.step = function() {
 		if (platformScan) platformScan.step();
+		if (platformSearch) platformSearch.step();
 	};
 
 	Search.render = function(ctx) {
 		var bbox = ToyWorld._camera._body.getBbox();
 		platformMap.render(ctx, bbox);
-		if (platformScan) platformScan.render(ctx, bbox);
+
+		if (platformScanRenderer) platformScanRenderer.render(ctx, bbox);
+		if (platformSearchRenderer) platformSearchRenderer.render(ctx, bbox);
 	};
 
 	return Search;

@@ -31,25 +31,43 @@ gm.Sample.Pathfinding.ToyWorld = (function(values) {
 		isCollision: true
 	});
 
-	var entity;
-	var body = new gm.Body({
-		sizeX: SIZE_X,
-		sizeY: SIZE_Y,
-		maxVelX: WALK_SPD,
-		maxVelY: TERMINAL_V,
-		weight: FALL_ACCEL
-	});
-	var bodyRenderer = new gm.Renderer.DebugEntity();
-	entity = new gm.Entity("player");
-	entity.setBody(body);
-	entity.setRenderer(bodyRenderer);
+	var startEntity;
+	(function() {
+		var body = new gm.Body({
+			sizeX: SIZE_X,
+			sizeY: SIZE_Y,
+			maxVelX: WALK_SPD,
+			maxVelY: TERMINAL_V,
+			weight: FALL_ACCEL
+		});
+		var bodyRenderer = new gm.Renderer.DebugEntity();
+		bodyRenderer._color = "#ffaaee";
+		startEntity = new gm.Entity("player");
+		startEntity.setBody(body);
+		startEntity.setRenderer(bodyRenderer);
+	})();
+
+	var endEntity;
+	(function() {
+		var body = new gm.Body({
+			sizeX: SIZE_X,
+			sizeY: SIZE_Y
+		});
+		var bodyRenderer = new gm.Renderer.DebugEntity();
+		bodyRenderer._color = "#00eeaa";
+		endEntity = new gm.Entity("object");
+		endEntity.setBody(body);
+		endEntity.setRenderer(bodyRenderer);
+	})();
 
 	level.addLayer(layer);
-	level.addEntity(entity, layer);
+	level.addEntity(startEntity, layer);
+	level.addEntity(endEntity, layer);
 
 	var ToyWorld = {
 		_layer: layer,
-		_entity: entity,
+		_startEntity: startEntity,
+		_endEntity: endEntity,
 		_level: level,
 		_camera: camera
 	};

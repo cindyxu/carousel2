@@ -41,6 +41,8 @@ html
 		script(src="/src/ai/pathfinder/walker/platform-scan/scan.js")
 		script(src="/src/ai/pathfinder/walker/platform-scan/renderer.js")
 		script(src="/src/ai/pathfinder/walker/platform-scan/scanner.js")
+		script(src="/src/ai/pathfinder/walker/platform-search/search.js")
+		script(src="/src/ai/pathfinder/walker/platform-search/renderer.js")
 		script(src="/sample/pathfinding/src/values.js")
 		script(src="/sample/pathfinding/src/toy-world.js")
 		script(src="/sample/pathfinding/src/editor.js")
@@ -51,9 +53,11 @@ html
 		h1 PATHFINDING TEST
 		#editor
 			.option
-				button#plan-path plan path
+				button#scan-platform scan platform
 			.option
-				button#plan-path-step step
+				button#search-platforms search platforms
+			.option
+				button#step step
 			.option
 				label render level
 				input(type="checkbox")#toggle-level-renderer

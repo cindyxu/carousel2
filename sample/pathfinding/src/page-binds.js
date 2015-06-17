@@ -5,8 +5,9 @@ $(function() {
 	var Editor = gm.Sample.Pathfinding.Editor;
 	var Search = gm.Sample.Pathfinding.Search;
 
-	var $planPathButton = $("#plan-path");
-	var $planPathStepButton = $("#plan-path-step");
+	var $scanPlatformButton = $("#scan-platform");
+	var $searchPlatformsButton = $("#search-platforms");
+	var $stepButton = $("#step");
 	var $toggleLevelRendererCheckbox = $("#toggle-level-renderer");
 	var $togglePlatformRendererCheckbox = $("#toggle-platform-renderer");
 
@@ -47,12 +48,19 @@ $(function() {
 		render();
 	});
 
-	$("#plan-path").click(function(e) {
-		Search.planPath();
+	$scanPlatformButton.click(function(e) {
+		Search.regeneratePlatforms();
+		Search.startScan();
 		render();
 	});
 
-	$("#plan-path-step").click(function(e) {
+	$searchPlatformsButton.click(function(e) {
+		Search.regeneratePlatforms();
+		Search.startSearch();
+		render();
+	});
+
+	$stepButton.click(function(e) {
 		Search.step();
 		render();
 	});

@@ -36,6 +36,8 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 		}
 	};
 
+	// sets platform.pxli and platform.pxri, which represent how far a body with sizeX and sizeY 
+	// could walk to the left/right of this platform before either falling off or hitting a wall.
 	var getPlatformExtents = function(platform, platformMap) {
 		var cmap = platformMap._combinedMap._map;
 
@@ -71,6 +73,8 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 		platformMap.extendPlatformRight(platform, Math.min(maxPxri, cmap.tileToPosX(rtx)));
 	};
 
+	// turns patch into platform(s). splits into smaller platforms if necessary,
+	// then extends each platform as far as possible to the left and right.
 	var addPlatformsForPatch = function(tx0, tx1, ty, platformMap) {
 		var cmap = platformMap._combinedMap._map;
 
@@ -84,6 +88,8 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 		}
 	};
 
+	// splits platform into smaller ones until a body with sizeX, sizeY
+	// can walk unencumbered from one end of each platform to the other.
 	var splitPlatform = function(platform, platformMap) {
 		var cmap = platformMap._combinedMap._map;
 
@@ -95,6 +101,8 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 		for (var tx = platform._tx0; tx < platform._tx1; tx++) {
 			var splitLeft = false;
 			var splitRight = false;
+
+			// we check tiles the body touches in each row
 			for (ty = minTy; ty < maxTy; ty++) {
 				var tile = cmap.tileAt(tx, ty);
 				splitLeft = splitLeft || (tile & LEFT);
