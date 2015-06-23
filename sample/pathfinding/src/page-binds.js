@@ -3,7 +3,7 @@ $(function() {
 	var values = gm.Sample.Pathfinding.values;
 	var ToyWorld = gm.Sample.Pathfinding.ToyWorld;
 	var Editor = gm.Sample.Pathfinding.Editor;
-	var Search = gm.Sample.Pathfinding.Search;
+	var Pathfinding = gm.Sample.Pathfinding.Pathfinding;
 
 	var $scanPlatformButton = $("#scan-platform");
 	var $searchPlatformsButton = $("#search-platforms");
@@ -49,25 +49,25 @@ $(function() {
 	});
 
 	$scanPlatformButton.click(function(e) {
-		Search.regeneratePlatforms();
-		Search.startScan();
+		Pathfinding.regeneratePlatforms();
+		Pathfinding.startScan();
 		render();
 	});
 
 	$searchPlatformsButton.click(function(e) {
-		Search.regeneratePlatforms();
-		Search.startSearch();
+		Pathfinding.regeneratePlatforms();
+		Pathfinding.startSearch();
 		render();
 	});
 
 	$stepButton.click(function(e) {
-		Search.step();
+		Pathfinding.step();
 		render();
 	});
 
 	var render = function() {
 		ToyWorld.render(ctx);
-		Search.render(ctx);
+		Pathfinding.render(ctx);
 		Editor.render(ctx);
 	};
 

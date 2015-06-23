@@ -1,4 +1,4 @@
-gm.Sample.Pathfinding.Search = function() {
+gm.Sample.Pathfinding.Pathfinding = function() {
 
 	var values = gm.Sample.Pathfinding.values;
 	var walkerParams = {
@@ -20,9 +20,9 @@ gm.Sample.Pathfinding.Search = function() {
 	var platformScan, platformScanRenderer;
 	var platformSearch, platformSearchRenderer;
 
-	var Search = {};
+	var Pathfinding = {};
 
-	Search.regeneratePlatforms = function() {
+	Pathfinding.regeneratePlatforms = function() {
 
 		platformSearch = undefined;
 		platformSearchRenderer = undefined;
@@ -33,7 +33,7 @@ gm.Sample.Pathfinding.Search = function() {
 		platformMap.fromCombinedMap(combinedMap);
 	};
 
-	Search.startScan = function() {
+	Pathfinding.startScan = function() {
 		var originPlatform = platformMap.getPlatformUnderBody(startBody);
 
 		if (originPlatform) {
@@ -50,25 +50,24 @@ gm.Sample.Pathfinding.Search = function() {
 		}
 	};
 
-	Search.startSearch = function() {
+	Pathfinding.startSearch = function() {
 
 		var originPlatform = platformMap.getPlatformUnderBody(startBody);
 		if (originPlatform) {
 			platformSearch = new gm.Pathfinder.Walker.PlatformSearch(
 				platformMap, 
-				startBody,
 				endBody._x,
 				endBody._y);
 			platformSearchRenderer = new gm.Pathfinder.Walker.PlatformSearch.Renderer(platformSearch);
 		}
 	};
 
-	Search.step = function() {
+	Pathfinding.step = function() {
 		if (platformScan) platformScan.step();
-		if (platformSearch) platformSearch.step();
+		if (platformSearch) platformSearch.stepLinkIncrement();
 	};
 
-	Search.render = function(ctx) {
+	Pathfinding.render = function(ctx) {
 		var bbox = ToyWorld._camera._body.getBbox();
 		platformMap.render(ctx, bbox);
 
@@ -76,6 +75,6 @@ gm.Sample.Pathfinding.Search = function() {
 		if (platformSearchRenderer) platformSearchRenderer.render(ctx, bbox);
 	};
 
-	return Search;
+	return Pathfinding;
 
 }();

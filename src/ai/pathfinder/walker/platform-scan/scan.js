@@ -6,6 +6,7 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 	var RIGHT = gm.Constants.Dir.RIGHT;
 
 	var PlatformArea = gm.Pathfinder.Walker.PlatformArea;
+	var PlatformPatch = gm.Pathfinder.Walker.PlatformPatch;
 
 	var PlatformScan = function(cmap, sizeX, sizeY, kinematics) {
 
@@ -253,7 +254,6 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 				txStart = ltx-1;
 
 			} else if ((tile & UP) && vyi >= 0) {
-
 				if (txStart >= ltx) {
 					area = this._createSplitSeed(childArea._parent, txStart, tx, ty);
 					splitSeeds.push(area);
@@ -320,9 +320,12 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 
 		var cmap = this._cmap;
 		
-		var patch = PlatformArea.fromArea(area,
-			cmap.tileToPosX(tx0) - this._sizeX,
-			cmap.tileToPosX(tx1) + this._sizeX);
+		var ppxl = cmap.tileToPosX(tx0);
+		var ppxr = cmap.tileToPosX(tx1);
+		var patch = new PlatformPatch(area,
+			ppxl, ppxr,
+			ppxl - this._sizeX,
+			ppxr + this._sizeX);
 		this._clipHierarchy(patch);
 		this._reachablePatches.push(patch);
 	};
@@ -361,8 +364,8 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 
 		for (var p = 0; p < this._reachablePatches.length; p++) {
 			patch = this._reachablePatches[p];
-			ltx = pmap.posToTileX(patch._pxli);
-			rtx = pmap.posToTileCeilX(patch._pxri);
+			ltx = pmap.posToTileX(patch._ppxl);
+			rtx = pmap.posToTileCeilX(patch._ppxr);
 			ty = pmap.posToTileY(patch._pyi);
 
 			for (var tx = ltx; tx < rtx; ) {
@@ -376,7 +379,6 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 				} else tx++;
 			}
 		}
-
 		return platformPatches;
 	};
 

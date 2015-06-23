@@ -1,6 +1,7 @@
+/* runs A* search over platform/link space */
 gm.Pathfinder.Walker.PlatformSearch = function() {
 
-	var PlatformSearch = function(platformMap, body, pxf, pyf) {
+	var PlatformSearch = function(platformMap, pxf, pyf) {
 		this._platformMap = platformMap;
 		this._kinematics = platformMap._kinematics;
 		this._pxf = pxf;
@@ -8,92 +9,200 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		
 		this._openNodes = [];
 		this._closedLinks = {};
+		this._fxEpsilon = 0.01;
+
+		this._currentNode = undefined;
+		this._linkIndex = 0;
+		this._currentNeighbor = undefined;
+		this._linkStepInc = 0;
+
+		var body = this._platformMap._body;
 
 		this._originPlatform = platformMap.getPlatformUnderBody(body);
 
-		if (this._originPlatform) {
-			this._openNodes.push({
+		if (this._originPlatform && this._originPlatform._links.length > 0) {
+			
+			this._currentNode = {
 				_platform: this._originPlatform,
-				_pnode: undefined,
+				_parent: undefined,
 				_link: undefined,
 				_pxli: body._x,
-				_pxri: body._x,
+				_pxri: body._x + body._sizeX,
 				_pxlo: body._x,
-				_pxro: body._x,
+				_pxro: body._x + body._sizeX,
 				_gx: 0,
-				_fx: this.euclideanDistance(body._x, platformMap._map.tileToPosY(this._originPlatform._ty))
-			});
+				_fx: this._euclideanDistance((body._x + body._sizeX) / 2, 
+					platformMap._map.tileToPosY(this._originPlatform._ty))
+			};
+
+			if (LOGGING) {
+				console.log("%%%%%%%%% start node %%%%%%%%%");
+				console.log("gx:", this._currentNode._gx);
+				console.log("fx:", this._currentNode._fx);
+				console.log("pxlo:", this._currentNode._pxlo);
+				console.log("pxro:", this._currentNode._pxro);
+			}
+
+			this._currentNeighbor = this._resolveLink(this._currentNode,
+				this._currentNode._platform._links[this._linkIndex]);
+
+			if (!this._currentNeighbor) this.stepLink();
 		}
 	};
 
-	PlatformSearch.prototype.euclideanDistance = function(px, py) {
-		var dx = this._pxf - px;
-		var dy = this._pyf - py;
-		return Math.sqrt(dx*dx + dy*dy);
-	};
+	PlatformSearch.prototype._resolveLink = function(node, nlink) {
+		lfx = Number.POSITIVE_INFINITY;
+		if (this._closedLinks[nlink._tag] !== undefined) {
+			lfx = this._closedLinks[nlink._tag];
+		}
 
-	PlatformSearch.prototype.getNeighborNode = function(node, nlink) {
-		var lpxli = nlink._head._pxli;
-		var lpxri = nlink._head._pxri;
+		var neighborNode = this._getNeighborNode(node, nlink);
+		if (neighborNode._gx !== node._gx && neighborNode._fx < lfx) {
+			
+			if (LOGGING) {
+				console.log("%%%%%%%%% next node %%%%%%%%%");
+				console.log(neighborNode._fx, "<", lfx);
+				console.log(nlink);
 
-		var pxli = Math.min(Math.max(node._pxlo, lpxli), lpxri);
-		var pxri = Math.min(Math.max(node._pxro, lpxli), lpxri);
+				var s = "";
+				var cnode = node;
+				while (cnode) {
+					s = cnode._platform._index + " " + s;
+					cnode = cnode._parent;
+				}
 
-		var walkDist = Math.max(0, Math.min(pxli - node._pxlo, node._pxro - pxri));
-		var walkTime = walkDist / this._kinematics._walkSpd;
+				console.log("platform chain:", s);
+				console.log("gx:", neighborNode._gx);
+				console.log("fx:", neighborNode._fx);
+				if (neighborNode._parent) {
+					console.log("ppxlo:", neighborNode._parent._pxlo);
+					console.log("ppxro:", neighborNode._parent._pxro);
+				}
+				console.log("pxli:", neighborNode._pxli);
+				console.log("pxri:", neighborNode._pxri);
+				console.log("pxlo:", neighborNode._pxlo);
+				console.log("pxro:", neighborNode._pxro);
+			}
 
-		var pxlo = Math.min(Math.max(pxli - nlink._maxDeltaX, nlink._tail._pxlo), nlink._tail._pxro);
-		var pxro = Math.min(Math.max(pxri + nlink._maxDeltaX, nlink._tail._pxlo), nlink._tail._pxro);
-
-		var gx = node._gx + walkTime + nlink._totalTime;
-
-		return {
-			_platform: nlink._toPlatform,
-			_pnode: node,
-			_link: nlink,
-			_pxli: pxli,
-			_pxri: pxri,
-			_pxlo: pxlo,
-			_pxro: pxro,
-			_gx: gx,
-			_fx: gx + this.euclideanDistance((pxlo + pxro) / 2,
-				this._platformMap._map.tileToPosY(nlink._toPlatform._ty)) / this._kinematics._walkSpd
-		};
+			this._openNodes.push(neighborNode);
+			this._closedLinks[nlink._tag] = neighborNode._fx;
+			this._neighborNode = neighborNode;
+			return neighborNode;
+		}
 	};
 
 	var sortFunction = function(n1, n2) {
 		return n1._fx - n2._fx;
 	};
 
-	PlatformSearch.prototype.step = function() {
+	PlatformSearch.prototype._getNeighborNode = function(node, nlink) {
+		var sizeX = this._platformMap._body._sizeX;
+		var sizeY = this._platformMap._body._sizeY;
 
-		if (this._openNodes.length === 0) return;
+		// starting range of current node in fromPlatform
+		var lpxli = nlink._pxli;
+		var lpxri = nlink._pxri;
 
-		this._openNodes.sort(sortFunction);
-		var node = this._openNodes.shift();
-		var platform = node._platform;
-		
-		var preachable = platform._reachable;
-		var nlinks;
-		var lfx;
+		// range in fromPlatform to start jumping/falling from (may need to walk there)
+		var pxli = Math.min(Math.max(node._pxlo, lpxli), lpxri - sizeX);
+		var pxri = Math.min(Math.max(node._pxro, lpxli + sizeX), lpxri);
 
-		for (var i in preachable) {
-			nlinks = preachable[i];
-			for (var l = 0; l < nlinks.length; l++) {
-				var nlink = nlinks[l];
+		var walkDist = Math.max(0, Math.min(pxli + sizeX - node._pxlo, node._pxro - sizeX - pxri));
+		var walkTime = walkDist / this._kinematics._walkSpd;
 
-				lfx = Number.POSITIVE_INFINITY;
-				if (this._closedLinks[nlink._tag] !== undefined) {
-					lfx = this._closedLinks[nlink._tag];
-				}
+		// landing range in toPlatform
+		var pxlo = Math.min(Math.max(pxli - nlink._maxDeltaX, nlink._pxlo), nlink._pxro);
+		var pxro = Math.min(Math.max(pxri + nlink._maxDeltaX, nlink._pxlo), nlink._pxro);
 
-				var neighborNode = this.getNeighborNode(node, nlink);
-				if (neighborNode._fx < lfx) {
-					this._openNodes.push(neighborNode);
-					this._closedLinks[nlink._tag] = neighborNode._fx;
-				}
+		var gx = node._gx + walkTime + nlink._totalTime;
+		var fx = gx + this._euclideanDistance((pxlo + pxro) / 2,
+				this._platformMap._map.tileToPosY(nlink._toPlatform._ty)) / this._kinematics._walkSpd;
+
+		var neighborNode = {
+			_platform: nlink._toPlatform,
+			_parent: node,
+			_link: nlink,
+			_pxli: pxli,
+			_pxri: pxri,
+			_pxlo: pxlo,
+			_pxro: pxro,
+			_gx: gx,
+			_fx: fx
+		};
+
+		if (LOGGING) {
+			console.log("######### check neighbor");
+			console.log("walkTime:", walkTime);
+			console.log("jumpTime:", nlink._totalTime);
+		}
+
+		return neighborNode;
+	};
+
+	// for rendering purposes only. 
+	PlatformSearch.prototype.stepLinkIncrement = function() {
+
+		if (LOGGING) {
+			console.log("STEP *************************************");
+			if (this._currentNode) {
+				console.log("platform index:", this._currentNode._platform._index);
+				console.log("link index:", this._linkIndex);
+				console.log("link step inc:", this._linkStepInc);
 			}
 		}
+
+		if (!this._currentNode) return;
+
+		if (this._linkStepInc < 3) {
+			this._linkStepInc++;
+			return true;
+		}
+
+		else return this.stepLink();
+	};
+
+	PlatformSearch.prototype.stepLink = function() {
+
+		if (!this._currentNode || this._currentNode._platform._links.length === 0) {
+			return false;
+		}
+
+		if (this._currentNode._platform._links[this._linkIndex+1]) {
+			this._linkIndex++;
+		} else {
+			this._openNodes.sort(sortFunction);
+			this._currentNode = this._openNodes.shift();
+			
+			if (!this._currentNode || this._currentNode._platform._links.length === 0) {
+				return false;
+			}
+			
+			this._linkIndex = 0;
+		}
+		
+		this._linkStepInc = 0;
+		this._currentNeighbor = this._resolveLink(this._currentNode, 
+				this._currentNode._platform._links[this._linkIndex]);
+		if (!this._currentNeighbor) return this.stepLink();
+
+		return true;
+	};
+
+	PlatformSearch.prototype.stepNode = function() {
+		var currentNode = this._currentNode;
+		if (!currentNode || this._currentNode._platform._links.length === 0) {
+			return false;
+		}
+		while (this.stepLink()) {
+			if (currentNode !== this._currentNode) break;
+		}
+		return true;
+	};
+
+	PlatformSearch.prototype._euclideanDistance = function(px, py) {
+		var dx = this._pxf - px;
+		var dy = this._pyf - py;
+		return Math.sqrt(dx*dx + dy*dy);
 	};
 
 	return PlatformSearch;

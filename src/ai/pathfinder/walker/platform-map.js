@@ -49,7 +49,8 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		this._pxli = -1;
 		this._pxri = -1;
 
-		this._reachable = {};
+		this._links = [];
+		this._linksByPlatform = {};
 		this._index = -1;
 	};
 
@@ -124,12 +125,14 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		}
 	};
 
-	PlatformMap.prototype.addReachableLink = function(originPlatform, reachedPlatform, patch) {
-		var patches = originPlatform._reachable[reachedPlatform._index];
-		if (!patches) {
-			patches = originPlatform._reachable[reachedPlatform._index] = [];
+	PlatformMap.prototype.addReachableLink = function(originPlatform, reachedPlatform, link) {
+		console.log("add link " + originPlatform._index + ", " + reachedPlatform._index);
+		var links = originPlatform._linksByPlatform[reachedPlatform._index];
+		if (!links) {
+			links = originPlatform._linksByPlatform[reachedPlatform._index] = [];
 		}
-		patches.push(patch);
+		links.push(link);
+		originPlatform._links.push(link);
 	};
 
 	PlatformMap.prototype.fromCombinedMap = function(combinedMap) {

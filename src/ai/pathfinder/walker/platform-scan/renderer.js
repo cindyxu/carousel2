@@ -44,7 +44,7 @@ gm.Pathfinder.Walker.PlatformScan.Renderer = function() {
 
 		for (var p = 0; p < reachablePatches.length; p++) {
 			var patch = reachablePatches[p];
-			ctx.fillRect(patch._pxli, patch._pyi, patch._pxri - patch._pxli, this._platformScan._cmap.tilesize);
+			ctx.fillRect(patch._ppxl, patch._pyi, patch._ppxr - patch._ppxl, this._platformScan._cmap.tilesize);
 		}
 
 		ctx.restore();

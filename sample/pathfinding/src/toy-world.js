@@ -73,9 +73,6 @@ gm.Sample.Pathfinding.ToyWorld = (function(values) {
 	};
 
 	ToyWorld.render = function(ctx) {
-		ctx.fillStyle = "black";
-		ctx.fillRect(0, 0, TILES_X * TILESIZE, TILES_Y * TILESIZE);
-
 		gm.Level.Renderer.render(ctx, level, camera);
 	};
 
