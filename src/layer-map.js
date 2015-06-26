@@ -12,21 +12,12 @@ gm.LayerMap = function() {
 
 		var layerMap = this;
 
-		layerMap._map = undefined;
-		layerMap._renderer = undefined;
-
-		layerMap._pos = {
-			x: 0,
-			y: 0
-		};
+		gm.PosMap.call(this, params);
 
 		layerMap._transformFns = [];
-
 		layerMap._elapsed = 0;
-
 		layerMap._offsetX = 0;
 		layerMap._offsetY = 0;
-
 		layerMap.listener = undefined;
 		layerMap._renderer = undefined;
 
@@ -37,6 +28,8 @@ gm.LayerMap = function() {
 		
 		if (renderer) layerMap.setRenderer(renderer);
 	};
+
+	LayerMap.prototype = Object.create(gm.PosMap.prototype);
 
 	LayerMap.prototype.setParams = function(params) {
 		var layerMap = this;
@@ -76,7 +69,7 @@ gm.LayerMap = function() {
 	};
 
 	LayerMap.prototype.render = function(ctx, bbox) {
-		if (this._renderer) this._renderer.render(ctx, this._pos.x, this._pos.y, bbox);
+		if (this._renderer) this._renderer.render(ctx, this._px, this._py, bbox);
 	};
 
 	LayerMap.prototype.updateStep = function(delta) {
@@ -84,38 +77,17 @@ gm.LayerMap = function() {
 		this.updatePosition();
 	};
 
+	var res = {};
 	LayerMap.prototype.updatePosition = function() {
 		var layerMap = this;
-		var pos = layerMap._pos;
-		pos.x = layerMap._offsetX;
-		pos.y = layerMap._offsetY;
+		layerMap._px = layerMap._offsetX;
+		layerMap._py = layerMap._offsetY;
 
 		var _transformFns = layerMap._transformFns;
 		var fct = _transformFns.length;
 		for (var i = 0; i < fct; i++) {
-			_transformFns[i](pos, layerMap._elapsed);
+			_transformFns[i](layerMap._px, layerMap._py, layerMap._elapsed, res);
 		}
-	};
-
-	LayerMap.prototype.posToTile = function(px, py, res) {
-		this._map.posToTile(px - this._pos.x, py - this._pos.y, res);
-	};
-
-	LayerMap.prototype.tileToPos = function(tx, ty, res) {
-		var layerMap = this;
-		layerMap._map.tileToPos(tx, ty, res);
-		res.x += layerMap._pos.x;
-		res.y += layerMap._pos.y;
-	};
-
-	var obbox = {};
-	LayerMap.prototype.getOverlappingTileBbox = function(bbox, res) {
-		var pos = layerMap._pos;
-		obbox.x0 = bbox.x0 + pos.x;
-		obbox.y0 = bbox.y0 + pos.y;
-		obbox.x1 = bbox.x1 + pos.x;
-		obbox.y1 = bbox.y1 + pos.y;
-		layerMap._map.getOverlappingTileBbox(obbox, res);
 	};
 
 	return LayerMap;

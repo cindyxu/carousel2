@@ -1,5 +1,6 @@
 gm.Pathfinder.Walker.PlatformScanner = function() {
 
+	var Reachable = gm.Pathfinder.Walker.Reachable;
 	var PlatformScanner = {};
 
 	PlatformScanner.scanPlatforms = function(platformMap) {
@@ -9,6 +10,8 @@ gm.Pathfinder.Walker.PlatformScanner = function() {
 			platformMap._body._sizeX, 
 			platformMap._body._sizeY, 
 			platformMap._kinematics);
+
+		var reachable = Reachable.newInstance();
 		
 		for (var p = 0; p < platforms.length; p++) {
 			var platform = platforms[p];
@@ -21,7 +24,7 @@ gm.Pathfinder.Walker.PlatformScanner = function() {
 				platformMap._map.tileToPosY(platform._ty));
 			while(scan.step());
 			PlatformScanner._addReachableLinks(platformMap, platform, 
-				scan.getPatchesByPlatform(platformMap._map));
+				scan.getPatchesByPlatform(platformMap._map), reachable);
 		
 			// don't jump
 			scan.beginScan(
@@ -31,16 +34,13 @@ gm.Pathfinder.Walker.PlatformScanner = function() {
 				platformMap._map.tileToPosY(platform._ty));
 			while(scan.step());
 			PlatformScanner._addReachableLinks(platformMap, platform, 
-				scan.getPatchesByPlatform(platformMap._map));
-
-			if (LOGGING) {
-				console.log("~~~~~~~~~~~~~~~~~~ RESULTS for platform", platform._index);
-				console.log(platform._linksByPlatform);
-			}
+				scan.getPatchesByPlatform(platformMap._map), reachable);
 		}
+
+		return reachable;
 	};
 
-	PlatformScanner._addReachableLinks = function(platformMap, originPlatform, patches) {
+	PlatformScanner._addReachableLinks = function(platformMap, originPlatform, patches, reachable) {
 		var map = platformMap._map;
 
 		for (var p = 0; p < patches.length; p++) {
@@ -54,10 +54,13 @@ gm.Pathfinder.Walker.PlatformScanner = function() {
 			for (var tx = tx0; tx < tx1; ) {
 				reachedPlatform = map.tileAt(tx, ty);
 				if (reachedPlatform && reachedPlatform !== originPlatform) {
+					
 					var link = new gm.Pathfinder.Walker.Link.Platform(
 						originPlatform, reachedPlatform, tailArea, platformMap._kinematics);
-					platformMap.addReachableLink(originPlatform, reachedPlatform, link);
+					
+					Reachable.addLink(reachable, link);
 					break;
+
 				} else tx++;
 			}
 		}

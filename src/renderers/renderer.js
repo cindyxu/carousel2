@@ -1,2 +1,1 @@
-gm.Renderer = function() {
-};
+gm.Renderer = function() {};

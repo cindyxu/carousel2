@@ -12,6 +12,8 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 		var pstart = -1;
 		var ptile;
 
+		var platforms = [];
+
 		for (var ty = 0; ty < cmap._tilesY; ty++) {
 			for (var tx = 0; tx < cmap._tilesX; tx++) {
 
@@ -19,7 +21,7 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 
 				var shouldFinishPlatform = (pstart >= 0 && !(ntile & gm.Constants.Dir.UP));
 				if (shouldFinishPlatform) {
-					addPlatformsForPatch(pstart, tx, ty, platformMap);
+					addPlatformsForPatch(pstart, tx, ty, platformMap, platforms);
 					pstart = -1;
 				}
 
@@ -30,15 +32,16 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 			}
 
 			if (pstart >= 0) {
-				addPlatformsForPatch(pstart, cmap._tilesX, ty, platformMap);
+				addPlatformsForPatch(pstart, cmap._tilesX, ty, platformMap, platforms);
 				pstart = -1;
 			}
 		}
+		return platforms;
 	};
 
 	// sets platform.pxli and platform.pxri, which represent how far a body with sizeX and sizeY 
 	// could walk to the left/right of this platform before either falling off or hitting a wall.
-	var getPlatformExtents = function(platform, platformMap) {
+	var setPlatformExtents = function(platform, platformMap) {
 		var cmap = platformMap._combinedMap._map;
 
 		var maxTy = platform._ty;
@@ -75,7 +78,7 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 
 	// turns patch into platform(s). splits into smaller platforms if necessary,
 	// then extends each platform as far as possible to the left and right.
-	var addPlatformsForPatch = function(tx0, tx1, ty, platformMap) {
+	var addPlatformsForPatch = function(tx0, tx1, ty, platformMap, res) {
 		var cmap = platformMap._combinedMap._map;
 
 		var initPlatform = platformMap.newPlatformObject(tx0, tx1, ty);
@@ -83,8 +86,8 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 
 		for (var s = 0; s < splitPlatforms.length; s++) {
 			var platform = splitPlatforms[s];
-			getPlatformExtents(platform, platformMap);
-			platformMap.addPlatform(platform);
+			setPlatformExtents(platform, platformMap);
+			res.push(platform);
 		}
 	};
 
@@ -93,12 +96,13 @@ gm.Pathfinder.Walker.PlatformGenerator = function() {
 	var splitPlatform = function(platform, platformMap) {
 		var cmap = platformMap._combinedMap._map;
 
+		var tx, ty;
 		var maxTy = platform._ty;
 		var minTy = cmap.posToTileY(cmap.tileToPosY(platform._ty) - platformMap._body._sizeY);
 
 		var splitPlatforms = [];
 		
-		for (var tx = platform._tx0; tx < platform._tx1; tx++) {
+		for (tx = platform._tx0; tx < platform._tx1; tx++) {
 			var splitLeft = false;
 			var splitRight = false;
 

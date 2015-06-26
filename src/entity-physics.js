@@ -82,8 +82,8 @@ gm.EntityPhysics = function() {
 			stileX = (body.vx < 0 ? tbbox.tx0 : tbbox.tx1 - 1);
 			if (!map.inRangeX(stileX)) return;
 			
-			stileY = map.clampTileDim(tbbox.ty0, Y);
-			etileY = map.clampTileDim(tbbox.ty1, Y);
+			stileY = map.clampTileY(tbbox.ty0);
+			etileY = map.clampTileY(tbbox.ty1);
 
 			for (var y = stileY; y < etileY; y++) {
 				collided = collided || EntityPhysics.collideBodyWithTile(body, layerMap, stileX, y, dim);
@@ -102,8 +102,8 @@ gm.EntityPhysics = function() {
 			stileY = (body.vy < 0 ? tbbox.ty0 : tbbox.ty1 - 1);
 			if (!map.inRangeX(stileY)) return;
 			
-			stileX = map.clampTileDim(tbbox.tx0, X);
-			etileX = map.clampTileDim(tbbox.tx1, X);
+			stileX = map.clampTileX(tbbox.tx0);
+			etileX = map.clampTileX(tbbox.tx1);
 
 			for (var x = stileX; x < etileX; x++) {
 				collided = collided || EntityPhysics.collideBodyWithTile(body, layerMap, x, stileY, dim);

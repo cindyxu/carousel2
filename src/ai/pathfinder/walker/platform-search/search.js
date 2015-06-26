@@ -1,9 +1,11 @@
 /* runs A* search over platform/link space */
 gm.Pathfinder.Walker.PlatformSearch = function() {
 
-	var PlatformSearch = function(platformMap, pxf, pyf) {
+	var PlatformSearch = function(platformMap, body, kinematics, pxf, pyf) {
 		this._platformMap = platformMap;
-		this._kinematics = platformMap._kinematics;
+		this._body = body;
+		this._kinematics = kinematics;
+
 		this._pxf = pxf;
 		this._pyf = pyf;
 		
@@ -16,37 +18,40 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		this._currentNeighbor = undefined;
 		this._linkStepInc = 0;
 
-		var body = this._platformMap._body;
-
 		this._originPlatform = platformMap.getPlatformUnderBody(body);
+		this._renderer = new gm.Pathfinder.Walker.PlatformSearch.Renderer(this);
 
-		if (this._originPlatform && this._originPlatform._links.length > 0) {
-			
-			this._currentNode = {
-				_platform: this._originPlatform,
-				_parent: undefined,
-				_link: undefined,
-				_pxli: body._x,
-				_pxri: body._x + body._sizeX,
-				_pxlo: body._x,
-				_pxro: body._x + body._sizeX,
-				_gx: 0,
-				_fx: this._euclideanDistance((body._x + body._sizeX) / 2, 
-					platformMap._map.tileToPosY(this._originPlatform._ty))
-			};
+		if (this._originPlatform) {
 
-			if (LOGGING) {
-				console.log("%%%%%%%%% start node %%%%%%%%%");
-				console.log("gx:", this._currentNode._gx);
-				console.log("fx:", this._currentNode._fx);
-				console.log("pxlo:", this._currentNode._pxlo);
-				console.log("pxro:", this._currentNode._pxro);
+			var linkObj = this._platformMap._reachable[this._originPlatform._index];
+			if (linkObj) {
+
+				this._currentNode = {
+					_platform: this._originPlatform,
+					_parent: undefined,
+					_link: undefined,
+					_pxli: body._x,
+					_pxri: body._x + body._sizeX,
+					_pxlo: body._x,
+					_pxro: body._x + body._sizeX,
+					_gx: 0,
+					_fx: this._euclideanDistance((body._x + body._sizeX) / 2, 
+						platformMap._map.tileToPosY(this._originPlatform._ty))
+				};
+
+				if (LOGGING) {
+					console.log("%%%%%%%%% start node %%%%%%%%%");
+					console.log("gx:", this._currentNode._gx);
+					console.log("fx:", this._currentNode._fx);
+					console.log("pxlo:", this._currentNode._pxlo);
+					console.log("pxro:", this._currentNode._pxro);
+				}
+
+				this._currentNeighbor = this._resolveLink(this._currentNode,
+					linkObj._links[this._linkIndex]);
+
+				if (!this._currentNeighbor) this.stepLink();
 			}
-
-			this._currentNeighbor = this._resolveLink(this._currentNode,
-				this._currentNode._platform._links[this._linkIndex]);
-
-			if (!this._currentNeighbor) this.stepLink();
 		}
 	};
 
@@ -96,8 +101,8 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype._getNeighborNode = function(node, nlink) {
-		var sizeX = this._platformMap._body._sizeX;
-		var sizeY = this._platformMap._body._sizeY;
+		var sizeX = this._body._sizeX;
+		var sizeY = this._body._sizeY;
 
 		// starting range of current node in fromPlatform
 		var lpxli = nlink._pxli;
@@ -163,26 +168,31 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 
 	PlatformSearch.prototype.stepLink = function() {
 
-		if (!this._currentNode || this._currentNode._platform._links.length === 0) {
-			return false;
-		}
+		if (!this._currentNode) return false;
 
-		if (this._currentNode._platform._links[this._linkIndex+1]) {
+		var reachable = this._platformMap._reachable;
+
+		var platform = this._currentNode._platform;
+		if (!reachable[platform._index]) return false;
+
+		if (reachable[platform._index]._links[this._linkIndex+1]) {
 			this._linkIndex++;
+		
 		} else {
 			this._openNodes.sort(sortFunction);
 			this._currentNode = this._openNodes.shift();
 			
-			if (!this._currentNode || this._currentNode._platform._links.length === 0) {
-				return false;
-			}
+			if (!this._currentNode) return false;
+			
+			platform = this._currentNode._platform;
+			if (!reachable[platform._index]) return false;
 			
 			this._linkIndex = 0;
 		}
 		
 		this._linkStepInc = 0;
 		this._currentNeighbor = this._resolveLink(this._currentNode, 
-				this._currentNode._platform._links[this._linkIndex]);
+				reachable[platform._index]._links[this._linkIndex]);
 		if (!this._currentNeighbor) return this.stepLink();
 
 		return true;
@@ -190,9 +200,11 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 
 	PlatformSearch.prototype.stepNode = function() {
 		var currentNode = this._currentNode;
-		if (!currentNode || this._currentNode._platform._links.length === 0) {
-			return false;
-		}
+		
+		if (!currentNode) return false;
+		var platform = this._currentNode._platform;
+		if (!this._platformMap._reachable[platform._index]) return false;
+		
 		while (this.stepLink()) {
 			if (currentNode !== this._currentNode) break;
 		}
@@ -203,6 +215,12 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		var dx = this._pxf - px;
 		var dy = this._pyf - py;
 		return Math.sqrt(dx*dx + dy*dy);
+	};
+
+	var pres = {};
+	PlatformSearch.prototype.render = function(ctx, bbox) {
+		this._platformMap.tileToPos(0, 0, pres);
+		this._renderer.render(ctx, pres.x, pres.y, bbox);
 	};
 
 	return PlatformSearch;

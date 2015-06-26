@@ -15,6 +15,7 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 		this._sizeX = sizeX;
 		this._sizeY = sizeY;
 		this._kinematics = kinematics;
+		this._renderer = new gm.Pathfinder.Walker.PlatformScan.Renderer(this);
 
 		if (LOGGING && !cmap) console.log("!!! platformScan - no combined map");
 	};
@@ -380,6 +381,10 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 			}
 		}
 		return platformPatches;
+	};
+
+	PlatformScan.prototype.render = function(ctx, x, y, bbox) {
+		this._renderer.render(ctx, x, y, bbox);
 	};
 
 	return PlatformScan;

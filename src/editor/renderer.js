@@ -21,8 +21,7 @@ gm.Editor._renderer = function(editor) {
 	};
 
 	var renderLayerMapDebug = function(layer, ctx, bbox) {
-		var pos = layer._layerMap._pos;
-		mapRenderers[layer._tag].render(ctx, pos.x, pos.y, bbox);
+		mapRenderers[layer._tag].render(ctx, layer._layerMap._px, layer._layerMap._py, bbox);
 	};
 
 	var renderEntityDebug = function(entity, ctx, bbox) {

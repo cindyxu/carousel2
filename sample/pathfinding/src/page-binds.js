@@ -8,8 +8,9 @@ $(function() {
 	var $scanPlatformButton = $("#scan-platform");
 	var $searchPlatformsButton = $("#search-platforms");
 	var $stepButton = $("#step");
-	var $toggleLevelRendererCheckbox = $("#toggle-level-renderer");
-	var $togglePlatformRendererCheckbox = $("#toggle-platform-renderer");
+	var $observeMapButton = $("#observe-map");
+
+	var editorActive = false;
 
 	var $canvas = $("<canvas/>")
 	.prop({
@@ -20,18 +21,24 @@ $(function() {
 
 	gm.Input.bind($canvas);
 	gm.Input.setListener('mousedown', function() {
-		Editor.onMouseDown();
-		render();
+		if (editorActive) {
+			Editor.onMouseDown();
+			render();
+		}
 	});
 	gm.Input.setListener('mouseup', function() {
-		Editor.onMouseUp();
-		render();
+		if (editorActive) {
+			Editor.onMouseUp();
+			render();
+		}
 	});
 	gm.Input.setListener('mousemove', function(mx, my) {
 		Editor.onMouseMove(mx, my);
+		Pathfinding.onMouseMove(mx, my);
 		render();
 	});
 	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.MOVE, function() {
+		editorActive = true;
 		Editor.onMoveKeyDown();
 		render();
 	});
@@ -40,10 +47,12 @@ $(function() {
 		render();
 	});
 	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.BRUSH, function() {
+		editorActive = true;
 		Editor.onBrushKeyDown();
 		render();
 	});
 	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.ERASE, function() {
+		editorActive = true;
 		Editor.onEraseKeyDown();
 		render();
 	});
@@ -65,10 +74,17 @@ $(function() {
 		render();
 	});
 
+	$observeMapButton.click(function(e) {
+		editorActive = false;
+		Pathfinding.regeneratePlatforms();
+		Pathfinding.startObserving();
+		render();
+	});
+
 	var render = function() {
 		ToyWorld.render(ctx);
 		Pathfinding.render(ctx);
-		Editor.render(ctx);
+		if (editorActive) Editor.render(ctx);
 	};
 
 	ctx = $canvas[0].getContext("2d");

@@ -46,6 +46,11 @@ gm.Map.prototype.posToTile = function(x, y, res) {
 	res.ty = Math.floor(y / this.tilesize);
 };
 
+gm.Map.prototype.posToTileCeil = function(x, y, res) {
+	res.tx = Math.ceil(x / this.tilesize);
+	res.ty = Math.ceil(y / this.tilesize);
+};
+
 gm.Map.prototype.posToTileX = function(x) {
 	return Math.floor(x / this.tilesize);
 };
@@ -80,9 +85,12 @@ gm.Map.prototype.clampTile = function(tx, ty, res) {
 	res.ty = Math.min(Math.max(0, ty), this._tilesY);
 };
 
-gm.Map.prototype.clampTileDim = function(td, dim) {
-	if (dim === gm.Constants.Dim.X) return Math.min(Math.max(td, 0), this._tilesX);
-	else return Math.min(Math.max(td, 0), this._tilesY);
+gm.Map.prototype.clampTileX = function(tx) {
+	return Math.min(Math.max(tx, 0), this._tilesX);
+};
+
+gm.Map.prototype.clampTileY = function(ty) {
+	return Math.min(Math.max(ty, 0), this._tilesY);
 };
 
 gm.Map.prototype.inRange = function(tx, ty) {

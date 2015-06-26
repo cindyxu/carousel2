@@ -4,10 +4,9 @@ gm.Pathfinder.Walker.PlatformScan.Renderer = function() {
 		this._platformScan = platformScan;
 	};
 
-	Renderer.prototype.render = function(ctx, bbox) {
-
+	Renderer.prototype.render = function(ctx, x, y, bbox) {
 		ctx.save();
-		ctx.translate(bbox.x0, bbox.y0);
+		ctx.translate(x - bbox.x0, y - bbox.y0);
 
 		this._renderAreas(ctx, bbox);
 		this._renderPatches(ctx, bbox);

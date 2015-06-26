@@ -73,36 +73,12 @@ gm.Body.prototype.setParams = function(params) {
 	}
 };
 
-gm.Body.prototype.writeState = function(state) {
-	state.x = this._x;
-	state.y = this._x;
-	state.vx = this.vx;
-	state.vy = this.vy;
-	state.ax = this.ax;
-	state.ay = this.ay;
-
-	state.collisionState = gm.CollisionRules.copyCollisionState(state.collisionState || {});
-};
-
-gm.Body.prototype.readState = function(state) {
-	this._x = state.x;
-	this._x = state.y;
-	this.vx = state.vx;
-	this.vy = state.vy;
-	this.ax = state.ax;
-	this.ay = state.ay;
-
-	gm.CollisionRules.copyCollisionState(state.collisionState, this._collisionState);
-
-	this._measurementsDirty = true;
-};
-
 gm.Body.prototype.moveTo = function(x, y) {
 	var body = this;
 	
 	body._x = x;
 	body._y = y;
-
+	
 	body._measurementsDirty = true;
 
 	if (LOGGING && (isNaN(body._x) || isNaN(body._y))) {
@@ -203,6 +179,9 @@ gm.Body.prototype.updateStepY = function(dt) {
 	body._measurementsDirty = true;
 };
 
+gm.Body.prototype.postUpdate = function() {
+};
+
 gm.Body.prototype.getCenter = function() {
 	var body = this;
 	if (body._measurementsDirty) body.recalculateMeasurements();
@@ -220,16 +199,14 @@ gm.Body.prototype.overlaps = function(other) {
 	var bbox = body.getBbox();
 	var obbox = other.getBbox();
 
-	return (bbox.x0 < obbox.x1 && bbox.x1 > obbox.x0 && 
-		bbox.y0 < obbox.y1 && bbox.y1 > obbox.y0);
+	return gm.Math.bboxesOverlap(bbox, obbox);
 };
 
 gm.Body.prototype.overlapsBbox = function(obbox) {
 	var body = this;
 	var bbox = body.getBbox();
 
-	return (bbox.x0 < obbox.x1 && bbox.x1 > obbox.x0 && 
-		bbox.y0 < obbox.y1 && bbox.y1 > obbox.y0);
+	return gm.Math.bboxesOverlap(bbox, obbox);
 };
 
 gm.Body.prototype.overlapsAxisX = function(other) {
