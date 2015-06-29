@@ -6,6 +6,9 @@ html
 		script(src="/underscore-min.js")
 		script(src="/jquery-1.11.2.min.js")
 		script(src="/jquery.animate-colors-min.js")
+		script(src="/gif.js")
+		script(src="/gif.worker.js")
+		script(src="/ccapture.min.js")
 
 		script(src="/src/gm.js")
 		script(src="/src/constants.js")
@@ -49,15 +52,18 @@ html
 		script(src="/src/ai/pathfinder/walker/platform-scan/scanner.js")
 		script(src="/src/ai/pathfinder/walker/platform-search/search.js")
 		script(src="/src/ai/pathfinder/walker/platform-search/renderer.js")
-		script(src="/src/ai/pathfinder/walker/observe/map.js")
-		script(src="/src/ai/pathfinder/walker/observe/renderer.js")
+		script(src="/src/ai/pathfinder/walker/observe-map/map.js")
+		script(src="/src/ai/pathfinder/walker/observe-map/renderer.js")
 		script(src="/sample/pathfinding/src/values.js")
 		script(src="/sample/pathfinding/src/toy-world.js")
 		script(src="/sample/pathfinding/src/editor.js")
 		script(src="/sample/pathfinding/src/pathfinding.js")
+		script(src="/sample/pathfinding/src/recorder.js")
 		script(src="/sample/pathfinding/src/page-binds.js")
 		
 	body
+		#recording.hidden
+			p REC &#9679;
 		h1 PATHFINDING TEST
 		#editor
 			.option

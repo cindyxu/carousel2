@@ -31,3 +31,14 @@ button
 	
 h1
 	font-size: 28px
+	
+#recording
+	position: absolute
+	top: 0
+	left: 0
+	color: red
+	border: 1px solid red
+	padding: 0.5rem
+
+.hidden
+	display: none

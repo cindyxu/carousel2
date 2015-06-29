@@ -182,7 +182,6 @@ gm.Pathfinder.Walker.ObservedPlatformMap = function() {
 			for (var l = 0; l < links.length; l++) {
 				
 				var link = links[l];
-				if (seenPlatforms.indexOf(link._toPlatform) < 0) continue;
 				if (opreachable && opreachable._links.indexOf(link) >= 0) continue;
 
 				lbbox.x0 = link._pxli;
@@ -192,9 +191,9 @@ gm.Pathfinder.Walker.ObservedPlatformMap = function() {
 
 				if (!gm.Math.bboxesOverlap(abbox, lbbox)) continue;
 
-				lbbox.x0 = link._pxlo;
+				lbbox.x0 = Math.max(link._pxlo, this._map.tileToPosX(link._toPlatform._tx0));
 				lbbox.y0 = this._map.tileToPosY(link._toPlatform._ty);
-				lbbox.x1 = link._pxro;
+				lbbox.x1 = Math.min(link._pxro, this._map.tileToPosX(link._toPlatform._tx1));
 				lbbox.y1 = this._map.tileToPosY(link._toPlatform._ty+1);
 
 				if (!gm.Math.bboxesOverlap(abbox, lbbox)) continue;

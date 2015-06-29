@@ -1,5 +1,5 @@
 gm.Settings = {
-	LOGGING: true
+	LOGGING: false
 };
 
 LOGGING = gm.Settings.LOGGING;

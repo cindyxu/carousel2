@@ -8,7 +8,8 @@ gm.Settings.Editor.keyBinds = {
 	SELECT_TILESET: "space",
 	MOVE: "W",
 	MOVE_TILES: "R",
-	TOGGLE_PLAY: "P"
+	TOGGLE_PLAY: "P",
+	RECORD: "0"
 };
 
 gm.Settings.Editor.colors = {

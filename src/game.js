@@ -7,7 +7,8 @@ gm.Game = function() {
 		_activeLevel: undefined,
 
 		_playing: false,
-		_lastRun: undefined,
+		_lastRunTime: undefined,
+		_currentTime: undefined,
 
 		_width : gm.Settings.Game.WIDTH,
 		_height : gm.Settings.Game.HEIGHT,
@@ -26,7 +27,7 @@ gm.Game = function() {
 
 	Game.play = function() {
 		Game._playing = true;
-		Game._lastRun = Date.now();
+		Game._lastRunTime = Date.now();
 		if (LOGGING) console.log("Game is playing");
 	};
 
@@ -41,7 +42,7 @@ gm.Game = function() {
 		var now = Date.now();
 
 		var targetTicks = Math.min(Game._maxTicks, 
-			Math.floor((now - Game._lastRun) / Game._tickStep));
+			Math.floor((now - Game._lastRunTime) / Game._tickStep));
 
 		var level = Game._activeLevel;
 
@@ -50,12 +51,13 @@ gm.Game = function() {
 		for (var i = 0; i < targetTicks; i++) {
 			level.updateStep(Game._tickStep, X);
 			level.updateStep(Game._tickStep, Y);
+			Game._currentTime += Game._tickStep;
 		}
 
-		var deltaTime = targetTicks * Game._tickStep;
+		var deltaTime = Game._currentTime - Game._lastRunTime;
 		level.postUpdate(deltaTime);
 		
-		Game._lastRun += deltaTime;
+		Game._lastRunTime = Gmae._currentTime;
 	};
 
 	Game.render = function(ctx) {

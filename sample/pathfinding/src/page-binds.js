@@ -4,13 +4,16 @@ $(function() {
 	var ToyWorld = gm.Sample.Pathfinding.ToyWorld;
 	var Editor = gm.Sample.Pathfinding.Editor;
 	var Pathfinding = gm.Sample.Pathfinding.Pathfinding;
+	var Recorder = gm.Sample.Pathfinding.Recorder;
 
 	var $scanPlatformButton = $("#scan-platform");
 	var $searchPlatformsButton = $("#search-platforms");
 	var $stepButton = $("#step");
 	var $observeMapButton = $("#observe-map");
+	var $recordingDiv = $("#recording");
 
 	var editorActive = false;
+	var recording = false;
 
 	var $canvas = $("<canvas/>")
 	.prop({
@@ -18,6 +21,8 @@ $(function() {
 		height: values.TILESIZE * values.TILES_Y
 	});
 	$("#game").append($canvas);
+
+	var recorder = new Recorder($canvas[0]);
 
 	gm.Input.bind($canvas);
 	gm.Input.setListener('mousedown', function() {
@@ -56,6 +61,18 @@ $(function() {
 		Editor.onEraseKeyDown();
 		render();
 	});
+	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.RECORD, function() {
+		if (!recording) {
+			$recordingDiv.removeClass("hidden");
+			recorder.startRecording();
+			recording = true;
+			render();
+		} else {
+			recorder.stopRecording();
+			$recordingDiv.addClass("hidden");
+			recording = false;
+		}
+	});
 
 	$scanPlatformButton.click(function(e) {
 		Pathfinding.regeneratePlatforms();
@@ -85,6 +102,7 @@ $(function() {
 		ToyWorld.render(ctx);
 		Pathfinding.render(ctx);
 		if (editorActive) Editor.render(ctx);
+		if (recording) recorder.capture();
 	};
 
 	ctx = $canvas[0].getContext("2d");

@@ -3,7 +3,7 @@ if (!gm.Sample) gm.Sample = {};
 gm.Sample.Pathfinding = {};
 
 gm.Sample.Pathfinding.values = {
-	TILES_X: 15,
+	TILES_X: 30,
 	TILES_Y: 15,
 	TILESIZE: 32,
 	SIZE_X: 48,

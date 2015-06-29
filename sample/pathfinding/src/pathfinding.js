@@ -101,7 +101,7 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 		var bbox = ToyWorld._camera._body.getBbox();
 		platformMap.render(ctx, bbox);
 
-		if (platformScan) platformScan.render(ctx, bbox);
+		if (platformScan) platformScan.render(ctx, 0, 0, bbox);
 		if (platformSearch) platformSearch.render(ctx, bbox);
 		if (observedPlatformMap) observedPlatformMap.render(ctx, bbox);
 	};
