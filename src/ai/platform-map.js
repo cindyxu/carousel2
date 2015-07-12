@@ -46,6 +46,9 @@ gm.Ai.PlatformMap = function() {
 		var cmap = this._combinedMap._map;
 		var tilesize = cmap.tilesize;
 
+		this._platforms.length = 0;
+		this._map.resize(0, 0);
+		
 		this._map.resize(cmap._tilesX, cmap._tilesY);
 		this._map.tilesize = tilesize;
 

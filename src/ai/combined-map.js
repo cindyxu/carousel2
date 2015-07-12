@@ -76,8 +76,10 @@ gm.Ai.CombinedMap.prototype._generateCombinedMap = function(layers) {
 		map = layerMap._map;
 
 		for (ty = 0; ty < map._tilesY; ty++) {
+			var s = "";
 			for (tx = 0; tx < map._tilesX; tx++) {
 				var ctile = this._map.tileAt(tx, ty);
+				s += ctile + " ";
 				var otile = map.tileAt(this._ptx + tx, this._pty + ty);
 				if (ctile !== undefined || otile !== undefined) {
 					this._map.setTile(tx, ty, ctile | otile);

@@ -35,7 +35,7 @@ gm.Ai.Observer = function() {
 
 		this._platformMap = platformMap;
 
-		this._currentPlatform = PlatformUtil.getPlatformUnderBody(this._body);
+		this._currentPlatform = PlatformUtil.getPlatformUnderBody(this._platformMap, this._body);
 
 		this._listeners = [];
 	};

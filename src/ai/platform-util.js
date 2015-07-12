@@ -3,11 +3,12 @@ gm.Ai.PlatformUtil = function() {
 	var PlatformUtil = {};
 
 	var obbox = {};
-	PlatformUtil.getPlatformUnderBody = function(pmap, body) {
+	PlatformUtil.getPlatformUnderBody = function(platformMap, body) {
+		var pmap = platformMap._map;
 		var tilesize = pmap.tilesize;
 		var bbox = body.getBbox();
 		
-		this.getOverlappingTileBbox(bbox, obbox);
+		platformMap.getOverlappingTileBbox(bbox, obbox);
 
 		var platform;
 		for (var ty = obbox.ty1; ty < pmap._tilesY; ty++) {

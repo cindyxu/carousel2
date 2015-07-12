@@ -9,7 +9,6 @@ gm.Ai.Agent = function() {
 
 		this._platformMap = new gm.Ai.PlatformMap(this._body, this._kinematics, this._combinedMap);
 		this._observedPlatformMap = new gm.Ai.ObservedPlatformMap(this._platformMap, this._body);
-		this._playerObserver = new gm.Ai.Observer(this._observedPlatformMap, this._body, this._walker);
 		
 		this._playerIntent = new gm.Ai.Intent(this._observer);
 	};
