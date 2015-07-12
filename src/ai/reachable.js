@@ -1,4 +1,4 @@
-gm.Pathfinder.Walker.Reachable = function() {
+gm.Ai.Reachable = function() {
 
 	var _PlatformLinks = function() {
 		this._links = [];

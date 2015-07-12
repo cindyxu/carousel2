@@ -1,7 +1,6 @@
-if (!gm.Pathfinder) gm.Pathfinder = {};
-if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
+if (!gm.Ai) gm.Ai = {};
 
-gm.Pathfinder.Walker.Kinematics = function() {
+gm.Ai.Kinematics = function() {
 
 	var Kinematics = function(params) {
 		this._walkSpd = params.walkSpd;

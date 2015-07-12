@@ -4,13 +4,10 @@ gm.EntityPhysics = function() {
 	var X = gm.Constants.Dim.X;
 	var Y = gm.Constants.Dim.Y;
 
-	var EntityPhysics = {
-		gravityX: 0,
-		gravityY: 1
-	};
+	var EntityPhysics = {};
 
-	EntityPhysics.preUpdate = function(entity) {
-		entity._body.addForce(EntityPhysics.gravityX, EntityPhysics.gravityY);
+	EntityPhysics.applyGravity = function(entity, gravity) {
+		entity._body.addForce(0, gravity);
 	};
 
 	EntityPhysics.postUpdate = function(entity) {

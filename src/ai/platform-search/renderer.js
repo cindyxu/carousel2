@@ -1,6 +1,6 @@
-gm.Pathfinder.Walker.PlatformSearch.Renderer = function() {
+gm.Ai.PlatformSearch.Renderer = function() {
 
-	var RenderUtil = gm.Pathfinder.Walker.RenderUtil;
+	var RenderUtil = gm.Ai.PlatformUtil.Render;
 
 	var Renderer = function(search) {
 		this._search = search;

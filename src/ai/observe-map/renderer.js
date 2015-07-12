@@ -1,6 +1,6 @@
-gm.Pathfinder.Walker.ObservedPlatformMap.Renderer = function() {
+gm.Ai.ObservedPlatformMap.Renderer = function() {
 
-	var RenderUtil = gm.Pathfinder.Walker.RenderUtil;
+	var RenderUtil = gm.Ai.PlatformUtil.Render;
 
 	var MapRenderer = function(map) {
 		gm.Renderer.Map.call(this, map);

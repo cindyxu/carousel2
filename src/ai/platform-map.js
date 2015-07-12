@@ -1,6 +1,6 @@
-if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
+if (!gm.Ai) gm.Ai = {};
 
-gm.Pathfinder.Walker.PlatformMap = function() {
+gm.Ai.PlatformMap = function() {
 
 	var PlatformMap = function(body, kinematics, combinedMap) {
 
@@ -49,8 +49,8 @@ gm.Pathfinder.Walker.PlatformMap = function() {
 		this._map.resize(cmap._tilesX, cmap._tilesY);
 		this._map.tilesize = tilesize;
 
-		this.setPlatforms(gm.Pathfinder.Walker.PlatformGenerator.generatePlatforms(this));
-		this._reachable = gm.Pathfinder.Walker.PlatformScanner.scanPlatforms(this);
+		this.setPlatforms(gm.Ai.PlatformGenerator.generatePlatforms(this));
+		this._reachable = gm.Ai.PlatformScanner.scanPlatforms(this);
 		if (LOGGING) console.log("platformMap - have", this._reachable.length, "links");
 
 		for (var i = 0; i < this._listeners.length; i++) {

@@ -1,4 +1,4 @@
-gm.Pathfinder.Walker.Link = function() {
+gm.Ai.Link = function() {
 
 	var tag = 0;
 
@@ -22,9 +22,9 @@ gm.Pathfinder.Walker.Link = function() {
 	return Link;
 }();
 
-gm.Pathfinder.Walker.Link.Platform = function() {
+gm.Ai.Link.Platform = function() {
 	
-	var Link = gm.Pathfinder.Walker.Link;
+	var Link = gm.Ai.Link;
 	
 	var PlatformLink = function(fromPlatform, toPlatform, tailArea, kinematics) {
 		

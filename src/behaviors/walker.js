@@ -12,8 +12,13 @@ gm.Behaviors.Walker = function() {
 		if (body) this.setBody(body);
 		if (params) this.setParams(params);
 
-		this._facing = 0;
+		this._facing = Dir.RIGHT;
+		this._walking = undefined;
+		
 		this._jumpCount = 0;
+		this._jumped = false;
+
+		this._crouching = false;
 	};
 
 	Walker.prototype.setParams = function(params) {
@@ -31,19 +36,35 @@ gm.Behaviors.Walker = function() {
 		var body = this._body;
 		if (!body) return;
 
-		if (input.down.left) {
-			body.addForce(-this._walkForce, 0);
-			this._facing = Dir.LEFT;
-		} 
-		else if (input.down.right) {
-			body.addForce(this._walkForce, 0);
-			this._facing = Dir.RIGHT;
+		if ((!input.down.left && this._walking === Dir.LEFT) ||
+			(!input.down.right && this._walking === Dir.RIGHT)) {
+			this._walking = undefined;
 		}
 
-		if (input.pressed.up && this._jumpCount < this._maxJumps) {
-			body.addImpulse(0, -this._jumpImpulse);
-			this._jumpCount++;
-		}	
+		if (input.pressed.left || 
+			(input.down.left && this._walking === Dir.LEFT)) {
+			body.addForce(-this._walkForce, 0);
+			this._facing = Dir.LEFT;
+			this._walking = Dir.LEFT;
+		}
+
+		if (input.pressed.right || 
+			(input.down.right && this._walking === Dir.RIGHT)) {
+			body.addForce(this._walkForce, 0);
+			this._facing = Dir.RIGHT;
+			this._walking = Dir.RIGHT;
+		}
+
+		if (body._collisionState.down && input.down.down) {
+			this._crouching = true;
+		} else {
+			this._crouching = false;
+			if (input.pressed.up && this._jumpCount < this._maxJumps) {
+				body.addImpulse(0, -this._jumpImpulse);
+				this._jumpCount++;
+				this._jumped = true;
+			}
+		}
 	};
 
 	Walker.prototype.post = function() {
@@ -52,6 +73,8 @@ gm.Behaviors.Walker = function() {
 
 		if (body._collisionState.down) {
 			this._jumpCount = 0;
+		} else if (!this._jumped) {
+			this._jumpCount--;
 		}
 	};
 

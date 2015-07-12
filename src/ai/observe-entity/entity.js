@@ -1,4 +1,4 @@
-gm.Pathfinder.Walker.EntityObserver = function() {
+gm.Ai.EntityObserver = function() {
 
 	var EntitySighting = function(entity, time) {
 		this._entity = entity;

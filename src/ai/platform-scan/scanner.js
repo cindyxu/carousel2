@@ -1,11 +1,11 @@
-gm.Pathfinder.Walker.PlatformScanner = function() {
+gm.Ai.PlatformScanner = function() {
 
-	var Reachable = gm.Pathfinder.Walker.Reachable;
+	var Reachable = gm.Ai.Reachable;
 	var PlatformScanner = {};
 
 	PlatformScanner.scanPlatforms = function(platformMap) {
 		var platforms = platformMap._platforms;
-		var scan = new gm.Pathfinder.Walker.PlatformScan(
+		var scan = new gm.Ai.PlatformScan(
 			platformMap._combinedMap._map,
 			platformMap._body._sizeX, 
 			platformMap._body._sizeY, 
@@ -55,7 +55,7 @@ gm.Pathfinder.Walker.PlatformScanner = function() {
 				reachedPlatform = map.tileAt(tx, ty);
 				if (reachedPlatform && reachedPlatform !== originPlatform) {
 					
-					var link = new gm.Pathfinder.Walker.Link.Platform(
+					var link = new gm.Ai.Link.Platform(
 						originPlatform, reachedPlatform, tailArea, platformMap._kinematics);
 					
 					Reachable.addLink(reachable, link);

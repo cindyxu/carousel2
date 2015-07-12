@@ -1,9 +1,9 @@
-if (!gm.Pathfinder) gm.Pathfinder = {};
+if (!gm.Ai) gm.Ai = {};
 
 /* combines all collision maps in the level
  * by ORing their tiles together. 
  */
-gm.Pathfinder.CombinedMap = function(layers) {
+gm.Ai.CombinedMap = function(layers) {
 	gm.PosMapTile.call(this, new gm.Map({
 		tilesX: 0,
 		tilesY: 0,
@@ -14,18 +14,18 @@ gm.Pathfinder.CombinedMap = function(layers) {
 	if (layers) this.fromLayers(layers);
 };
 
-gm.Pathfinder.CombinedMap.prototype = Object.create(gm.PosMapTile.prototype);
+gm.Ai.CombinedMap.prototype = Object.create(gm.PosMapTile.prototype);
 
-gm.Pathfinder.CombinedMap.prototype.addListener = function(listener) {
+gm.Ai.CombinedMap.prototype.addListener = function(listener) {
 	if (this._listeners.indexOf(listener) < 0) this._listeners.push(listener);
 };
 
-gm.Pathfinder.CombinedMap.prototype.removeListener = function(listener) {
+gm.Ai.CombinedMap.prototype.removeListener = function(listener) {
 	var i = this._listeners.indexOf(listener);
 	if (i >= 0) this._listeners.splice(i, 1);
 };
 
-gm.Pathfinder.CombinedMap.prototype.fromLayers = function(layers) {
+gm.Ai.CombinedMap.prototype.fromLayers = function(layers) {
 	if (layers.length > 0) {
 		this._generateCombinedMap(layers);
 	} else {
@@ -33,12 +33,12 @@ gm.Pathfinder.CombinedMap.prototype.fromLayers = function(layers) {
 	}
 };
 
-gm.Pathfinder.CombinedMap.prototype._reset = function() {
+gm.Ai.CombinedMap.prototype._reset = function() {
 	this._ptx = this._pty = 0;
 	this._map.resize(0, 0);
 };
 
-gm.Pathfinder.CombinedMap.prototype._setupCombinedMap = function(layers) {
+gm.Ai.CombinedMap.prototype._setupCombinedMap = function(layers) {
 	this._reset();
 
 	var tilesX = 0;
@@ -66,7 +66,7 @@ gm.Pathfinder.CombinedMap.prototype._setupCombinedMap = function(layers) {
 	this._map.tilesize = map.tilesize;
 };
 
-gm.Pathfinder.CombinedMap.prototype._generateCombinedMap = function(layers) {
+gm.Ai.CombinedMap.prototype._generateCombinedMap = function(layers) {
 
 	this._setupCombinedMap(layers);
 

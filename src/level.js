@@ -6,6 +6,8 @@ gm.Level = function() {
 	level._layers = [];
 	level._collisionLayers = [];
 	level._entities = [];
+
+	level._gravity = 1;
 };
 
 gm.Level.prototype.init = function() {
@@ -166,7 +168,7 @@ gm.Level.prototype.preUpdate = function() {
 
 	var elength = entities.length;
 	for (var e = 0; e < elength; e++) {
-		gm.EntityPhysics.preUpdate(entities[e]);
+		gm.EntityPhysics.applyGravity(entities[e], this._gravity);
 		entities[e].preUpdate();
 	}
 };

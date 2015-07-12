@@ -1,6 +1,6 @@
-gm.Pathfinder.Walker.ObservedPlatformMap = function() {
+gm.Ai.ObservedPlatformMap = function() {
 	
-	var Reachable = gm.Pathfinder.Walker.Reachable;
+	var Reachable = gm.Ai.Reachable;
 
 	var ObservedPlatformMap = function(platformMap, body) {
 		gm.PosMapTile.call(this, new gm.Map({
@@ -22,7 +22,7 @@ gm.Pathfinder.Walker.ObservedPlatformMap = function() {
 
 		this._generateMap();
 
-		this._renderer = new gm.Pathfinder.Walker.ObservedPlatformMap.Renderer(this);
+		this._renderer = new gm.Ai.ObservedPlatformMap.Renderer(this);
 	};
 
 	ObservedPlatformMap.prototype = Object.create(gm.PosMapTile.prototype);
@@ -205,7 +205,7 @@ gm.Pathfinder.Walker.ObservedPlatformMap = function() {
 	};
 
 	ObservedPlatformMap.prototype.onPlatformMapUpdated = function() {
-		this._hasobserved = false;
+		this._hasObserved = false;
 	};
 
 	var pres = {};

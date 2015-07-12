@@ -1,4 +1,4 @@
-gm.Pathfinder.Walker.PlatformScan.Renderer = function() {
+gm.Ai.PlatformScan.Renderer = function() {
 
 	var Renderer = function(platformScan) {
 		this._platformScan = platformScan;

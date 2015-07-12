@@ -1,7 +1,7 @@
-gm.Pathfinder.Walker.PlatformGenerator = function() {
+gm.Ai.PlatformGenerator = function() {
 
 	var PlatformGenerator = {};
-	var PlatformMap = gm.Pathfinder.Walker.PlatformMap;
+	var PlatformMap = gm.Ai.PlatformMap;
 
 	var LEFT = gm.Constants.Dir.LEFT;
 	var RIGHT = gm.Constants.Dir.RIGHT;

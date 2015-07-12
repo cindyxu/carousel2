@@ -1,5 +1,7 @@
 /* runs A* search over platform/link space */
-gm.Pathfinder.Walker.PlatformSearch = function() {
+gm.Ai.PlatformSearch = function() {
+
+	var PlatformUtil = gm.Ai.PlatformUtil;
 
 	var PlatformSearch = function(platformMap, body, kinematics, pxf, pyf) {
 		this._platformMap = platformMap;
@@ -18,8 +20,8 @@ gm.Pathfinder.Walker.PlatformSearch = function() {
 		this._currentNeighbor = undefined;
 		this._linkStepInc = 0;
 
-		this._originPlatform = platformMap.getPlatformUnderBody(body);
-		this._renderer = new gm.Pathfinder.Walker.PlatformSearch.Renderer(this);
+		this._originPlatform = PlatformUtil.getPlatformUnderBody(platformMap, body);
+		this._renderer = new gm.Ai.PlatformSearch.Renderer(this);
 
 		if (this._originPlatform) {
 

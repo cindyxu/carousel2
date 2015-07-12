@@ -1,12 +1,12 @@
-gm.Pathfinder.Walker.PlatformScan = function() {
+gm.Ai.PlatformScan = function() {
 
 	var DOWN = gm.Constants.Dir.DOWN;
 	var UP = gm.Constants.Dir.UP;
 	var LEFT = gm.Constants.Dir.LEFT;
 	var RIGHT = gm.Constants.Dir.RIGHT;
 
-	var PlatformArea = gm.Pathfinder.Walker.PlatformArea;
-	var PlatformPatch = gm.Pathfinder.Walker.PlatformPatch;
+	var PlatformArea = gm.Ai.PlatformArea;
+	var PlatformPatch = gm.Ai.PlatformPatch;
 
 	var PlatformScan = function(cmap, sizeX, sizeY, kinematics) {
 
@@ -15,7 +15,7 @@ gm.Pathfinder.Walker.PlatformScan = function() {
 		this._sizeX = sizeX;
 		this._sizeY = sizeY;
 		this._kinematics = kinematics;
-		this._renderer = new gm.Pathfinder.Walker.PlatformScan.Renderer(this);
+		this._renderer = new gm.Ai.PlatformScan.Renderer(this);
 
 		if (LOGGING && !cmap) console.log("!!! platformScan - no combined map");
 	};

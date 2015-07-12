@@ -1,7 +1,7 @@
-if (!gm.Pathfinder) gm.Pathfinder = {};
-if (!gm.Pathfinder.Walker) gm.Pathfinder.Walker = {};
+if (!gm.Ai) gm.Ai = {};
+if (!gm.Ai) gm.Ai = {};
 
-gm.Pathfinder.Walker._PlatformArea = function() {
+gm.Ai._PlatformArea = function() {
 	var _PlatformArea = function(parent, vyi, pxli, pxri, pyi, vyo, pxlo, pxro, pyo) {
 		this._vyi = vyi;
 		this._pxli = pxli;
@@ -71,13 +71,13 @@ gm.Pathfinder.Walker._PlatformArea = function() {
 
 	// static constructors
 
-	gm.Pathfinder.Walker.PlatformArea = {};
+	gm.Ai.PlatformArea = {};
 
-	gm.Pathfinder.Walker.PlatformArea.fromPlatform = function(vyi, pxli, pxri, pyi) {
+	gm.Ai.PlatformArea.fromPlatform = function(vyi, pxli, pxri, pyi) {
 		return new _PlatformArea(undefined, vyi, pxli, pxri, pyi);
 	};
 
-	gm.Pathfinder.Walker.PlatformArea.fromArea = function(parent, pxli, pxri, vyi) {
+	gm.Ai.PlatformArea.fromArea = function(parent, pxli, pxri, vyi) {
 		var cpxli = (pxli === undefined ? undefined : Math.max(parent._pxlo, pxli));
 		var cpxri = (pxri === undefined ? undefined : Math.min(parent._pxro, pxri));
 		return new _PlatformArea(parent, vyi, cpxli, cpxri);

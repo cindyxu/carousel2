@@ -1,10 +1,11 @@
 gm.Sample.Pathfinding.Pathfinding = function() {
 
-	var PlatformMap = gm.Pathfinder.Walker.PlatformMap;
-	var ObservedPlatformMap = gm.Pathfinder.Walker.ObservedPlatformMap;
+	var PlatformMap = gm.Ai.PlatformMap;
+	var ObservedPlatformMap = gm.Ai.ObservedPlatformMap;
+	var PlatformUtil = gm.Ai.PlatformUtil;
 
 	var values = gm.Sample.Pathfinding.values;
-	var kinematics = new gm.Pathfinder.Walker.Kinematics({
+	var kinematics = new gm.Ai.Kinematics({
 		walkSpd: values.WALK_SPD,
 		jumpSpd: values.JUMP_SPD,
 		fallAccel: values.FALL_ACCEL,
@@ -13,7 +14,7 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 
 	var ToyWorld = gm.Sample.Pathfinding.ToyWorld;
 
-	var combinedMap = new gm.Pathfinder.CombinedMap(ToyWorld._level._layers);
+	var combinedMap = new gm.Ai.CombinedMap(ToyWorld._level._layers);
 
 	var startBody = ToyWorld._startEntity._body;
 	var endBody = ToyWorld._endEntity._body;
@@ -45,10 +46,10 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 	};
 
 	Pathfinding.startScan = function() {
-		var originPlatform = platformMap.getPlatformUnderBody(startBody);
+		var originPlatform = PlatformUtil.getPlatformUnderBody(platformMap, startBody);
 
 		if (originPlatform) {
-			platformScan = new gm.Pathfinder.Walker.PlatformScan(
+			platformScan = new gm.Ai.PlatformScan(
 				combinedMap._map,
 				platformMap._body._sizeX,
 				platformMap._body._sizeY,
@@ -61,9 +62,9 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 
 	Pathfinding.startSearch = function() {
 
-		var originPlatform = platformMap.getPlatformUnderBody(startBody);
+		var originPlatform = PlatformUtil.getPlatformUnderBody(platformMap, startBody);
 		if (originPlatform) {
-			platformSearch = new gm.Pathfinder.Walker.PlatformSearch(
+			platformSearch = new gm.Ai.PlatformSearch(
 				platformMap,
 				startBody,
 				kinematics,

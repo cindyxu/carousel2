@@ -1,11 +1,11 @@
-/* extends from gm.Pathfinder.Walker._PlatformArea. represents landing on a platform.
+/* extends from gm.Ai._PlatformArea. represents landing on a platform.
  * ppxl and ppxr represent the left and right bounds of the platform
  * which may be more confined than pxlo/pxro if the body extends over the edge.
  */
 
-gm.Pathfinder.Walker.PlatformPatch = function() {
+gm.Ai.PlatformPatch = function() {
 
-	var _PlatformArea = gm.Pathfinder.Walker._PlatformArea;
+	var _PlatformArea = gm.Ai._PlatformArea;
 
 	var PlatformPatch = function(parent, ppxl, ppxr, pxli, pxri) {
 		

@@ -1,4 +1,4 @@
-gm.Pathfinder.Walker.RenderUtil = {
+gm.Ai.PlatformUtil.Render = {
 
 	renderPlatform: function(ctx, pmap, platform) {
 		var px0 = pmap.tileToPosX(platform._tx0);
