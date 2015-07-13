@@ -1,16 +1,44 @@
 gm.Ai.Agent = function() {
 	
-	var Agent = function(level, walker, body, combinedMap) {
-		this._walker = walker;
-		this._body = body;
-		this._combinedMap = combinedMap;
+	var Agent = function(entity) {
+		this._game = undefined;
 
-		this._kinematics = this._createKinematicsFromWalker(level, this._walker, this._body);
-
-		this._platformMap = new gm.Ai.PlatformMap(this._body, this._kinematics, this._combinedMap);
-		this._observedPlatformMap = new gm.Ai.ObservedPlatformMap(this._platformMap, this._body);
+		this._entity = entity;
 		
-		this._playerIntent = new gm.Ai.Intent(this._observer);
+		this._playerObserver = new gm.Ai.Observer("player", entity._camera._body);
+		this._playerIntent = new gm.Ai.PlayerIntent(this._playerObserver);
+	};
+
+	Agent.initWithGame = function(game) {
+		this._game = game;
+		game.addListener(this);
+		this._onLevelChanged(game.getEntityLevel(entity));
+	};
+
+	Agent._onLevelChanged = function(level) {
+		if (level) {
+
+			var walker = this._entity._walker;
+			var body = this._entity._body;
+			var pathfinding = level._pathfinding;
+
+			this._kinematics = this._createKinematicsFromWalker(level, walker, body);
+			this._reachable = gm.Ai.PlatformScanner.scanPlatforms(pathfinding._combinedMap, 
+				pathfinding._platformMap, body, this._kinematics);
+
+			this._observedPlatformMap = new gm.Ai.ObservedPlatformMap(pathfinding._platformMap, body);
+			this._observedReachable = gm.Ai.Reachable.newInstance();
+			this.__reachableObserver = new gm.Ai.ReachableObserver(this._observedPlatformMap, 
+				this._reachable, this._observedReachable);
+
+		} else {
+			this._reachable = undefined;
+			this._observedPlatformMap = undefined;
+			this._observedReachable = undefined;
+			this.__reachableObserver = undefined;
+		}
+
+		this._playerObserver.onLevelChanged(level);
 	};
 
 	Agent._createKinematicsFromWalker = function(level, walker, body) {
@@ -22,8 +50,16 @@ gm.Ai.Agent = function() {
 		});
 	};
 
-	Agent._onLevelChanged = function() {
-		
+	Agent.onEntityAddedToLevel = function(entity, level) {
+		if (entity === this._entity) {
+			this._onLevelChanged(level);
+		}
+	};
+
+	Agent.onEntityRemovedFromLevel = function(entity, level) {
+		if (entity === this._entity) {
+			this._onLevelChanged();
+		}
 	};
 
 	Agent.preUpdate = function() {

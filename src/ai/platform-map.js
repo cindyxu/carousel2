@@ -11,12 +11,13 @@ gm.Ai.PlatformMap = function() {
 		}));
 
 		this._platforms = [];
-		this._reachable = [];
 		this._listeners = [];
 
 		this._body = body;
 		this._kinematics = kinematics;
-		this.setCombinedMap(combinedMap);
+		if (combinedMap !== undefined) {
+			this.setCombinedMap(combinedMap);
+		}
 		
 		this._renderer = new gm.Renderer.PlatformMap(this._map);
 
@@ -48,13 +49,11 @@ gm.Ai.PlatformMap = function() {
 
 		this._platforms.length = 0;
 		this._map.resize(0, 0);
-		
+
 		this._map.resize(cmap._tilesX, cmap._tilesY);
 		this._map.tilesize = tilesize;
 
 		this.setPlatforms(gm.Ai.PlatformGenerator.generatePlatforms(this));
-		this._reachable = gm.Ai.PlatformScanner.scanPlatforms(this);
-		if (LOGGING) console.log("platformMap - have", this._reachable.length, "links");
 
 		for (var i = 0; i < this._listeners.length; i++) {
 			this._listeners[i].onPlatformMapUpdated();

@@ -2,7 +2,7 @@ gm.Ai.ObservedPlatformMap = function() {
 	
 	var Reachable = gm.Ai.Reachable;
 
-	var ObservedPlatformMap = function(platformMap, body) {
+	var ObservedPlatformMap = function(platformMap, cameraBody) {
 		gm.PosMapTile.call(this, new gm.Map({
 			tilesX: 0,
 			tilesY: 0,
@@ -10,9 +10,8 @@ gm.Ai.ObservedPlatformMap = function() {
 		}));
 
 		this._platforms = [];
-		this._reachable = Reachable.newInstance();
 
-		this._body = body;
+		this._cameraBody = cameraBody;
 
 		this._lastX = undefined;
 		this._lastY = undefined;
@@ -20,12 +19,18 @@ gm.Ai.ObservedPlatformMap = function() {
 		this._platformMap = platformMap;
 		this._platformMap.addListener(this);
 
+		this._listener = undefined;
+
 		this._generateMap();
 
 		this._renderer = new gm.Ai.ObservedPlatformMap.Renderer(this);
 	};
 
 	ObservedPlatformMap.prototype = Object.create(gm.PosMapTile.prototype);
+
+	ObservedPlatformMap.prototype.setListener = function(listener) {
+		this._listener = listener;
+	};
 
 	ObservedPlatformMap.prototype._generateMap = function() {
 		var pmap = this._platformMap._map;
@@ -37,7 +42,7 @@ gm.Ai.ObservedPlatformMap = function() {
 	};
 
 	ObservedPlatformMap.prototype.observe = function() {
-		var bbox = this._body.getBbox();
+		var bbox = this._cameraBody.getBbox();
 
 		if (this._lastX === undefined || this._lastY === undefined) {
 			this._observeAll(bbox);
@@ -102,7 +107,9 @@ gm.Ai.ObservedPlatformMap = function() {
 			}
 		}
 
-		this._observeLinks(abbox, seenPlatforms);
+		if (this._listener && seenPlatforms.length > 0) {
+			this._listener.onPlatformsSeen(abbox, seenPlatforms);
+		}
 	};
 
 	ObservedPlatformMap.prototype._getDeltaNinePatch = function(tbbox, abbox, res) {
@@ -151,7 +158,9 @@ gm.Ai.ObservedPlatformMap = function() {
 			}
 		}
 
-		this._observeLinks(abbox, seenPlatforms);
+		if (this._listener && seenPlatforms.length > 0) {
+			this._listener.onPlatformsSeen(abbox, seenPlatforms);
+		}
 	};
 
 	ObservedPlatformMap.prototype._observePlatform = function(tx, ty, seenPlatforms) {
@@ -165,43 +174,6 @@ gm.Ai.ObservedPlatformMap = function() {
 		if (platform && seenPlatforms.indexOf(platform) < 0) {
 			seenPlatforms.push(platform);
 		}
-
-	};
-
-	ObservedPlatformMap.prototype._observeLinks = function(abbox, seenPlatforms) {
-
-		for (var i = 0; i < seenPlatforms.length; i++) {
-			platform = seenPlatforms[i];
-			
-			var preachable = this._platformMap._reachable[platform._index];
-			var opreachable = this._reachable[platform._index];
-			if (!preachable) continue;
-
-			var links = preachable._links;
-
-			for (var l = 0; l < links.length; l++) {
-				
-				var link = links[l];
-				if (opreachable && opreachable._links.indexOf(link) >= 0) continue;
-
-				lbbox.x0 = link._pxli;
-				lbbox.y0 = this._map.tileToPosY(platform._ty);
-				lbbox.x1 = link._pxri;
-				lbbox.y1 = this._map.tileToPosY(platform._ty+1);
-
-				if (!gm.Math.bboxesOverlap(abbox, lbbox)) continue;
-
-				lbbox.x0 = Math.max(link._pxlo, this._map.tileToPosX(link._toPlatform._tx0));
-				lbbox.y0 = this._map.tileToPosY(link._toPlatform._ty);
-				lbbox.x1 = Math.min(link._pxro, this._map.tileToPosX(link._toPlatform._tx1));
-				lbbox.y1 = this._map.tileToPosY(link._toPlatform._ty+1);
-
-				if (!gm.Math.bboxesOverlap(abbox, lbbox)) continue;
-
-				Reachable.addLink(this._reachable, link);
-			}
-		}
-
 	};
 
 	ObservedPlatformMap.prototype.onPlatformMapUpdated = function() {

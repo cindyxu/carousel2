@@ -3,13 +3,13 @@ gm.Ai.PlatformScanner = function() {
 	var Reachable = gm.Ai.Reachable;
 	var PlatformScanner = {};
 
-	PlatformScanner.scanPlatforms = function(platformMap) {
+	PlatformScanner.scanPlatforms = function(combinedMap, platformMap, body, kinematics) {
 		var platforms = platformMap._platforms;
 		var scan = new gm.Ai.PlatformScan(
-			platformMap._combinedMap._map,
-			platformMap._body._sizeX, 
-			platformMap._body._sizeY, 
-			platformMap._kinematics);
+			combinedMap._map,
+			body._sizeX, 
+			body._sizeY, 
+			kinematics);
 
 		var reachable = Reachable.newInstance();
 		

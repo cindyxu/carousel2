@@ -3,8 +3,9 @@ gm.Ai.PlatformSearch = function() {
 
 	var PlatformUtil = gm.Ai.PlatformUtil;
 
-	var PlatformSearch = function(platformMap, body, kinematics, pxf, pyf) {
+	var PlatformSearch = function(platformMap, reachable, body, kinematics, pxf, pyf) {
 		this._platformMap = platformMap;
+		this._reachable = reachable;
 		this._body = body;
 		this._kinematics = kinematics;
 
@@ -25,7 +26,7 @@ gm.Ai.PlatformSearch = function() {
 
 		if (this._originPlatform) {
 
-			var linkObj = this._platformMap._reachable[this._originPlatform._index];
+			var linkObj = this._reachable[this._originPlatform._index];
 			if (linkObj) {
 
 				this._currentNode = {
@@ -172,12 +173,10 @@ gm.Ai.PlatformSearch = function() {
 
 		if (!this._currentNode) return false;
 
-		var reachable = this._platformMap._reachable;
-
 		var platform = this._currentNode._platform;
-		if (!reachable[platform._index]) return false;
+		if (!this._reachable[platform._index]) return false;
 
-		if (reachable[platform._index]._links[this._linkIndex+1]) {
+		if (this._reachable[platform._index]._links[this._linkIndex+1]) {
 			this._linkIndex++;
 		
 		} else {
@@ -187,14 +186,14 @@ gm.Ai.PlatformSearch = function() {
 			if (!this._currentNode) return false;
 			
 			platform = this._currentNode._platform;
-			if (!reachable[platform._index]) return false;
+			if (!this._reachable[platform._index]) return false;
 			
 			this._linkIndex = 0;
 		}
 		
 		this._linkStepInc = 0;
 		this._currentNeighbor = this._resolveLink(this._currentNode, 
-				reachable[platform._index]._links[this._linkIndex]);
+				this._reachable[platform._index]._links[this._linkIndex]);
 		if (!this._currentNeighbor) return this.stepLink();
 
 		return true;
@@ -205,7 +204,7 @@ gm.Ai.PlatformSearch = function() {
 		
 		if (!currentNode) return false;
 		var platform = this._currentNode._platform;
-		if (!this._platformMap._reachable[platform._index]) return false;
+		if (!this._reachable[platform._index]) return false;
 		
 		while (this.stepLink()) {
 			if (currentNode !== this._currentNode) break;

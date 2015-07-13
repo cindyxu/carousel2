@@ -7,10 +7,19 @@ gm.Level = function() {
 	level._collisionLayers = [];
 	level._entities = [];
 
+	level._pathfinding = new gm.Ai.Pathfinding(this._layers);
+
 	level._gravity = 1;
+
+	level._listeners = [];
 };
 
-gm.Level.prototype.init = function() {
+gm.Level.prototype.addListener = function(listener) {
+
+};
+
+gm.Level.prototype.removeListener = function(listener) {
+
 };
 
 gm.Level.prototype.writeState = function(state) {
@@ -138,6 +147,12 @@ gm.Level.prototype.addEntity = function(entity, layer) {
 		entities.push(entity);
 		layer.addEntity(entity);
 		if (LOGGING) console.log("added entity", entity.name, "to", layer.name);
+	
+		for (var l = 0; l < this._listeners.length; l++) {
+			if (this._listeners[l].onEntityAdded) {
+				this._listeners[l].onEntityAdded(entity, this);
+			}
+		}
 	}
 };
 
@@ -147,15 +162,27 @@ gm.Level.prototype.removeEntity = function(entity) {
 	entity.layer.removeEntity(entity);
 
 	var i = entities.indexOf(entity);
-	if (i >= 0) entities.splice(i, 1);
+	if (i >= 0) {
+		entities.splice(i, 1);
+		for (var l = 0; l < this._listeners.length; l++) {
+			if (this._listeners[l].onEntityRemoved) {
+				this._listeners[l].onEntityRemoved(entity, this);
+			}
+		}
+	}
 	if (LOGGING) console.log("removed entity", entity.name);
 
 };
 
 gm.Level.prototype.resolveLevelChange = function() {
 	var level = this;
-	
 	level._levelDirty = false;
+	
+	for (var i = 0; i < level._listeners.length; i++) {
+		if (level._listeners[i].onLevelChanged) {
+			level._listeners[i].onLevelChanged(this);
+		}
+	}
 };
 
 gm.Level.prototype.preUpdate = function() {

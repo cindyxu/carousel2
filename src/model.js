@@ -55,7 +55,11 @@ gm.Level.Model.createEntity = function(className, name, callback) {
 		if (callback) callback();
 		return;
 	}
-	var entity = new entityClass(name, callback);
+	var entity = entityClass(name);
 	entity.className = className;
+	if (callback) {
+		// entity.renderer.load(function() { callback(entity); });
+		callback(entity);
+	}
 	return entity;
 };

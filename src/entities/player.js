@@ -26,7 +26,7 @@ gm.EntityClasses.Player = function() {
 		drawIndex: -99
 	};
 
-	return function(name, callback) {
+	var Player = function(name) {
 		var body = new gm.Body(bodyParams);
 		//var renderer = new gm.Renderer.EntitySprite(body, sprite);
 		var controller = new gm.Controllers.Player(controllerParams, body);
@@ -35,11 +35,9 @@ gm.EntityClasses.Player = function() {
 		//entity.setRenderer(renderer);
 		entity.setController(controller);
 
-		if (callback) {
-			// entity.renderer.load(function() { callback(entity); });
-			callback(entity);
-		}
 		return entity;
 	};
+
+	return Player;
 	
 }();
