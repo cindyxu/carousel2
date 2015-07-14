@@ -71,7 +71,7 @@ gm.Ai.PlatformSearch.Renderer = function() {
 		
 		var parent = neighborNode._parent;
 		var pmap = this._search._platformMap._map;
-		var sizeY = this._search._body._sizeY;
+		var sizeY = this._search._platformMap._body._sizeY;
 
 		ctx.save();
 
@@ -96,7 +96,7 @@ gm.Ai.PlatformSearch.Renderer = function() {
 		if (!neighborNode) return;
 		
 		var pmap = this._search._platformMap._map;
-		var sizeY = this._search._body._sizeY;
+		var sizeY = this._search._platformMap._body._sizeY;
 
 		ctx.save();
 

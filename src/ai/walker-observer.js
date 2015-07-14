@@ -20,7 +20,7 @@ gm.Ai.WalkerObserver = function() {
 		this._crouching = this._targetWalker._crouching;
 	};
 
-	var WalkerObserver = function(targetName, cameraBody, level) {
+	var WalkerObserver = function(targetName, cameraBody, level, platformMap) {
 
 		this._lastJumpX = undefined;
 		this._lastJumpY = undefined;
@@ -37,14 +37,14 @@ gm.Ai.WalkerObserver = function() {
 
 		this._listeners = [];
 
-		if (level) this.onLevelChanged(level);
+		if (platformMap) this.onLevelChanged(platformMap);
 	};
 
-	WalkerObserver.prototype.onLevelChanged = function(level) {
+	WalkerObserver.prototype.onLevelChanged = function(level, platformMap) {
 		this._level = level;
+		this._platformMap = platformMap;
 		
-		if (level) {
-			var platformMap = level._pathfinding._platformMap;
+		if (platformMap) {
 			this._currentPlatform = PlatformUtil.getPlatformUnderBody(platformMap, this._body);
 		} else {
 			this._currentPlatform = undefined;
@@ -97,7 +97,7 @@ gm.Ai.WalkerObserver = function() {
 
 	WalkerObserver.prototype._observeLand = function() {
 		var body = this._body;
-		var platformMap = this._level._pathfinding._platformMap;
+		var platformMap = this._platformMap;
 
 		this._lastLandX = body._x;
 		this._lastLandY = body._y;

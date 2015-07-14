@@ -21,7 +21,7 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 	var camera = ToyWorld._camera;
 
 	var platformMap = new PlatformMap(startBody, kinematics, combinedMap);
-	var reachable = gm.Ai.PlatformScanner.scanPlatforms(combinedMap, platformMap, startBody, kinematics);
+	var reachable = gm.Ai.PlatformScanner.scanPlatforms(combinedMap, platformMap);
 
 	var platformScan;
 	var platformSearch;
@@ -48,8 +48,7 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 
 		combinedMap.fromLayers(ToyWorld._level._layers);
 		platformMap.generateMap();
-		reachable = gm.Ai.PlatformScanner.scanPlatforms(combinedMap, platformMap, startBody, kinematics);
-
+		reachable = gm.Ai.PlatformScanner.scanPlatforms(combinedMap, platformMap);
 	};
 
 	Pathfinding.startScan = function() {
@@ -74,8 +73,6 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 			platformSearch = new gm.Ai.PlatformSearch(
 				platformMap,
 				reachable,
-				startBody,
-				kinematics,
 				endBody._x,
 				endBody._y);
 		}

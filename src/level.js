@@ -7,7 +7,7 @@ gm.Level = function() {
 	level._collisionLayers = [];
 	level._entities = [];
 
-	level._pathfinding = new gm.Ai.Pathfinding(this._layers);
+	level._combinedMap = new gm.Ai.CombinedMap(this._layers);
 
 	level._gravity = 1;
 
@@ -176,7 +176,7 @@ gm.Level.prototype.removeEntity = function(entity) {
 
 gm.Level.prototype.resolveLevelChange = function() {
 	var level = this;
-	level._pathfinding.onLevelChanged(this._layers);
+	level._combinedMap.fromLayers(this._layers);
 	level._levelDirty = false;
 	
 	for (var i = 0; i < level._listeners.length; i++) {
@@ -196,7 +196,7 @@ gm.Level.prototype.preUpdate = function() {
 
 	var elength = entities.length;
 	for (var e = 0; e < elength; e++) {
-		gm.EntityPhysics.applyGravity(entities[e], this._gravity);
+		gm.EntityPhysics.applyGravity(entities[e], level._gravity);
 		entities[e].preUpdate();
 	}
 };

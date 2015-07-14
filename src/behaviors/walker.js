@@ -46,6 +46,9 @@ gm.Behaviors.Walker = function() {
 			body.addForce(-this._walkForce, 0);
 			this._facing = Dir.LEFT;
 			this._walking = Dir.LEFT;
+			if (LOGGING && input.pressed.left) {
+				console.log("walker - going left");
+			}
 		}
 
 		if (input.pressed.right || 
@@ -53,10 +56,16 @@ gm.Behaviors.Walker = function() {
 			body.addForce(this._walkForce, 0);
 			this._facing = Dir.RIGHT;
 			this._walking = Dir.RIGHT;
+			if (LOGGING && input.pressed.right) {
+				console.log("walker - going right");
+			}
 		}
 
 		if (body._collisionState.down && input.down.down) {
 			this._crouching = true;
+			if (LOGGING && input.pressed.down) {
+				console.log("walker - crouching");
+			}
 		} else {
 			this._crouching = false;
 			if (input.pressed.up && this._jumpCount < this._maxJumps) {

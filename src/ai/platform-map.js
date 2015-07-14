@@ -13,6 +13,7 @@ gm.Ai.PlatformMap = function() {
 
 		this._body = body;
 		this._kinematics = kinematics;
+		
 		if (combinedMap !== undefined) {
 			this.setCombinedMap(combinedMap);
 		}

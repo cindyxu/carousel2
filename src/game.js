@@ -26,16 +26,16 @@ gm.Game = function() {
 			sizeX: Game._width, 
 			sizeY: Game._height
 		});
-		Game._observer = new gm.Game.Observer(this);
 
 		Game._activeLevel = new gm.Level();
 		Game._addLevel(Game._activeLevel);
-		Game._activeLevel.init();
+
+		Game._lastRunTime = Game._currentTime = Date.now();
 	};
 
 	Game.play = function() {
 		Game._playing = true;
-		Game._lastRunTime = Date.now();
+		Game._lastRunTime = Game._currentTime = Date.now();
 		if (LOGGING) console.log("Game is playing");
 	};
 
@@ -77,6 +77,10 @@ gm.Game = function() {
 	};
 
 	Game.addListener = function(listener) {
+		if (this._listeners.indexOf(listener) < 0) {
+			this._listeners.push(listener);
+		}
+	};
 
 	Game._registerEntity = function(entity) {
 		this._registeredEntities[entity._tag] = true;
@@ -97,10 +101,6 @@ gm.Game = function() {
 					this._listeners[i].onLevelAddedToGame(level);
 				}
 			}
-		}
-	};
-		if (this._listeners.indexOf(listener) < 0) {
-			this._listeners.push(listener);
 		}
 	};
 

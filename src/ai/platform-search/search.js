@@ -3,11 +3,11 @@ gm.Ai.PlatformSearch = function() {
 
 	var PlatformUtil = gm.Ai.PlatformUtil;
 
-	var PlatformSearch = function(platformMap, reachable, body, kinematics, pxf, pyf) {
+	var PlatformSearch = function(platformMap, reachable, pxf, pyf) {
 		this._platformMap = platformMap;
 		this._reachable = reachable;
-		this._body = body;
-		this._kinematics = kinematics;
+
+		var body = this._platformMap._body;
 
 		this._pxf = pxf;
 		this._pyf = pyf;
@@ -104,8 +104,8 @@ gm.Ai.PlatformSearch = function() {
 	};
 
 	PlatformSearch.prototype._getNeighborNode = function(node, nlink) {
-		var sizeX = this._body._sizeX;
-		var sizeY = this._body._sizeY;
+		var sizeX = this._platformMap._body._sizeX;
+		var sizeY = this._platformMap._body._sizeY;
 
 		// starting range of current node in fromPlatform
 		var lpxli = nlink._pxli;
@@ -116,7 +116,7 @@ gm.Ai.PlatformSearch = function() {
 		var pxri = Math.min(Math.max(node._pxro, lpxli + sizeX), lpxri);
 
 		var walkDist = Math.max(0, Math.min(pxli + sizeX - node._pxlo, node._pxro - sizeX - pxri));
-		var walkTime = walkDist / this._kinematics._walkSpd;
+		var walkTime = walkDist / this._platformMap._kinematics._walkSpd;
 
 		// landing range in toPlatform
 		var pxlo = Math.min(Math.max(pxli - nlink._maxDeltaX, nlink._pxlo), nlink._pxro);
@@ -124,7 +124,7 @@ gm.Ai.PlatformSearch = function() {
 
 		var gx = node._gx + walkTime + nlink._totalTime;
 		var fx = gx + this._euclideanDistance((pxlo + pxro) / 2,
-				this._platformMap._map.tileToPosY(nlink._toPlatform._ty)) / this._kinematics._walkSpd;
+				this._platformMap._map.tileToPosY(nlink._toPlatform._ty)) / this._platformMap._kinematics._walkSpd;
 
 		var neighborNode = {
 			_platform: nlink._toPlatform,

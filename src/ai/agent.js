@@ -20,13 +20,13 @@ gm.Ai.Agent = function() {
 
 			var walker = this._entity._walker;
 			var body = this._entity._body;
-			var pathfinding = level._pathfinding;
 
 			this._kinematics = this._createKinematicsFromWalker(level, walker, body);
-			this._reachable = gm.Ai.PlatformScanner.scanPlatforms(pathfinding._combinedMap, 
-				pathfinding._platformMap, body, this._kinematics);
+			this._platformMap = new gm.Ai.PlatformMap(body, this._kinematics, level._combinedMap);
+			this._reachable = gm.Ai.PlatformScanner.scanPlatforms(level._combinedMap, 
+				this._platformMap, body, this._kinematics);
 
-			this._observedPlatformMap = new gm.Ai.ObservedPlatformMap(pathfinding._platformMap, body);
+			this._observedPlatformMap = new gm.Ai.ObservedPlatformMap(this._platformMap, body);
 			this._observedReachable = gm.Ai.Reachable.newInstance();
 			this.__reachableObserver = new gm.Ai.ReachableObserver(this._observedPlatformMap, 
 				this._reachable, this._observedReachable);
@@ -38,7 +38,7 @@ gm.Ai.Agent = function() {
 			this.__reachableObserver = undefined;
 		}
 
-		this._playerObserver.onLevelChanged(level);
+		this._playerObserver.onLevelChanged(level, this._observedPlatformMap);
 	};
 
 	Agent._createKinematicsFromWalker = function(level, walker, body) {
