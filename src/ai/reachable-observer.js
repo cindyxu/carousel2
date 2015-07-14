@@ -1,4 +1,7 @@
 gm.Ai.ReachableObserver = function() {
+	
+	var Reachable = gm.Ai.Reachable;
+
 	var ReachableObserver = function(observedPlatformMap, sourceReachable, targetReachable) {
 		this._observedPlatformMap = observedPlatformMap;
 		this._targetReachable = targetReachable;
@@ -8,7 +11,7 @@ gm.Ai.ReachableObserver = function() {
 	};
 
 	var lbbox = {};
-	ReachableObserver.prototype._onPlatformsSeen = function(abbox, seenPlatforms) {
+	ReachableObserver.prototype.onPlatformsSeen = function(abbox, seenPlatforms) {
 
 		var opmap = this._observedPlatformMap._map;
 		for (var i = 0; i < seenPlatforms.length; i++) {
@@ -53,5 +56,7 @@ gm.Ai.ReachableObserver = function() {
 		bbox.x1 = Math.min(link._pxro, opmap.tileToPosX(link._toPlatform._tx1));
 		bbox.y1 = opmap.tileToPosY(link._toPlatform._ty+1);
 	};
+
+	return ReachableObserver;
 
 }();

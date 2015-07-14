@@ -138,7 +138,8 @@ gm.Ai.WalkerObserver = function() {
 
 		if (this._entity) {
 			if (!this.__lastState) {
-				this.__lastState = new _State(this._entity._body, this._entity._walker, this._cameraBody);
+				this.__lastState = new _State(this._entity._body, 
+					this._entity._walker, this._cameraBody);
 				this._onEnterSight();
 			}
 

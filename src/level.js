@@ -176,6 +176,7 @@ gm.Level.prototype.removeEntity = function(entity) {
 
 gm.Level.prototype.resolveLevelChange = function() {
 	var level = this;
+	level._pathfinding.onLevelChanged(this._layers);
 	level._levelDirty = false;
 	
 	for (var i = 0; i < level._listeners.length; i++) {

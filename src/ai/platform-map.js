@@ -1,5 +1,3 @@
-if (!gm.Ai) gm.Ai = {};
-
 gm.Ai.PlatformMap = function() {
 
 	var PlatformMap = function(body, kinematics, combinedMap) {

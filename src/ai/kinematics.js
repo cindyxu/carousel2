@@ -1,5 +1,3 @@
-if (!gm.Ai) gm.Ai = {};
-
 gm.Ai.Kinematics = function() {
 
 	var Kinematics = function(params) {

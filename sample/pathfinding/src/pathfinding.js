@@ -21,12 +21,14 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 	var camera = ToyWorld._camera;
 
 	var platformMap = new PlatformMap(startBody, kinematics, combinedMap);
+	var reachable = gm.Ai.PlatformScanner.scanPlatforms(combinedMap, platformMap, startBody, kinematics);
 
 	var platformScan;
 	var platformSearch;
 
 	var observedPlatformMap;
-	var observeBody = new gm.Body({
+	var observedReachable, reachableObserver;
+	var observeCameraBody = new gm.Body({
 		sizeX: values.OBSERVE_CAMERA_SIZE_X,
 		sizeY: values.OBSERVE_CAMERA_SIZE_Y
 	});
@@ -39,10 +41,15 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 
 		platformSearch = undefined;
 		platformScan = undefined;
+
 		observedPlatformMap = undefined;
+		observedReachable = undefined;
+		reachableObserver = undefined;
 
 		combinedMap.fromLayers(ToyWorld._level._layers);
 		platformMap.generateMap();
+		reachable = gm.Ai.PlatformScanner.scanPlatforms(combinedMap, platformMap, startBody, kinematics);
+
 	};
 
 	Pathfinding.startScan = function() {
@@ -61,11 +68,12 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 	};
 
 	Pathfinding.startSearch = function() {
-
+		console.log(reachable);
 		var originPlatform = PlatformUtil.getPlatformUnderBody(platformMap, startBody);
 		if (originPlatform) {
 			platformSearch = new gm.Ai.PlatformSearch(
 				platformMap,
+				reachable,
 				startBody,
 				kinematics,
 				endBody._x,
@@ -75,11 +83,13 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 
 	var pres = {};
 	Pathfinding.startObserving = function() {
-		var center = observeBody.getCenter();
+		var center = observeCameraBody.getCenter();
 		camera.canvasToWorldPos(mx, my, pres);
-		observeBody.moveTo(pres.x - center.x, pres.y - center.y);
+		observeCameraBody.moveTo(pres.x - center.x, pres.y - center.y);
 
-		observedPlatformMap = new ObservedPlatformMap(platformMap, observeBody);
+		observedPlatformMap = new ObservedPlatformMap(platformMap, observeCameraBody);
+		observedReachable = gm.Ai.Reachable.newInstance();
+		reachableObserver = new gm.Ai.ReachableObserver(observedPlatformMap, reachable, observedReachable);
 	};
 
 	Pathfinding.onMouseMove = function(nmx, nmy) {
@@ -87,13 +97,12 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 		my = nmy;
 		if (observedPlatformMap) {
 			camera.canvasToWorldPos(mx, my, pres);
-			observeBody.moveTo(pres.x - observeBody._sizeX/2, pres.y - observeBody._sizeY/2);
+			observeCameraBody.moveTo(pres.x - observeCameraBody._sizeX/2, pres.y - observeCameraBody._sizeY/2);
 			observedPlatformMap.observe();
 		}
 	};
 
 	Pathfinding.step = function() {
-
 		if (platformScan) platformScan.step();
 		if (platformSearch) platformSearch.stepLinkIncrement();
 	};
@@ -105,6 +114,7 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 		if (platformScan) platformScan.render(ctx, 0, 0, bbox);
 		if (platformSearch) platformSearch.render(ctx, bbox);
 		if (observedPlatformMap) observedPlatformMap.render(ctx, bbox);
+		if (observedReachable) observedReachable.render(ctx, 0, 0, bbox);
 	};
 
 	return Pathfinding;

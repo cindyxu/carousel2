@@ -1,5 +1,3 @@
-if (!gm.Ai) gm.Ai = {};
-
 /* combines all collision maps in the level
  * by ORing their tiles together. 
  */

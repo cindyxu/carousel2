@@ -8,7 +8,12 @@ gm.Ai.Reachable = function() {
 	var Reachable = {};
 
 	Reachable.newInstance = function() {
-		return [];
+		var instance = [];
+		instance._renderer = new gm.Ai.Reachable.Renderer(instance);
+		instance.render = function(ctx, x, y, bbox) {
+			this._renderer.render(ctx, x, y, bbox);
+		};
+		return instance;
 	};
 
 	Reachable.addLink = function(reachable, link) {

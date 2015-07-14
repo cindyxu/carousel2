@@ -1,6 +1,3 @@
-if (!gm.Ai) gm.Ai = {};
-if (!gm.Ai) gm.Ai = {};
-
 gm.Ai._PlatformArea = function() {
 	var _PlatformArea = function(parent, vyi, pxli, pxri, pyi, vyo, pxlo, pxro, pyo) {
 		this._vyi = vyi;
