@@ -1,24 +1,24 @@
-gm.PlayerIntent.Travelling = function(observer) {
+gm.Ai.PlayerIntent.Travelling = function(observer) {
 	this._observer = observer;
-	this._predictor = new gm.PlayerIntent.Travelling.Predictor(observer, this);
+	this._predictor = new gm.Ai.PlayerIntent.Predictor(observer, this);
 };
 
-gm.PlayerIntent.Travelling.enter = function() {
+gm.Ai.PlayerIntent.Travelling.prototype.enter = function() {
 	this._predictor.startListening();
 };
 
-gm.PlayerIntent.Travelling.exit = function() {
+gm.Ai.PlayerIntent.Travelling.prototype.exit = function() {
 	this._predictor.stopListening();
 };
 
-gm.PlayerIntent.onUnexpectedJump = function() {
+gm.Ai.PlayerIntent.prototype.onUnexpectedJump = function() {
 	console.log("unexpected jump");
 };
 
-gm.PlayerIntent.onUnexpectedTurn = function() {
+gm.Ai.PlayerIntent.prototype.onUnexpectedTurn = function() {
 	console.log("unexpected turn");
 };
 
-gm.PlayerIntent.onUnexpectedLand = function() {
+gm.Ai.PlayerIntent.prototype.onUnexpectedLand = function() {
 	console.log("unexpected land");
 };

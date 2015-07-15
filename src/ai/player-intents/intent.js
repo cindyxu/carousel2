@@ -1,11 +1,11 @@
-gm.PlayerIntent = function(observer) {
+gm.Ai.PlayerIntent = function(observer) {
 
 	this._pastIntents = [];
-	this._currentIntent = new gm.PlayerIntent.Travelling(observer);
+	this._currentIntent = new gm.Ai.PlayerIntent.Travelling(observer);
 	this._currentIntent.enter();
 
 };
 
-gm.PlayerIntent.onChangeIntent = function(newIntent) {
+gm.Ai.PlayerIntent.onChangeIntent = function(newIntent) {
 
 };

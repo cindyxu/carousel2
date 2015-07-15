@@ -1,23 +1,28 @@
 gm.Ai.Agent = function() {
 	
-	var Agent = function(entity) {
+	var Agent = function(entity, camera) {
 		this._game = undefined;
 
 		this._entity = entity;
 		
-		this._playerObserver = new gm.Ai.Observer("player", entity._camera._body);
+		this._playerObserver = new gm.Ai.WalkerObserver("player", camera._body);
 		this._playerIntent = new gm.Ai.PlayerIntent(this._playerObserver);
 	};
 
 	Agent.initWithGame = function(game) {
+		if (LOGGING) {
+			console.log("agent - initialize with game", level);
+		}
 		this._game = game;
 		game.addListener(this);
-		this._onLevelChanged(game.getEntityLevel(entity));
+		this.initWithLevel(game.getEntityLevel(entity));
 	};
 
-	Agent._onLevelChanged = function(level) {
+	Agent.initWithLevel = Agent.onLevelChanged = function(level) {
+		if (LOGGING) {
+			console.log("agent - level changed", level);
+		}
 		if (level) {
-
 			var walker = this._entity._walker;
 			var body = this._entity._body;
 
@@ -50,12 +55,14 @@ gm.Ai.Agent = function() {
 		});
 	};
 
+	// entered new level
 	Agent.onEntityAddedToLevel = function(entity, level) {
 		if (entity === this._entity) {
 			this._onLevelChanged(level);
 		}
 	};
 
+	// left level
 	Agent.onEntityRemovedFromLevel = function(entity, level) {
 		if (entity === this._entity) {
 			this._onLevelChanged();
@@ -69,5 +76,7 @@ gm.Ai.Agent = function() {
 	Agent.postUpdate = function() {
 
 	};
+
+	return Agent;
 
 }();

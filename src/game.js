@@ -84,17 +84,26 @@ gm.Game = function() {
 
 	Game._registerEntity = function(entity) {
 		this._registeredEntities[entity._tag] = true;
-		if (entity._agent) {
-			entity._agent.initWithGame(this);
-		}
+
 		if (entity._name === "player") {
 			this._bindToPlayer(entity);
+		}
+		for (var i = 0; i < this._listeners.length; i++) {
+			if (this._listeners[i].onEntityRegistered) {
+				this._listeners[i].onEntityRegistered(entity);
+			}
 		}
 	};
 
 	Game._addLevel = function(level) {
+		if (LOGGING) {
+			console.log("level added");
+		}
 		if (this._levels.indexOf(level) < 0) {
 			this._levels.push(level);
+			for (var e = 0; e < level._entities.length; e++) {
+				this.onEntityAddedToLevel(level._entities[e]);
+			}
 			level.addListener(this);
 			for (var i = 0; i < this._listeners.length; i++) {
 				if (this._listeners[i].onLevelAddedToGame) {
@@ -114,14 +123,18 @@ gm.Game = function() {
 		}
 		this._entityLocations[entity._tag] = level;
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onEntityAddedToLevel(entity, level);
+			if (this._listeners[i].onEntityAddedToLevel) {
+				this._listeners[i].onEntityAddedToLevel(entity, level);
+			}
 		}
 	};
 
 	Game.onEntityRemovedFromLevel = function(entity, level) {
 		this._entityLocations[entity._tag] = undefined;
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onEntityRemovedFromLevel(entity, level);
+			if (this._listeners[i].onEntityRemovedFromLevel) {
+				this._listeners[i].onEntityRemovedFromLevel(entity, level);
+			}
 		}
 	};
 

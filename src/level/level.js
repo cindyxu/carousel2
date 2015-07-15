@@ -15,11 +15,16 @@ gm.Level = function() {
 };
 
 gm.Level.prototype.addListener = function(listener) {
-
+	if (this._listeners.indexOf(listener) < 0) {
+		this._listeners.push(listener);
+	}
 };
 
 gm.Level.prototype.removeListener = function(listener) {
-
+	var i = this._listeners.indexOf(listener);
+	if (i >= 0) {
+		this._listeners.splice(i, 1);
+	}
 };
 
 gm.Level.prototype.writeState = function(state) {
@@ -149,8 +154,8 @@ gm.Level.prototype.addEntity = function(entity, layer) {
 		if (LOGGING) console.log("added entity", entity.name, "to", layer.name);
 	
 		for (var l = 0; l < this._listeners.length; l++) {
-			if (this._listeners[l].onEntityAdded) {
-				this._listeners[l].onEntityAdded(entity, this);
+			if (this._listeners[l].onEntityAddedToLevel) {
+				this._listeners[l].onEntityAddedToLevel(entity, this);
 			}
 		}
 	}
@@ -165,8 +170,8 @@ gm.Level.prototype.removeEntity = function(entity) {
 	if (i >= 0) {
 		entities.splice(i, 1);
 		for (var l = 0; l < this._listeners.length; l++) {
-			if (this._listeners[l].onEntityRemoved) {
-				this._listeners[l].onEntityRemoved(entity, this);
+			if (this._listeners[l].onEntityRemovedFromLevel) {
+				this._listeners[l].onEntityRemovedFromLevel(entity, this);
 			}
 		}
 	}

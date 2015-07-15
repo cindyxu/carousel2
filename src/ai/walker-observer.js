@@ -22,6 +22,8 @@ gm.Ai.WalkerObserver = function() {
 
 	var WalkerObserver = function(targetName, cameraBody, level, platformMap) {
 
+		this._platformMap = undefined;
+
 		this._lastJumpX = undefined;
 		this._lastJumpY = undefined;
 		
@@ -50,7 +52,7 @@ gm.Ai.WalkerObserver = function() {
 			this._currentPlatform = undefined;
 		}
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onLevelChanged();
+			this._listeners[i].onLevelChanged(level, platformMap);
 		}
 	};
 
@@ -170,5 +172,5 @@ gm.Ai.WalkerObserver = function() {
 	WalkerObserver.prototype.postUpdate = function() {
 	};
 
-	return Observer;
+	return WalkerObserver;
 }();
