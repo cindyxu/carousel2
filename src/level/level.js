@@ -1,3 +1,5 @@
+var tag = 1;
+
 gm.Level = function() {
 	var level = this;
 
@@ -6,14 +8,17 @@ gm.Level = function() {
 	level._layers = [];
 	level._collisionLayers = [];
 	level._entities = [];
+	level._entityLayers = {};
+	level._listeners = [];
 
 	level._combinedMap = new gm.Ai.CombinedMap(this._layers);
 
 	level._gravity = 1;
 
-	level._listeners = [];
+	level._tag = tag++;
 };
 
+// do not add any ai-related listeners. use gm.LevelAi instead
 gm.Level.prototype.addListener = function(listener) {
 	if (this._listeners.indexOf(listener) < 0) {
 		this._listeners.push(listener);
@@ -151,6 +156,7 @@ gm.Level.prototype.addEntity = function(entity, layer) {
 	if (e < 0) {
 		entities.push(entity);
 		layer.addEntity(entity);
+		this._entityLayers[entity._tag] = layer;
 		if (LOGGING) console.log("added entity", entity.name, "to", layer.name);
 	
 		for (var l = 0; l < this._listeners.length; l++) {
@@ -164,7 +170,9 @@ gm.Level.prototype.addEntity = function(entity, layer) {
 gm.Level.prototype.removeEntity = function(entity) {
 	var entities = this._entities;
 	
-	entity.layer.removeEntity(entity);
+	var layer = this._entityLayers[entity];
+	if (layer) layer.removeEntity(entity);
+	this._entityLayers[entity._tag] = undefined;
 
 	var i = entities.indexOf(entity);
 	if (i >= 0) {
@@ -176,7 +184,22 @@ gm.Level.prototype.removeEntity = function(entity) {
 		}
 	}
 	if (LOGGING) console.log("removed entity", entity.name);
+};
 
+gm.Level.prototype.moveEntityToLayer = gm.Level.prototype.onEntityLayerChanged = 
+	function(entity, toLayer) {
+	var fromLayer = this._entityLayers[entity];
+	if (fromLayer) fromLayer.removeEntity(entity);
+	toLayer.addEntity(entity);
+	this._entityLayers[entity._tag] = toLayer;
+	if (LOGGING) console.log("moved entity", entity.name, "to", toLayer.name);
+};
+
+gm.Level.prototype.findEntityByName = function(name) {
+	var entities = this._entities;
+	for (var i = 0; i < entities.length; i++) {
+		if (entities[i].name === name) return entities[i];
+	}
 };
 
 gm.Level.prototype.resolveLevelChange = function() {
@@ -204,6 +227,12 @@ gm.Level.prototype.preUpdate = function() {
 		gm.EntityPhysics.applyGravity(entities[e], level._gravity);
 		entities[e].preUpdate();
 	}
+
+	for (var l = 0; l < this._listeners.length; l++) {
+		if (this._listeners[l].onPreUpdate) {
+			this._listeners[l].onPreUpdate();
+		}
+	}
 };
 
 gm.Level.prototype.postUpdate = function() {
@@ -214,6 +243,12 @@ gm.Level.prototype.postUpdate = function() {
 	for (var e = 0; e < elength; e++) {
 		entities[e].postUpdate();
 		gm.EntityPhysics.postUpdate(entities[e]);
+	}
+
+	for (var l = 0; l < this._listeners.length; l++) {
+		if (this._listeners[l].onPostUpdate) {
+			this._listeners[l].onPostUpdate();
+		}
 	}
 };
 
@@ -233,5 +268,5 @@ gm.Level.prototype.updateStep = function(delta, dim) {
 		gm.EntityPhysics.updateStep(entities[e], delta, dim);
 	}
 
-	gm.EntityPhysics.resolveCollisions(collisionLayers, entities, dim);
+	gm.EntityPhysics.resolveCollisions(collisionLayers, entities, dim, this);
 };

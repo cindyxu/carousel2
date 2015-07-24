@@ -62,7 +62,6 @@ gm.Layer = function() {
 			layer._entities.push(entity);
 			layer._entitiesNeedSort = true;
 		}
-		entity.layer = layer;
 	};
 
 	Layer.prototype.removeEntity = function(entity) {
@@ -71,7 +70,6 @@ gm.Layer = function() {
 		if (i >= 0) {
 			layer._entities.splice(i, 1);
 		}
-		entity.layer = undefined;
 	};
 
 	var entityDrawSortFunction = function(e1, e2) {
@@ -141,5 +139,4 @@ gm.Layer = function() {
 	};
 
 	return Layer;
-
 }();

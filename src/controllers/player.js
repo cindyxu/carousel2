@@ -1,14 +1,12 @@
 if (!gm.Controllers) gm.Controllers = {};
 
-gm.Controllers.Player = function(params, body, sprite) {
-	this._behavior = new gm.Behaviors.Walker(params, body, sprite);
+gm.Controllers.Player = function(entity, params) {
+	this._entity = entity;
+	this._behavior = new gm.Behaviors.Walker(params, entity._body, entity._sprite);
 };
 
-gm.Controllers.Player.prototype.setBody = function(body) {
-	this._behavior.setBody(body);
-};
-
-gm.Controllers.Player.prototype.setSprite = function(sprite) {
+gm.Controllers.Player.prototype.onBodyChanged = function() {
+	this._behavior.setBody(this._entity._body);
 };
 
 gm.Controllers.Player.prototype.control = function() {

@@ -14,9 +14,8 @@ gm.Ai.PlatformMap = function() {
 		this._body = body;
 		this._kinematics = kinematics;
 		
-		if (combinedMap !== undefined) {
-			this.setCombinedMap(combinedMap);
-		}
+		this._combinedMap = combinedMap;
+		this.generateMap();
 		
 		this._renderer = new gm.Renderer.PlatformMap(this._map);
 
@@ -32,12 +31,6 @@ gm.Ai.PlatformMap = function() {
 	};
 
 	PlatformMap.prototype = Object.create(gm.PosMapTile.prototype);
-
-	PlatformMap.prototype.setCombinedMap = function(combinedMap) {
-		this._combinedMap = combinedMap;
-		this._combinedMap.addListener(this);
-		this.generateMap();
-	};
 
 	PlatformMap.prototype.generateMap = function() {
 		this._ptx = this._combinedMap._ptx;
@@ -177,10 +170,6 @@ gm.Ai.PlatformMap = function() {
 		if (this._listeners.indexOf(listener) < 0) {
 			this._listeners.push(listener);
 		}
-	};
-
-	PlatformMap.prototype.onCombinedMapUpdated = function() {
-		this.generateMap();
 	};
 
 	return PlatformMap;

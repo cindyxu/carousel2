@@ -210,13 +210,18 @@ gm.Body.prototype.overlapsBbox = function(obbox) {
 };
 
 gm.Body.prototype.overlapsAxisX = function(other) {
-	return body._x < other._x + other._sizeX &&
-		other._x < body._x + body._sizeX;
+	return this._x < other._x + other._sizeX &&
+		other._x < this._x + this._sizeX;
+};
+
+gm.Body.prototype.overlapsAxisY = function(other) {
+	return this._y < other._y + other._sizeY &&
+		other._y < this._y + this._sizeY;
 };
 
 gm.Body.prototype.overlapsAxis = function(other) {
-	return body._y < other._y + other._sizeY &&
-	other._y < body._y + body._sizeY;
+	return this._y < other._y + other._sizeY &&
+	other._y < this._y + this._sizeY;
 };
 
 gm.Body.prototype.overlapsPoint = function(x, y) {

@@ -63,7 +63,7 @@ gm.CollisionRules = function() {
 		}
 	};
 
-	CollisionRules.onFinishCollisions = function(entity) {
+	CollisionRules.onFinishCollisions = function(entity, callback) {
 		var body = entity._body;
 		var nextCollisionState = body.__nextCollisionState;
 		var currentCollisionState = body._collisionState;
@@ -73,11 +73,11 @@ gm.CollisionRules = function() {
 		currentCollisionState.up = nextCollisionState.up;
 		currentCollisionState.down = nextCollisionState.down;
 
-		if (currentCollisionState.layer !== nextCollisionState.layer) {
-			gm.moveEntityToLayer(entity, layer);
-			currentCollisionState.layer = nextCollisionState.layer;
+		var prevLayer = currentCollisionState.layer;
+		currentCollisionState.layer = nextCollisionState.layer;
+		if (prevLayer !== currentCollisionState.layer) {
+			callback.onEntityLayerChanged(currentCollisionState.layer);
 		}
-
 	};
 
 	CollisionRules.shouldCollideEntityWithLayer = function(entity, layer) {
@@ -101,11 +101,11 @@ gm.CollisionRules = function() {
 	};
 
 	CollisionRules.onEntitiesCollided = function(pentity, nentity, dim) {
-		var pnextCollisionState = pentity.__nextCollisionState;
-		var nnextCollisionState = nentity.__nextCollisionState;
+		var pnextCollisionState = pentity._body.__nextCollisionState;
+		var nnextCollisionState = nentity._body.__nextCollisionState;
 
 		if (dim === X) {
-			pextCollisionState.right = nentity;
+			pnextCollisionState.right = nentity;
 			nnextCollisionState.left = pentity;
 		} else {
 			pnextCollisionState.down = nentity;

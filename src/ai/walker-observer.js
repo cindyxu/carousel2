@@ -2,10 +2,20 @@ gm.Ai.WalkerObserver = function() {
 
 	var PlatformUtil = gm.Ai.PlatformUtil;
 
-	var _State = function(targetBody, targetWalker, cameraBody) {
+	var _State = function(targetBody, targetWalker) {
+
+		if (LOGGING) {
+			if (!targetBody) {
+				console.log("walkerObserver - state targetBody was undefined");
+			} if (!targetWalker) {
+				console.log("walkerObserver - state targetWalker was undefined");
+			} if (!cameraBody) {
+				console.log("walkerObserver - state cameraBody was undefined");
+			}
+		}
+
 		this._targetBody = targetBody;
 		this._targetWalker = targetWalker;
-		this._cameraBody = cameraBody;
 
 		this._update();
 	};
@@ -16,13 +26,26 @@ gm.Ai.WalkerObserver = function() {
 
 		this._walking = this._targetWalker._walking;
 		this._jumped = this._targetWalker._jumped;
-		this._grounded = (this._body._collisionState.down);
+		this._grounded = this._body._collisionState.down;
 		this._crouching = this._targetWalker._crouching;
 	};
 
-	var WalkerObserver = function(targetName, cameraBody, level, platformMap) {
+	var WalkerObserver = function(targetName, cameraBody, levelInfo) {
 
-		this._platformMap = undefined;
+		if (LOGGING) {
+			if (!targetName) {
+				console.log("walkerObserver - targetName was undefined");
+			} if (!cameraBody) {
+				console.log("walkerObserver - cameraBody was undefined");
+			}
+		}
+
+		this._targetName = targetName;
+		this._cameraBody = cameraBody;
+
+		this._levelInfo = undefined;
+
+		this._currentPlatform = undefined;
 
 		this._lastJumpX = undefined;
 		this._lastJumpY = undefined;
@@ -39,28 +62,25 @@ gm.Ai.WalkerObserver = function() {
 
 		this._listeners = [];
 
-		if (platformMap) this.onLevelChanged(platformMap);
+		if (levelInfo) this.onInitWithLevel(levelInfo);
 	};
 
-	WalkerObserver.prototype.onLevelChanged = function(level, platformMap) {
-		this._level = level;
-		this._platformMap = platformMap;
-		
-		if (platformMap) {
-			this._currentPlatform = PlatformUtil.getPlatformUnderBody(platformMap, this._body);
-		} else {
-			this._currentPlatform = undefined;
-		}
+	WalkerObserver.prototype.onInitWithLevel = function(levelInfo) {
+		this._levelInfo = levelInfo;
+		this.__lastState = undefined;
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onLevelChanged(level, platformMap);
+			this._listeners[i].onLevelChanged();
 		}
 	};
 
 	WalkerObserver.prototype._lookForTarget = function() {
-		if (!this._level) {
+		if (!this._levelInfo) {
 			return;
 		}
-		this._entity = this._level.findEntityByName(this._targetName);
+		var entity = this._levelInfo._level.findEntityByName(this._targetName);
+		if (entity && entity._body._overlaps(this._cameraBody)) {
+			return entity;
+		}
 	};
 
 	WalkerObserver.prototype.addListener = function(listener) {
@@ -99,7 +119,7 @@ gm.Ai.WalkerObserver = function() {
 
 	WalkerObserver.prototype._observeLand = function() {
 		var body = this._body;
-		var platformMap = this._platformMap;
+		var platformMap = this._levelInfo._platformMap;
 
 		this._lastLandX = body._x;
 		this._lastLandY = body._y;
@@ -136,16 +156,16 @@ gm.Ai.WalkerObserver = function() {
 	};
 
 	WalkerObserver.prototype.preUpdate = function() {
-		this._lookForTarget();
+		var entity = this._lookForTarget();
 
-		if (this._entity) {
+		if (entity) {
 			if (!this.__lastState) {
-				this.__lastState = new _State(this._entity._body, 
-					this._entity._walker, this._cameraBody);
+				this.__lastState = new _State(entity._body, 
+					entity._controller._behavior);
 				this._onEnterSight();
 			}
 
-			var walker = this._entity._walker;
+			var walker = entity._controller._behavior;
 			
 			if (walker._walking !== this.__lastState._walking) {
 				if (walker._walking === undefined) {

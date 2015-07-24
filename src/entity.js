@@ -7,8 +7,6 @@ gm.Entity = function() {
 
 		entity.name = name;
 
-		entity.layer = undefined;
-
 		entity._body = undefined;
 		entity._sprite = undefined;
 		entity._renderer = undefined;
@@ -42,13 +40,12 @@ gm.Entity = function() {
 	Entity.prototype.setBody = function(body) {
 		this._body = body;
 		if (this._renderer) this._renderer.setBody(this._body);
-		if (this._controller) this._controller.setBody(this._body);
+		if (this._controller) this._controller.onBodyChanged();
 	};
 
 	Entity.prototype.setSprite = function(sprite) {
 		this._sprite = sprite;
 		if (this._sprite) this._renderer.setSprite(this._sprite);
-		if (this._controller) this._controller.setSprite(this._sprite);
 	};
 
 	Entity.prototype.setRenderer = function(renderer) {
@@ -59,8 +56,7 @@ gm.Entity = function() {
 
 	Entity.prototype.setController = function(controller) {
 		this._controller = controller;
-		this._controller.setBody(this._body);
-		this._controller.setSprite(this._sprite);
+		this._controller.onBodyChanged();
 	};
 
 	Entity.prototype.preUpdate = function() {

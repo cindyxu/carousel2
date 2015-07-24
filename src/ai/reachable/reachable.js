@@ -9,10 +9,11 @@ gm.Ai.Reachable = function() {
 
 	Reachable.newInstance = function() {
 		var instance = [];
-		instance._renderer = new gm.Ai.Reachable.Renderer(instance);
-		instance.render = function(ctx, x, y, bbox) {
-			this._renderer.render(ctx, x, y, bbox);
-		};
+		// TODO move this
+		// instance._renderer = new gm.Ai.Reachable.Renderer(instance);
+		// instance.render = function(ctx, x, y, bbox) {
+		// 	this._renderer.render(ctx, x, y, bbox);
+		// };
 		return instance;
 	};
 

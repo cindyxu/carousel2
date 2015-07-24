@@ -19,11 +19,11 @@ gm.EntityPhysics = function() {
 		else entity._body.updateStepY(delta);
 	};
 
-	EntityPhysics.resolveCollisions = function(layers, entities, dim) {
+	EntityPhysics.resolveCollisions = function(layers, entities, dim, callback) {
 		EntityPhysics.startCollisions(layers, entities, dim);
 		EntityPhysics.collideEntitiesWithLayers(layers, entities, dim);
 		EntityPhysics.collideEntities(entities, dim);
-		EntityPhysics.finishCollisions(layers, entities, dim);
+		EntityPhysics.finishCollisions(layers, entities, dim, callback);
 	};
 
 	EntityPhysics.startCollisions = function(layers, entities, dim) {
@@ -32,13 +32,14 @@ gm.EntityPhysics = function() {
 		}
 	};
 
-	EntityPhysics.finishCollisions = function(layers, entities, dim) {
+	EntityPhysics.finishCollisions = function(layers, entities, dim, callback) {
 		for (var e = 0; e < entities.length; e++) {
 			
-			colRules.onFinishCollisions(entities[e]);
+			colRules.onFinishCollisions(entities[e], callback);
 
 			var entity = entities[e];
 			var body = entity._body;
+
 			if (dim === X) {
 				if (body._collisionState.left) {
 					body.clampVelLeft();
@@ -145,15 +146,15 @@ gm.EntityPhysics = function() {
 
 		var overlapAmt;
 
-		if (dim === X && entity2.body._x < entity1.body._x ||
-			dim === Y && entity2.body._y < entity1.body._y) {
+		if (dim === X && entity2._body._x < entity1._body._x ||
+			dim === Y && entity2._body._y < entity1._body._y) {
 			var tmp = entity1;
 			entity1 = entity2;
 			entity2 = tmp;
 		}
 
-		var body1 = entity1.body;
-		var body2 = entity2.body;
+		var body1 = entity1._body;
+		var body2 = entity2._body;
 
 		var moveRatio1, moveRatio2;
 
@@ -176,14 +177,14 @@ gm.EntityPhysics = function() {
 			
 			body1.moveTo(body1._x - overlapAmt * moveRatio1, body1._y);
 			body2.moveTo(body2._x + overlapAmt * moveRatio2, body2._y);
-			colRules.onEntitiesCollided(currEntity, nextEntity, dim);
+			colRules.onEntitiesCollided(entity1, entity2, dim);
 
 		} else {
 			overlapAmt = body1._y + body1._sizeY - body2._y;
 			
 			body1.moveTo(body1._x, body1._y - overlapAmt * moveRatio1);
 			body2.moveTo(body2._x, body2._y + overlapAmt * moveRatio2);
-			colRules.onEntitiesCollided(currEntity, nextEntity, dim);
+			colRules.onEntitiesCollided(entity1, entity2, dim);
 		}
 	};
 
@@ -216,7 +217,7 @@ gm.EntityPhysics = function() {
 	};
 
 	var sortEntitiesXAxis = function(e1, e2) {
-		return e1.body.x - e2.body.x;
+		return e1._body._x - e2._body._x;
 	};
 
 	EntityPhysics.collideEntities = function(entities, dim) {

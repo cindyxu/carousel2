@@ -23,7 +23,8 @@ gm.Ai.ObservedPlatformMap = function() {
 
 		this._generateMap();
 
-		this._renderer = new gm.Ai.ObservedPlatformMap.Renderer(this._map);
+		// TODO move this
+		// this._renderer = new gm.Ai.ObservedPlatformMap.Renderer(this._map);
 	};
 
 	ObservedPlatformMap.prototype = Object.create(gm.PosMapTile.prototype);

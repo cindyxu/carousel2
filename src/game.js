@@ -83,21 +83,28 @@ gm.Game = function() {
 	};
 
 	Game._registerEntity = function(entity) {
-		this._registeredEntities[entity._tag] = true;
+		if (!this._registeredEntities[entity._tag]) {
+			
+			if (LOGGING) {
+				console.log("game - registering entity", entity.name);
+			}
 
-		if (entity._name === "player") {
-			this._bindToPlayer(entity);
-		}
-		for (var i = 0; i < this._listeners.length; i++) {
-			if (this._listeners[i].onEntityRegistered) {
-				this._listeners[i].onEntityRegistered(entity);
+			this._registeredEntities[entity._tag] = true;
+
+			if (entity._name === "player") {
+				this._bindToPlayer(entity);
+			}
+			for (var i = 0; i < this._listeners.length; i++) {
+				if (this._listeners[i].onEntityRegistered) {
+					this._listeners[i].onEntityRegistered(entity);
+				}
 			}
 		}
 	};
 
 	Game._addLevel = function(level) {
 		if (LOGGING) {
-			console.log("level added");
+			console.log("game - adding level", level.name);
 		}
 		if (this._levels.indexOf(level) < 0) {
 			this._levels.push(level);

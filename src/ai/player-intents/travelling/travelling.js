@@ -1,6 +1,6 @@
 gm.Ai.PlayerIntent.Travelling = function(observer) {
 	this._observer = observer;
-	this._predictor = new gm.Ai.PlayerIntent.Predictor(observer, this);
+	this._predictor = new gm.Ai.PlayerIntent.Predictor(observer);
 };
 
 gm.Ai.PlayerIntent.Travelling.prototype.enter = function() {

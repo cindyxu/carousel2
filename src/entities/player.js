@@ -29,8 +29,8 @@ gm.EntityClasses.Player = function() {
 	var Player = function(name) {
 		var body = new gm.Body(bodyParams);
 		//var renderer = new gm.Renderer.EntitySprite(body, sprite);
-		var controller = new gm.Controllers.Player(controllerParams, body);
 		var entity = new gm.Entity(name, entityParams);
+		var controller = new gm.Controllers.Player(entity, controllerParams);
 		entity.setBody(body);
 		//entity.setRenderer(renderer);
 		entity.setController(controller);

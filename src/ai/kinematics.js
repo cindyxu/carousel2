@@ -1,6 +1,18 @@
 gm.Ai.Kinematics = function() {
 
 	var Kinematics = function(params) {
+		if (LOGGING) {
+			if (params.walkSpd === undefined || isNaN(params.walkSpd)) {
+				console.log("!!! kinematics - walkSpd was invalid");
+			} if (params.jumpSpd === undefined || isNaN(params.jumpSpd)) {
+				console.log("!!! kinematics - jumpSpd was invalid");
+			} if (params.fallAccel === undefined || isNaN(params.fallAccel)) {
+				console.log("!!! kinematics - fallAccel was invalid");
+			} if (params.terminalV === undefined || isNaN(params.terminalV)) {
+				console.log("!!! kinematics - terminalV was invalid");
+			}
+		}
+
 		this._walkSpd = params.walkSpd;
 		this._jumpSpd = params.jumpSpd;
 		this._fallAccel = params.fallAccel;

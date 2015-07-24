@@ -1,79 +1,82 @@
 gm.Ai.Agent = function() {
-	
-	var Agent = function(entity, camera) {
-		this._game = undefined;
 
+	var Agent = function(entity, walker, camera) {
+		if (LOGGING) {
+			if (!entity) console.log("!!! agent - entity was undefined");
+			if (!camera) console.log("!!! agent - camera was undefined");
+		}
+
+		this._gameAi = undefined;
 		this._entity = entity;
-		
+		this._walker = walker;
 		this._playerObserver = new gm.Ai.WalkerObserver("player", camera._body);
 		this._playerIntent = new gm.Ai.PlayerIntent(this._playerObserver);
+
+		this._level = undefined;
+		this._levelInfo = undefined;
+		this._levelInfoDirty = false;
 	};
 
-	Agent.initWithGame = function(game) {
-		if (LOGGING) {
-			console.log("agent - initialize with game", level);
-		}
-		this._game = game;
-		game.addListener(this);
-		this.initWithLevel(game.getEntityLevel(entity));
+	Agent.prototype._setLevel = function(level) {
+		this._level = level;
+		this._levelInfoDirty = true;
 	};
 
-	Agent.initWithLevel = Agent.onLevelChanged = function(level) {
+	Agent.prototype.initWithGameAi = function(gameAi) {
 		if (LOGGING) {
-			console.log("agent - level changed", level);
+			console.log("agent - initialize with game");
 		}
-		if (level) {
-			var walker = this._entity._walker;
-			var body = this._entity._body;
+		this._gameAi = gameAi;
+		gameAi.addListener(this);
+	};
 
-			this._kinematics = this._createKinematicsFromWalker(level, walker, body);
-			this._platformMap = new gm.Ai.PlatformMap(body, this._kinematics, level._combinedMap);
-			this._reachable = gm.Ai.PlatformScanner.scanPlatforms(level._combinedMap, 
-				this._platformMap, body, this._kinematics);
-
-			this._observedPlatformMap = new gm.Ai.ObservedPlatformMap(this._platformMap, body);
-			this._observedReachable = gm.Ai.Reachable.newInstance();
-			this.__reachableObserver = new gm.Ai.ReachableObserver(this._observedPlatformMap, 
-				this._reachable, this._observedReachable);
-
+	Agent.prototype._initWithQueuedLevel = function() {
+		if (LOGGING) {
+			console.log("agent - level changed", this._level.name);
+		}
+		if (this._level) {
+			// todo not great, fix this
+			this._levelInfo = new gm.Ai.LevelInfo(this._level, this._walker, this._entity._body);
 		} else {
-			this._reachable = undefined;
-			this._observedPlatformMap = undefined;
-			this._observedReachable = undefined;
-			this.__reachableObserver = undefined;
+			this._levelInfo = undefined;
 		}
 
-		this._playerObserver.onLevelChanged(level, this._observedPlatformMap);
-	};
-
-	Agent._createKinematicsFromWalker = function(level, walker, body) {
-		return new gm.Ai.Kinematics({
-			walkSpd: body._maxVelX,
-			jumpSpd: walker._jumpImpulse,
-			fallAccel: body._weight * level._gravity,
-			terminalV: body._maxVelY
-		});
+		this._levelInfoDirty = false;
+		this._playerObserver.onInitWithLevel(this._levelInfo);
 	};
 
 	// entered new level
-	Agent.onEntityAddedToLevel = function(entity, level) {
+	Agent.prototype.onEntityAddedToLevel = function(entity, level, levelAi) {
 		if (entity === this._entity) {
-			this._onLevelChanged(level);
+			this._setLevel(level);
+			levelAi.addListener(this);
 		}
 	};
 
 	// left level
-	Agent.onEntityRemovedFromLevel = function(entity, level) {
+	Agent.prototype.onEntityRemovedFromLevel = function(entity, level, levelAi) {
 		if (entity === this._entity) {
-			this._onLevelChanged();
+			this._setLevel(undefined);
+			this._levelInfoDirty = true;
 		}
 	};
 
-	Agent.preUpdate = function() {
-		this._observer.preUpdate();
+	Agent.prototype.onLevelChanged = function() {
+		this._levelInfoDirty = true;
 	};
 
-	Agent.postUpdate = function() {
+	Agent.prototype.onBodyChanged = function() {
+		this._levelInfoDirty = true;
+	};
+
+	Agent.prototype.getNextInput = function() {
+		if (this._levelInfoDirty) {
+			this._initWithQueuedLevel();
+		}
+		this._playerObserver.preUpdate();
+	};
+
+	Agent.prototype.postUpdate = function() {
 
 	};
 
