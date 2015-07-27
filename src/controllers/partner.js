@@ -8,7 +8,7 @@ gm.Controllers.Partner = function(entity, params) {
 	this._camera = new gm.Camera();
 	this._camera.track(entity._body);
 	
-	this._agent = new gm.Ai.Agent(entity, this._behavior, this._camera);
+	this._agent = new gm.Ai.Agent(entity, this._camera);
 };
 
 gm.Controllers.Partner.prototype.onBodyChanged = function() {

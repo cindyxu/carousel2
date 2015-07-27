@@ -5,7 +5,7 @@ gm.Editor._layer = undefined;
 gm.Editor._entity = undefined;
 
 gm.Editor.init = function() {
-	gm.Editor._level = gm.Game._activeLevel;
+	gm.Editor._level = gm.Game._activeLevels[0];
 	gm.Editor._renderer.init();
 };
 
@@ -48,12 +48,13 @@ gm.Editor.selectEntity = function(entity) {
 
 gm.Editor.addNewEntity = function(className, name, callback) {
 	var level = gm.Editor._level;
+	var layer = gm.Editor._layer;
 	
-	if (!gm.Editor._layer) {
+	if (!layer) {
 		if (callback) callback(); 
 		return;
 	}
-	var entity = level.addNewEntity(className, name, gm.Editor._layer, function(entity) {
+	var entity = gm.Game.addNewEntity(className, name, level, layer, function(entity) {
 		if (!entity) {
 			if (callback) callback(); 
 			return;

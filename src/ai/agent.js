@@ -1,6 +1,6 @@
 gm.Ai.Agent = function() {
 
-	var Agent = function(entity, walker, camera) {
+	var Agent = function(entity, camera) {
 		if (LOGGING) {
 			if (!entity) console.log("!!! agent - entity was undefined");
 			if (!camera) console.log("!!! agent - camera was undefined");
@@ -8,9 +8,7 @@ gm.Ai.Agent = function() {
 
 		this._gameAi = undefined;
 		this._entity = entity;
-		this._walker = walker;
-		this._playerObserver = new gm.Ai.WalkerObserver("player", camera._body);
-		this._playerIntent = new gm.Ai.PlayerIntent(this._playerObserver);
+		this._playerIntent = new gm.Ai.PlayerIntent(camera);
 
 		this._level = undefined;
 		this._levelInfo = undefined;
@@ -35,14 +33,14 @@ gm.Ai.Agent = function() {
 			console.log("agent - level changed", this._level.name);
 		}
 		if (this._level) {
-			// todo not great, fix this
-			this._levelInfo = new gm.Ai.LevelInfo(this._level, this._walker, this._entity._body);
+			var walker = this._entity._controller._behavior;
+			this._levelInfo = new gm.Ai.LevelInfo(this._level, walker, this._entity._body);
 		} else {
 			this._levelInfo = undefined;
 		}
-
 		this._levelInfoDirty = false;
-		this._playerObserver.onInitWithLevel(this._levelInfo);
+
+		this._playerIntent.onInitWithLevel(this._levelInfo);
 	};
 
 	// entered new level
@@ -56,8 +54,8 @@ gm.Ai.Agent = function() {
 	// left level
 	Agent.prototype.onEntityRemovedFromLevel = function(entity, level, levelAi) {
 		if (entity === this._entity) {
+			levelAi.removeListener(this);
 			this._setLevel(undefined);
-			this._levelInfoDirty = true;
 		}
 	};
 
@@ -69,15 +67,27 @@ gm.Ai.Agent = function() {
 		this._levelInfoDirty = true;
 	};
 
+	var noInput = {
+		down: {
+			up: undefined,
+			down: undefined,
+			left: undefined,
+			right: undefined
+		},
+		pressed: {
+			up: undefined,
+			down: undefined,
+			left: undefined,
+			right: undefined	
+		}
+	};
+
 	Agent.prototype.getNextInput = function() {
 		if (this._levelInfoDirty) {
 			this._initWithQueuedLevel();
 		}
-		this._playerObserver.preUpdate();
-	};
-
-	Agent.prototype.postUpdate = function() {
-
+		this._playerIntent.preUpdate();
+		return noInput;
 	};
 
 	return Agent;

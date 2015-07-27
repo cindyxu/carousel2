@@ -60,6 +60,8 @@ gm.Ai.WalkerObserver = function() {
 		this._jumping = false;
 		this._crouching = false;
 
+		this._portalObserver = new gm.Ai.WalkerObserver.PortalObserver(this);
+
 		this._listeners = [];
 
 		if (levelInfo) this.onInitWithLevel(levelInfo);
@@ -68,9 +70,6 @@ gm.Ai.WalkerObserver = function() {
 	WalkerObserver.prototype.onInitWithLevel = function(levelInfo) {
 		this._levelInfo = levelInfo;
 		this.__lastState = undefined;
-		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onLevelChanged();
-		}
 	};
 
 	WalkerObserver.prototype._lookForTarget = function() {
@@ -98,13 +97,17 @@ gm.Ai.WalkerObserver = function() {
 
 	WalkerObserver.prototype._observeMove = function(dir) {
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onMove(dir);
+			if (this._listeners[i].onMove) {
+				this._listeners[i].onMove(dir);
+			}
 		}
 	};
 
 	WalkerObserver.prototype._observeStop = function() {
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onStop();
+			if (this._listeners[i].onStop) {
+				this._listeners[i].onStop();
+			}
 		}
 	};
 
@@ -113,7 +116,9 @@ gm.Ai.WalkerObserver = function() {
 		this._lastJumpX = body._x;
 		this._lastJumpY = body._y;
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onJump();
+			if (this._listeners[i].onJump) {
+				this._listeners[i].onJump();
+			}
 		}
 	};
 
@@ -127,32 +132,52 @@ gm.Ai.WalkerObserver = function() {
 		this._currentPlatform = PlatformUtil.getPlatformUnderBody(platformMap, body);
 
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onLand();
+			if (this._listeners[i].onLand) {
+				this._listeners[i].onLand();
+			}
 		}
 	};
 
 	WalkerObserver.prototype._observeCrouch = function() {
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onCrouch();
+			if (this._listeners[i].onCrouch) {
+				this._listeners[i].onCrouch();
+			}
 		}	
 	};
 
 	WalkerObserver.prototype._observeRise = function() {
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onRise();
+			if (this._listeners[i].onRise) {
+				this._listeners[i].onRise();
+			}
 		}
 	};
 
 	WalkerObserver.prototype._onLeaveSight = function() {
+		this._portalObserver.stopListening();
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onLeaveSight();
+			if (this._listeners[i].onLeaveSight) {
+				this._listeners[i].onLeaveSight();
+			}
 		}
 	};
 
-	WalkerObserver.prototype._onEnterSight = function() {
+	WalkerObserver.prototype._onEnterSight = function(entity) {
+		this._portalObserver.startListening(entity);
 		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].onEnterSight();
+			if (this._listeners[i].onEnterSight) {
+				this._listeners[i].onEnterSight();
+			}
 		}
+	};
+
+	WalkerObserver.prototype._onEnterPortal = function(toLevel) {
+		for (var i = 0; i < this._listeners.length; i++) {
+			if (this._listeners[i].onEnterPortal) {
+				this._listeners[i].onEnterPortal();
+			}
+		}	
 	};
 
 	WalkerObserver.prototype.preUpdate = function() {
@@ -162,7 +187,7 @@ gm.Ai.WalkerObserver = function() {
 			if (!this.__lastState) {
 				this.__lastState = new _State(entity._body, 
 					entity._controller._behavior);
-				this._onEnterSight();
+				this._onEnterSight(entity);
 			}
 
 			var walker = entity._controller._behavior;

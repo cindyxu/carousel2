@@ -22,9 +22,6 @@ gm.Ai.ObservedPlatformMap = function() {
 		this._listener = undefined;
 
 		this._generateMap();
-
-		// TODO move this
-		// this._renderer = new gm.Ai.ObservedPlatformMap.Renderer(this._map);
 	};
 
 	ObservedPlatformMap.prototype = Object.create(gm.PosMapTile.prototype);
@@ -179,12 +176,6 @@ gm.Ai.ObservedPlatformMap = function() {
 
 	ObservedPlatformMap.prototype.onPlatformMapUpdated = function() {
 		this._hasObserved = false;
-	};
-
-	var pres = {};
-	ObservedPlatformMap.prototype.render = function(ctx, bbox) {
-		this.tileToPos(0, 0, pres);
-		this._renderer.render(ctx, pres.x, pres.y, bbox);
 	};
 
 	return ObservedPlatformMap;

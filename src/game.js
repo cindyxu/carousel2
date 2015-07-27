@@ -4,7 +4,7 @@ gm.Game = function() {
 	var Y = gm.Constants.Dim.Y;
 
 	var Game = {
-		_activeLevel: undefined,
+		_activeLevels: [],
 		_levels: [],
 
 		_playing: false,
@@ -27,8 +27,9 @@ gm.Game = function() {
 			sizeY: Game._height
 		});
 
-		Game._activeLevel = new gm.Level();
-		Game._addLevel(Game._activeLevel);
+		var level = new gm.Level();
+		Game._addLevel(level);
+		Game._addActiveLevel(level);
 
 		Game._lastRunTime = Game._currentTime = Date.now();
 	};
@@ -52,24 +53,29 @@ gm.Game = function() {
 		var targetTicks = Math.min(Game._maxTicks, 
 			Math.floor((now - Game._lastRunTime) / Game._tickStep));
 
-		var level = Game._activeLevel;
+		var currentTime = Game._currentTime;
 
-		level.preUpdate();
+		for (var l = 0; l < Game._activeLevels.length; l++) {
+			var level = Game._activeLevels[l];
+			level.preUpdate();
 
-		for (var i = 0; i < targetTicks; i++) {
-			level.updateStep(Game._tickStep, X);
-			level.updateStep(Game._tickStep, Y);
-			Game._currentTime += Game._tickStep;
+			for (var i = 0; i < targetTicks; i++) {
+				level.updateStep(Game._tickStep, X);
+				level.updateStep(Game._tickStep, Y);
+				currentTime += Game._tickStep;
+			}
+
+			var deltaTime = currentTime - Game._lastRunTime;
+			level.postUpdate(deltaTime);
 		}
 
-		var deltaTime = Game._currentTime - Game._lastRunTime;
-		level.postUpdate(deltaTime);
-		
+		Game._currentTime += Game._tickStep * targetTicks;
 		Game._lastRunTime = Game._currentTime;
 	};
 
 	Game.render = function(ctx) {
-		gm.Level.Renderer.render(ctx, Game._activeLevel, Game._camera);
+		// TODO figure out which level to render
+		gm.Level.Renderer.render(ctx, Game._activeLevels[0], Game._camera);
 	};
 
 	Game.getEntityLevel = function(entity) {
@@ -80,6 +86,25 @@ gm.Game = function() {
 		if (this._listeners.indexOf(listener) < 0) {
 			this._listeners.push(listener);
 		}
+	};
+
+	Game.addNewEntity = function(className, name, level, layer, callback) {
+		gm.Entity.Model.createEntity(className, name, function(entity) {
+			Game._registerEntity(entity);
+			level.addEntity(entity, layer);
+			if (callback) callback(entity);
+			Game._onEntityAddedToLevel(entity, level);
+		});
+	};
+
+	Game.moveEntityToLevel = function(entity, level, layer) {
+		var plevel = this._entityLocations[entity._tag];
+		if (plevel) {
+			plevel.removeEntity(entity);
+			Game._onEntityRemovedFromLevel(entity, level);
+		}
+		level.addEntity(entity, layer);
+		Game.onEntityAddedToLevel(entity, level);
 	};
 
 	Game._registerEntity = function(entity) {
@@ -120,14 +145,23 @@ gm.Game = function() {
 		}
 	};
 
+	Game._addActiveLevel = function(level) {
+		if (this._activeLevels.indexOf(level) < 0) {
+			this._activeLevels.push(level);
+		}
+	};
+
+	Game._removeActiveLevel = function(level) {
+		if (this._activeLevels.indexOf(level) < 0) {
+			this._activeLevels.push(level);
+		}
+	};
+
 	Game._bindToPlayer = function(playerEntity) {
 		this._camera = playerEntity._camera;
 	};
 
-	Game.onEntityAddedToLevel = function(entity, level) {
-		if (!this._registeredEntities[entity._tag]) {
-			this._registerEntity(entity);
-		}
+	Game._onEntityAddedToLevel = function(entity, level) {
 		this._entityLocations[entity._tag] = level;
 		for (var i = 0; i < this._listeners.length; i++) {
 			if (this._listeners[i].onEntityAddedToLevel) {
@@ -136,7 +170,7 @@ gm.Game = function() {
 		}
 	};
 
-	Game.onEntityRemovedFromLevel = function(entity, level) {
+	Game._onEntityRemovedFromLevel = function(entity, level) {
 		this._entityLocations[entity._tag] = undefined;
 		for (var i = 0; i < this._listeners.length; i++) {
 			if (this._listeners[i].onEntityRemovedFromLevel) {

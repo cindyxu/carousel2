@@ -19,9 +19,10 @@ gm.Level = function() {
 };
 
 // do not add any ai-related listeners. use gm.LevelAi instead
-gm.Level.prototype.addListener = function(listener) {
+gm.Level.prototype.addListener = function(listener, front) {
 	if (this._listeners.indexOf(listener) < 0) {
-		this._listeners.push(listener);
+		if (front) this._listeners.shift(listener);
+		else this._listeners.push(listener);
 	}
 };
 
@@ -67,7 +68,7 @@ gm.Level.prototype.clearLevel = function() {
 
 gm.Level.prototype.addNewLayer = function(params, callback) {
 	var level = this;
-	gm.Level.Model.createLayer(params, function(layer) {
+	gm.Layer.Model.createLayer(params, function(layer) {
 		level.addLayer(layer);
 		if (callback) callback(layer);
 	});
@@ -138,14 +139,6 @@ gm.Level.prototype.findLayerByTag = function(tag) {
 	}
 };
 
-gm.Level.prototype.addNewEntity = function(className, name, layer, callback) {
-	var level = this;
-	gm.Level.Model.createEntity(className, name, function(entity) {
-		level.addEntity(entity, layer);
-		if (callback) callback(entity);
-	});
-};
-
 gm.Level.prototype.addEntity = function(entity, layer) {
 	if (!layer) {
 		if (LOGGING) console.log("!!! addEntity - no layer provided");
@@ -158,12 +151,6 @@ gm.Level.prototype.addEntity = function(entity, layer) {
 		layer.addEntity(entity);
 		this._entityLayers[entity._tag] = layer;
 		if (LOGGING) console.log("added entity", entity.name, "to", layer.name);
-	
-		for (var l = 0; l < this._listeners.length; l++) {
-			if (this._listeners[l].onEntityAddedToLevel) {
-				this._listeners[l].onEntityAddedToLevel(entity, this);
-			}
-		}
 	}
 };
 
@@ -177,11 +164,6 @@ gm.Level.prototype.removeEntity = function(entity) {
 	var i = entities.indexOf(entity);
 	if (i >= 0) {
 		entities.splice(i, 1);
-		for (var l = 0; l < this._listeners.length; l++) {
-			if (this._listeners[l].onEntityRemovedFromLevel) {
-				this._listeners[l].onEntityRemovedFromLevel(entity, this);
-			}
-		}
 	}
 	if (LOGGING) console.log("removed entity", entity.name);
 };

@@ -22,7 +22,6 @@ gm.Ai.PlatformSearch = function() {
 		this._linkStepInc = 0;
 
 		this._originPlatform = PlatformUtil.getPlatformUnderBody(platformMap, body);
-		this._renderer = new gm.Ai.PlatformSearch.Renderer(this);
 
 		if (this._originPlatform) {
 
@@ -216,12 +215,6 @@ gm.Ai.PlatformSearch = function() {
 		var dx = this._pxf - px;
 		var dy = this._pyf - py;
 		return Math.sqrt(dx*dx + dy*dy);
-	};
-
-	var pres = {};
-	PlatformSearch.prototype.render = function(ctx, bbox) {
-		this._platformMap.tileToPos(0, 0, pres);
-		this._renderer.render(ctx, pres.x, pres.y, bbox);
 	};
 
 	return PlatformSearch;

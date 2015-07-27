@@ -18,18 +18,6 @@ gm.Game.Ai = function() {
 		}
 	};
 
-	LevelAi.prototype.onPreUpdate = function() {
-		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].preUpdate();
-		}
-	};
-
-	LevelAi.prototype.onPostUpdate = function() {
-		for (var i = 0; i < this._listeners.length; i++) {
-			this._listeners[i].postUpdate();
-		}
-	};
-
 	LevelAi.prototype.onLevelChanged = function() {
 		for (var i = 0; i < this._listeners.length; i++) {
 			this._listeners[i].onLevelChanged();

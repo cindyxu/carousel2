@@ -1,4 +1,4 @@
-gm.Editor._toolbox = function(editor, tools, keyBinds) {
+gm.Editor._toolbox = function(tools, keyBinds) {
 
 	var toolWrappers = [];
 
@@ -281,4 +281,4 @@ gm.Editor._toolbox = function(editor, tools, keyBinds) {
 
 	return toolbox;
 
-}(gm.Editor, gm.Editor.Tools, gm.Settings.Editor.keyBinds);
+}(gm.Editor.Tools, gm.Settings.Editor.keyBinds);

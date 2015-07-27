@@ -21,15 +21,16 @@ html
 		script(src="/src/pos-map.js")
 		script(src="/src/pos-map-tile.js")
 		script(src="/src/sprite.js")
-		script(src="/src/entity.js")
+		script(src="/src/entity/entity.js")
+		script(src="/src/entity/model.js")
 		script(src="/src/layer-map.js")
-		script(src="/src/layer.js")
+		script(src="/src/layer/layer.js")
+		script(src="/src/layer/model.js")
 		script(src="/src/camera.js")
 		script(src="/src/entity-physics.js")
 		script(src="/src/level/level.js")
 		script(src="/src/level/renderer.js")
 		script(src="/src/game.js")
-		script(src="/src/model.js")
 
 		script(src="/src/renderers/renderer.js")
 		script(src="/src/renderers/entity-sprite.js")
@@ -48,6 +49,8 @@ html
 
 		script(src="/src/entities/player.js")
 		script(src="/src/entities/partner.js")
+		
+		script(src="/src/portal-manager.js")
 		
 		script(src="/src/editor/settings.js")
 			
@@ -82,10 +85,13 @@ html
 		script(src="/src/ai/platform-scan/scanner.js")
 		script(src="/src/ai/observe-map/map.js")
 		script(src="/src/ai/reachable-observer.js")
-		script(src="/src/ai/walker-observer.js")
+		script(src="/src/ai/walker-observer/observer.js")
+		script(src="/src/ai/walker-observer/portal-observer.js")
 
 		script(src="/src/ai/player-intents/intent.js")
-		script(src="/src/ai/player-intents/predictor.js")
+		script(src="/src/ai/player-intents/predictor/predictor.js")
+		// TODO remove this
+		script(src="/src/ai/player-intents/predictor/renderer.js") 
 		script(src="/src/ai/player-intents/travelling/travelling.js")
 		
 		script(src="/src/ai/level-info.js")

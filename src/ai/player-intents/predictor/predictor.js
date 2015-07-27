@@ -6,7 +6,7 @@ gm.Ai.PlayerIntent.Predictor = function() {
 	var Predictor = function(observer) {
 		this._lastVisiblePlatform = undefined;
 
-		this._predictedPlatformLinks = [];
+		this._predictedLinks = [];
 		this._discardedLinks = {};
 		this._listener = undefined;
 
@@ -22,9 +22,9 @@ gm.Ai.PlayerIntent.Predictor = function() {
 		this.resetPredictions();
 	};
 
-	Predictor.prototype.resetPredictions = Predictor.prototype.onLevelChanged = function() {
+	Predictor.prototype.resetPredictions = function() {
 		this._lastVisiblePlatform = undefined;
-		this._predictedPlatformLinks = [];
+		this._predictedLinks = [];
 		this._discardedLinks = {};
 	};
 
@@ -41,11 +41,11 @@ gm.Ai.PlayerIntent.Predictor = function() {
 		var platform = this._observer._currentPlatform;
 
 		var reachableLinks = this._observer._reachable[platform._index]._links;
-		this._predictedPlatformLinks = [];
+		this._predictedLinks = [];
 		for (var l = 0; l < reachableLinks.length; l++) {
 			var link = reachableLinks[l];
 			if (!this._discardedLinks[link._tag]) {
-				this._predictedPlatformLinks.push(l);
+				this._predictedLinks.push(l);
 			}
 		}
 	};
@@ -53,7 +53,7 @@ gm.Ai.PlayerIntent.Predictor = function() {
 	Predictor.prototype.onTurn = function() {
 		this._filterLinks(this._linkInDirection);
 
-		if (this._predictedPlatformLinks.length === 0) {
+		if (this._predictedLinks.length === 0) {
 			this._listener.onUnexpectedTurn();
 			this._resetLinks();
 			this._filterLinks(this._linkInDirection);
@@ -62,7 +62,7 @@ gm.Ai.PlayerIntent.Predictor = function() {
 
 	Predictor.prototype.postUpdate = function() {
 		if (this._observer._dir !== undefined) {
-			this._predictedPlatformLinks = _.filter(this._predictedPlatformLinks, this._linkInRange);
+			this._predictedLinks = _.filter(this._predictedLinks, this._linkInRange);
 		}
 	};
 
@@ -91,28 +91,28 @@ gm.Ai.PlayerIntent.Predictor = function() {
 	Predictor.prototype._resetLinks = function() {
 		var platform = this._observer.getCurrentPlatform();
 		this._discardedLinks = {};
-		this._predictedPlatformLinks = this._observer._reachable[platform._index]._links;
+		this._predictedLinks = this._observer._reachable[platform._index]._links;
 	};
 
 	Predictor.prototype._filterLinks = function(filter) {
 		var newPlatformLinks = [];
-		for (var i = 0; i < this._predictedPlatformLinks.length; i++) {
+		for (var i = 0; i < this._predictedLinks.length; i++) {
 				
-			var link = this._predictedPlatformLinks[i];
+			var link = this._predictedLinks[i];
 			if (filter(link)) {
 				newPlatformLinks.push(link);
 			} else {
 				this._discardedLinks[link._tag] = true;
 			}
 		}
-		this._predictedPlatformLinks = newPlatformLinks;
+		this._predictedLinks = newPlatformLinks;
 	};
 
 	Predictor.prototype._isUnexpectedJump = function() {
 		var body = this._observer._targetBody;
 		if (!body) return;
-		for (var i = 0; i < this._predictedPlatformLinks.length; i++) {
-			var link = this._predictedPlatformLinks[i];
+		for (var i = 0; i < this._predictedLinks.length; i++) {
+			var link = this._predictedLinks[i];
 			if (link._pxli <= body._x &&
 				link._pxri >= body._x + body._sizeX) {
 				return false;

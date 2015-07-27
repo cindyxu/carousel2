@@ -15,8 +15,6 @@ gm.Ai.PlatformScan = function() {
 		this._sizeX = sizeX;
 		this._sizeY = sizeY;
 		this._kinematics = kinematics;
-		// TODO move this
-		// this._renderer = new gm.Ai.PlatformScan.Renderer(this);
 
 		if (LOGGING && !cmap) console.log("!!! platformScan - no combined map");
 	};
@@ -382,10 +380,6 @@ gm.Ai.PlatformScan = function() {
 			}
 		}
 		return platformPatches;
-	};
-
-	PlatformScan.prototype.render = function(ctx, x, y, bbox) {
-		this._renderer.render(ctx, x, y, bbox);
 	};
 
 	return PlatformScan;
