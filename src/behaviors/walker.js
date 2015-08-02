@@ -61,6 +61,7 @@ gm.Behaviors.Walker = function() {
 			}
 		}
 
+		this._jumped = false;
 		if (body._collisionState.down && input.down.down) {
 			this._crouching = true;
 			if (LOGGING && input.pressed.down) {

@@ -190,11 +190,12 @@ gm.Editor._toolbox = function(tools, keyBinds) {
 		},
 		shouldSwitchIn: function(camera) {
 			return gm.Input.pressed[keyBinds.MOVE] &&
-			move.getMoveObject(gm.Input.mouseX, gm.Input.mouseY, camera);
+			move.getMoveBody(gm.Input.mouseX, gm.Input.mouseY, camera);
 		},
 		shouldSwitchOut: function(camera) {
 			return !gm.Input.down[keyBinds.MOVE];
 		},
+		onLayerChanged: function(layer) { },
 		switchIn: function(camera) {
 			move.switchIn(gm.Input.mouseX, gm.Input.mouseY, camera);
 		},
@@ -206,6 +207,8 @@ gm.Editor._toolbox = function(tools, keyBinds) {
 			move.render(ctx, camera);
 		}
 	};
+
+	toolWrappers.push(moveWrapper);
 
 	///////////////////////////////////////////////
 

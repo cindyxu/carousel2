@@ -3,13 +3,13 @@ var LINK_MERGE_DISTANCE = 16;
 
 gm.Ai.PlayerIntent.Predictor = function() {
 
-	var Predictor = function(observer) {
+	var Predictor = function(observer, listener) {
 		this._lastVisiblePlatform = undefined;
 
 		this._predictedLinks = [];
 		this._discardedLinks = {};
-		this._listener = undefined;
 
+		this._listener = listener;
 		this._observer = observer;
 	};
 
@@ -40,12 +40,15 @@ gm.Ai.PlayerIntent.Predictor = function() {
 	Predictor.prototype.onLand = function() {
 		var platform = this._observer._currentPlatform;
 
-		var reachableLinks = this._observer._reachable[platform._index]._links;
 		this._predictedLinks = [];
-		for (var l = 0; l < reachableLinks.length; l++) {
-			var link = reachableLinks[l];
-			if (!this._discardedLinks[link._tag]) {
-				this._predictedLinks.push(l);
+		var preachable = this._observer._levelInfo._reachable[platform._index];
+		if (preachable) {
+			var reachableLinks = preachable._links;
+			for (var l = 0; l < reachableLinks.length; l++) {
+				var link = reachableLinks[l];
+				if (!this._discardedLinks[link._tag]) {
+					this._predictedLinks.push(l);
+				}
 			}
 		}
 	};
@@ -61,37 +64,43 @@ gm.Ai.PlayerIntent.Predictor = function() {
 	};
 
 	Predictor.prototype.postUpdate = function() {
-		if (this._observer._dir !== undefined) {
+		if (this._observer._walking !== undefined) {
 			this._predictedLinks = _.filter(this._predictedLinks, this._linkInRange);
 		}
 	};
 
 	Predictor.prototype._linkInDirection = function(link) {
-		var dir = this._observer._dir;
-		var body = this._observer._targetBody;
+		var body = this._observer._body;
 		if (!body) return;
-		return (body._x + body._sizeX < link._pxri && dir > 0) ||
-			(body._x > link._pxli && dir < 0);
+		var walking = this._observer._walking;
+		return (body._x + body._sizeX < link._pxri && walking > 0) ||
+			(body._x > link._pxli && walking < 0);
 	};
 
 	Predictor.prototype._linkInRange = function(link) {
-		var body = this._observer._targetBody;
+		var body = this._observer._body;
 		if (!body) return;
-		return (dir > 0 && link._pxri < body._x - DROP_DISTANCE) ||
-			(dir < 0 && link._pxli > body._x + body._sizeX + DROP_DISTANCE);
+		var walking = this._observer._walking;
+		return (walking > 0 && link._pxri < body._x - DROP_DISTANCE) ||
+			(walking < 0 && link._pxli > body._x + body._sizeX + DROP_DISTANCE);
 	};
 
 	Predictor.prototype._linkOverlapsJump = function(link) {
-		var body = this._observer._targetBody;
+		var body = this._observer._body;
 		if (!body) return;
 		return link._pxli - (body._x + body._sizeX) > LINK_MERGE_DISTANCE || 
 				body._x - link._pxri > LINK_MERGE_DISTANCE;
 	};
 
 	Predictor.prototype._resetLinks = function() {
-		var platform = this._observer.getCurrentPlatform();
+		var platform = this._observer._currentPlatform;
 		this._discardedLinks = {};
-		this._predictedLinks = this._observer._reachable[platform._index]._links;
+		var preachable = this._observer._levelInfo._reachable[platform._index];
+		if (preachable) {
+			this._predictedLinks = preachable._links;
+		} else {
+			this._predictedLinks = [];
+		}
 	};
 
 	Predictor.prototype._filterLinks = function(filter) {
@@ -109,7 +118,7 @@ gm.Ai.PlayerIntent.Predictor = function() {
 	};
 
 	Predictor.prototype._isUnexpectedJump = function() {
-		var body = this._observer._targetBody;
+		var body = this._observer._body;
 		if (!body) return;
 		for (var i = 0; i < this._predictedLinks.length; i++) {
 			var link = this._predictedLinks[i];

@@ -88,7 +88,7 @@ gm.Level.prototype.addLayer = function(layer) {
 gm.Level.prototype.updateLayer = function(layer, params, callback) {
 	var level = this;
 	var layers = level._layers;
-	gm.Level.Model.updateLayer(layer, params, function() {
+	gm.Layer.Model.updateLayer(layer, params, function() {
 		if (LOGGING) console.log("updated layer");
 		
 		var coli = level._collisionLayers.indexOf(coli);

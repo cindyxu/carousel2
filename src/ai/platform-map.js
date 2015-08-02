@@ -17,8 +17,6 @@ gm.Ai.PlatformMap = function() {
 		this._combinedMap = combinedMap;
 		this.generateMap();
 		
-		this._renderer = new gm.Renderer.PlatformMap(this._map);
-
 		if (LOGGING) {
 			if (!body) {
 				console.log("!!! PlatformMap - no body");
@@ -138,31 +136,6 @@ gm.Ai.PlatformMap = function() {
 		
 		for (var tx = platform._tx0; tx < platform._tx1; tx++) {
 			this._map.setTile(tx, platform._ty, platform);
-		}
-	};
-
-	var pres = {};
-	PlatformMap.prototype.render = function(ctx, bbox) {
-		var tilesize = this._map.tilesize;
-		this.tileToPos(0, 0, pres);
-		this._renderer.render(ctx, pres.x, pres.y, bbox);
-	};
-
-	var obbox = {};
-	PlatformMap.prototype.getPlatformUnderBody = function(body) {
-
-		var platformMap = this._map;
-		var tilesize = this._map.tilesize;
-		var bbox = body.getBbox();
-		
-		this.getOverlappingTileBbox(bbox, obbox);
-
-		var platform;
-		for (var ty = obbox.ty1; ty < platformMap._tilesY; ty++) {
-			for (var tx = obbox.tx0; tx < obbox.tx1; tx++) {
-				platform = platformMap.tileAt(tx, ty);
-				if (platform) return platform;
-			}
 		}
 	};
 

@@ -1,6 +1,6 @@
 gm.Ai.PlayerIntent.Travelling = function(observer) {
 	this._observer = observer;
-	this._predictor = new gm.Ai.PlayerIntent.Predictor(observer);
+	this._predictor = new gm.Ai.PlayerIntent.Predictor(observer, this);
 	this._observer.addListener(this);
 };
 
@@ -14,6 +14,7 @@ gm.Ai.PlayerIntent.Travelling.prototype.exitIntent = function() {
 };
 
 gm.Ai.PlayerIntent.Travelling.prototype.preUpdate = function() {
+	this._observer.preUpdate();
 };
 
 gm.Ai.PlayerIntent.Travelling.prototype.onUnexpectedJump = function() {

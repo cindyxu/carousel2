@@ -26,8 +26,8 @@ gm.Editor.Tools.Move = (function() {
 		var level = this.level;
 
 		this._layer.transformPointToLocalSpace(res.x, res.y, bbox, lres);
-		for (var e = layer._entities.length - 1; e >= 0; e--) {
-			var entity = layer._entities[e];
+		for (var e = this._layer._entities.length - 1; e >= 0; e--) {
+			var entity = this._layer._entities[e];
 			if (entity._body.overlapsPoint(lres.x, lres.y)) {
 				return entity._body;
 			}

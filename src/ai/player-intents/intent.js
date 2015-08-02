@@ -6,8 +6,8 @@ gm.Ai.PlayerIntent = function(camera) {
 	this._currentIntent.enterIntent();
 };
 
-gm.Ai.PlayerIntent.prototype.onInitWithLevel = function(level) {
-
+gm.Ai.PlayerIntent.prototype.onInitWithLevel = function(levelInfo) {
+	this._playerObserver.onInitWithLevel(levelInfo);
 };
 
 gm.Ai.PlayerIntent.prototype.onChangeIntent = function(newIntent) {

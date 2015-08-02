@@ -168,13 +168,14 @@ gm.Body.prototype.updateStepX = function(dt) {
 };
 
 gm.Body.prototype.updateStepY = function(dt) {
+
 	var body = this;
 
 	var dmpay = body.ay - (body.vy * body._dampY);
-	body._y += body.vy * dt;
 	body.vy += dmpay * dt;
 	if (body.vy < -body._maxVelY) body.vy = -body._maxVelY;
 	else if (body.vy > body._maxVelY) body.vy = body._maxVelY;
+	body._y += body.vy * dt;
 
 	body._measurementsDirty = true;
 };
