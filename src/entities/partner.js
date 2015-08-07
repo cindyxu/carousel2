@@ -5,18 +5,18 @@ gm.EntityClasses.Partner = function() {
 	var spriteSrc = "images/spritesheets/Partner.png";
 
 	var bodyParams = {
-		sizeX: 16,
-		sizeY: 16,
-		maxVelX: 30,
+		sizeX: 24,
+		sizeY: 24,
+		maxVelX: 50,
 		maxVelY: 120,
-		dampX: 5,
+		dampX: 100,
 		dampY: 0,
-		weight: 100
+		weight: 200
 	};
 
 	var controllerParams = {
-		walkForce: 120,
-		jumpImpulse: 0.5,
+		walkForce: 300,
+		jumpImpulse: 0.6,
 		maxJumps: 1
 	};
 

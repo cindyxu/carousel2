@@ -1,6 +1,6 @@
 gm.Ai.PlayerIntent.Predictor.Renderer = function() {
 
-	var RenderUtil = gm.Ai.RenderUtil;
+	var RenderUtil = gm.Ai.PlatformUtil.Render;
 
 	var PredictorRenderer = function(predictor) {
 		this._predictor = predictor;
@@ -9,16 +9,16 @@ gm.Ai.PlayerIntent.Predictor.Renderer = function() {
 		}
 	};
 
-	PredictorRenderer.prototype.renderer = function(ctx, bbox) {
+	PredictorRenderer.prototype.render = function(ctx, bbox) {
 		ctx.save();
 
-		ctx.fillStyle = "yellow";
+		ctx.fillStyle = "rgba(0, 255, 0, 0.3)";
 		var predictedLinks = this._predictor._predictedLinks;
 		for (var i = 0; i < predictedLinks.length; i++) {
 			RenderUtil.renderLink(ctx, predictedLinks[i]._tail);
 		}
 
-		ctx.fillStyle = "red";
+		ctx.fillStyle = "rgba(255, 0, 0, 0.3)";
 		var discardedLinks = Object.keys(this._predictor._discardedLinks);
 		for (var k in discardedLinks) {
 			RenderUtil.renderLink(ctx, discardedLinks[k]._tail);
@@ -26,4 +26,6 @@ gm.Ai.PlayerIntent.Predictor.Renderer = function() {
 
 		ctx.restore();
 	};
-};
+
+	return PredictorRenderer;
+}();

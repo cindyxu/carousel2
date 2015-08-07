@@ -17,6 +17,10 @@ gm.Ai.PlayerIntent.Travelling.prototype.preUpdate = function() {
 	this._observer.preUpdate();
 };
 
+gm.Ai.PlayerIntent.Travelling.prototype.postUpdate = function() {
+	this._predictor.postUpdate();
+};
+
 gm.Ai.PlayerIntent.Travelling.prototype.onUnexpectedJump = function() {
 	console.log("unexpected jump");
 };

@@ -10,6 +10,12 @@ gm.Ai.Kinematics = function() {
 				console.log("!!! kinematics - fallAccel was invalid");
 			} if (params.terminalV === undefined || isNaN(params.terminalV)) {
 				console.log("!!! kinematics - terminalV was invalid");
+			} if (params.jumpSpd < 0) {
+				console.log("!!! kinematics - jumpSpd was negative");
+			} if (params.terminalV < 0) {
+				console.log("!!! kinematics - terminalV was negative");
+			} if (params.jumpSpd >= 0 && params.terminalV >= 0 && params.terminalV < params.jumpSpd) {
+				console.log("!!! kinematics - jumpSpd greater than terminalV");
 			}
 		}
 
@@ -40,7 +46,6 @@ gm.Ai.Kinematics = function() {
 		var absVyf = Math.sqrt(Math.max(0, vyi * vyi + 2 * this._fallAccel * dy));
 		var vyf = vyi < -absVyf ? -absVyf : absVyf;
 		vyf = Math.min(this._terminalV, vyf);
-
 		return vyf;
 	};
 

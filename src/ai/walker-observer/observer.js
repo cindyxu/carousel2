@@ -56,8 +56,10 @@ gm.Ai.WalkerObserver = function() {
 		this._walker = undefined;
 
 		this._currentPlatform = undefined;
-		this._lastJumpX = undefined;
-		this._lastJumpY = undefined;
+		this._platformHistory = [];
+
+		this._lastGroundX = undefined;
+		this._lastGroundY = undefined;
 		this._lastLandX = undefined;
 		this._lastLandY = undefined;
 		this._lastSeen = undefined;
@@ -102,6 +104,15 @@ gm.Ai.WalkerObserver = function() {
 		}
 	};
 
+	WalkerObserver.prototype._observeTurn = function() {
+		if (LOGGING) console.log("walkerObserver - turn");
+		for (var i = 0; i < this._listeners.length; i++) {
+			if (this._listeners[i].onTurn) {
+				this._listeners[i].onTurn();
+			}
+		}
+	};
+
 	WalkerObserver.prototype._observeMove = function() {
 		if (LOGGING) console.log("walkerObserver - move");
 		for (var i = 0; i < this._listeners.length; i++) {
@@ -122,11 +133,22 @@ gm.Ai.WalkerObserver = function() {
 
 	WalkerObserver.prototype._observeJump = function() {
 		if (LOGGING) console.log("walkerObserver - jump");
-		this._lastJumpX = this._body._x;
-		this._lastJumpY = this._body._y;
+		this._lastGroundX = this._body._x;
+		this._lastGroundY = this._body._y;
 		for (var i = 0; i < this._listeners.length; i++) {
 			if (this._listeners[i].onJump) {
 				this._listeners[i].onJump();
+			}
+		}
+	};
+
+	WalkerObserver.prototype._observeDrop = function() {
+		if (LOGGING) console.log("walkerObserver - drop");
+		this._lastGroundX = this._body._x;
+		this._lastGroundY = this._body._y;
+		for (var i = 0; i < this._listeners.length; i++) {
+			if (this._listeners[i].onDrop) {
+				this._listeners[i].onDrop();
 			}
 		}
 	};
@@ -216,10 +238,18 @@ gm.Ai.WalkerObserver = function() {
 					this._observeMove();
 				}
 			}
-			if (this._jumped) {
-				this._observeJump();
+			if (this._facing !== this.__lastState._facing) {
+				this._observeTurn();
 			}
-			if (!this.__lastState._grounded && this._grounded) {
+
+			if (this.__lastState._grounded && !this._grounded) {
+				if (this._jumped) {
+					this._observeJump();
+				} else {
+					this._observeDrop();
+				}
+			}
+			else if (!this.__lastState._grounded && this._grounded) {
 				this._observeLand();
 			}
 

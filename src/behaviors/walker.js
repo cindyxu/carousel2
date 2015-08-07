@@ -83,8 +83,8 @@ gm.Behaviors.Walker = function() {
 
 		if (body._collisionState.down) {
 			this._jumpCount = 0;
-		} else if (!this._jumped) {
-			this._jumpCount--;
+		} else if (!this._jumped && this._jumpCount === 0) {
+			this._jumpCount++;
 		}
 	};
 

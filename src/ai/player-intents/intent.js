@@ -1,5 +1,4 @@
 gm.Ai.PlayerIntent = function(camera) {
-
 	this._pastIntents = [];
 	this._playerObserver = new gm.Ai.WalkerObserver("player", camera._body);
 	this._currentIntent = new gm.Ai.PlayerIntent.Travelling(this._playerObserver);

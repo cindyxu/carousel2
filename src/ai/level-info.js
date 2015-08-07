@@ -29,7 +29,7 @@ gm.Ai.LevelInfo = function() {
 	LevelInfo._createKinematicsFromWalker = function(level, walker, body) {
 		return new gm.Ai.Kinematics({
 			walkSpd: body._maxVelX,
-			jumpSpd: walker._jumpImpulse,
+			jumpSpd: walker._jumpImpulse * body._weight,
 			fallAccel: body._weight * level._gravity,
 			terminalV: body._maxVelY
 		});

@@ -128,9 +128,7 @@ gm.Game = function() {
 	};
 
 	Game._addLevel = function(level) {
-		if (LOGGING) {
-			console.log("game - adding level", level.name);
-		}
+		if (LOGGING) console.log("game - adding level", level.name);
 		if (this._levels.indexOf(level) < 0) {
 			this._levels.push(level);
 			for (var e = 0; e < level._entities.length; e++) {

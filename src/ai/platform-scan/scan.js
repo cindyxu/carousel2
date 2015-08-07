@@ -113,6 +113,7 @@ gm.Ai.PlatformScan = function() {
 				vyo = kinematics.getVyFinalFromDeltaY(childArea._vyi, dyTarget);
 			}
 			pyo = pyoTop + this._sizeY;
+			console.log(childArea._vyi, dyTarget, vyo);
 		}
 		// going down
 		else {
