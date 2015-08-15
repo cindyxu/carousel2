@@ -52,8 +52,8 @@ gm.CollisionRules = function() {
 
 		if (!nextCollisionState) {
 			nextCollisionState = body.__nextCollisionState = CollisionRules.createCollisionState();
+		
 		} else {
-
 			nextCollisionState.left = undefined;
 			nextCollisionState.right = undefined;
 			nextCollisionState.up = undefined;
@@ -63,7 +63,7 @@ gm.CollisionRules = function() {
 		}
 	};
 
-	CollisionRules.onFinishCollisions = function(entity, callback) {
+	CollisionRules.onFinishCollisionStep = function(entity, callback) {
 		var body = entity._body;
 		var nextCollisionState = body.__nextCollisionState;
 		var currentCollisionState = body._collisionState;
@@ -94,6 +94,7 @@ gm.CollisionRules = function() {
 	};
 
 	CollisionRules.onEntityCollidedWithLayer = function(entity, layer, dir) {
+
 		entity._body.__nextCollisionState[dir] = layer;
 		if (entity.collideType === COLLIDE_MAP_TYPE_STICKY) {
 			entity._body.__nextCollisionState.layer = layer;

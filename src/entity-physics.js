@@ -17,25 +17,46 @@ gm.EntityPhysics = function() {
 	EntityPhysics.updateStep = function(entity, delta, dim) {
 		if (dim === X) entity._body.updateStepX(delta);
 		else entity._body.updateStepY(delta);
+
+		EntityPhysics.storeLastPosition(entity, dim);
 	};
 
 	EntityPhysics.resolveCollisions = function(layers, entities, dim, callback) {
 		EntityPhysics.startCollisions(layers, entities, dim);
-		EntityPhysics.collideEntitiesWithLayers(layers, entities, dim);
-		EntityPhysics.collideEntities(entities, dim);
-		EntityPhysics.finishCollisions(layers, entities, dim, callback);
+		
+		var loop = true;
+		while (loop) {
+			EntityPhysics.collideEntitiesWithLayers(layers, entities, dim);
+			EntityPhysics.finishCollisionStep(layers, entities, dim, callback);
+
+			for (var e = 0; e < entities.length; e++) {
+				EntityPhysics.storeLastPosition(entities[e], dim);
+			}
+
+			loop = EntityPhysics.collideEntities(entities, dim);
+			EntityPhysics.finishCollisionStep(layers, entities, dim, callback);
+		}
 	};
 
 	EntityPhysics.startCollisions = function(layers, entities, dim) {
 		for (var e = 0; e < entities.length; e++) {
 			colRules.onStartCollisions(entities[e]);
+			var body = entities[e]._body;
+			body.__dx = body._x - body.vx;
+			body.__dy = body._y - body.vy;
 		}
 	};
 
-	EntityPhysics.finishCollisions = function(layers, entities, dim, callback) {
+	EntityPhysics.finishLayerCollisions = function(layers, entities, dim, callback) {
+		for (var e = 0; e < entities.length; e++) {
+			colRules.onFinishCollisionStep(entities[e]);
+		}
+	};
+
+	EntityPhysics.finishCollisionStep = function(layers, entities, dim, callback) {
 		for (var e = 0; e < entities.length; e++) {
 			
-			colRules.onFinishCollisions(entities[e], callback);
+			colRules.onFinishCollisionStep(entities[e], callback);
 
 			var entity = entities[e];
 			var body = entity._body;
@@ -73,7 +94,7 @@ gm.EntityPhysics = function() {
 		var collideDir;
 
 		if (dim === X) {
-			if (!body.vx) return;
+			if (body.__dx === body._x) return;
 
 			layerMap.getOverlappingTileBbox(bbox, tbbox);
 
@@ -88,12 +109,12 @@ gm.EntityPhysics = function() {
 			}
 
 			if (collided) {
-				if (body.vx < 0) collideDir = "left";
+				if (body._x - body.__dx < 0) collideDir = "left";
 				else collideDir = "right";
 			}
 
 		} else {
-			if (!body.vy) return;
+			if (body.__dy === body._y) return;
 			
 			layerMap.getOverlappingTileBbox(bbox, tbbox);
 
@@ -108,7 +129,7 @@ gm.EntityPhysics = function() {
 			}
 
 			if (collided) {
-				if (body.vy < 0) collideDir = "up";
+				if (body._y - body.__dy < 0) collideDir = "up";
 				else collideDir = "down";
 			}
 		}
@@ -124,14 +145,14 @@ gm.EntityPhysics = function() {
 		if (tile == gm.Constants.Collision.SOLID) {
 			layerMap.tileToPos(tx, ty, pres1);
 			if (dim === X) {
-				if (body.vx > 0) {
+				if (body._x - body.__dx > 0) {
 					body.moveTo(pres1.x - body._sizeX, body._y);
 				} else {
 					body.moveTo(pres1.x + layerMap._map.tilesize, body._y);
 				}
 				return true;
 			} else {
-				if (body.vy > 0) {
+				if (body._y - body.__dy > 0) {
 					body.moveTo(body._x, pres1.y - body._sizeY);
 				} else {
 					body.moveTo(body._x, pres1.y + layerMap._map.tilesize);
@@ -168,8 +189,8 @@ gm.EntityPhysics = function() {
 		}
 		else {
 			// smaller one moves more.
-			moveRatio1 = body2.weight / (body1.weight + body2.weight);
-			moveRatio2 = body1.weight / (body1.weight + body2.weight);
+			moveRatio1 = body2._weight / (body1._weight + body2._weight);
+			moveRatio2 = body1._weight / (body1._weight + body2._weight);
 		}
 
 		if (dim === X) {
@@ -221,6 +242,7 @@ gm.EntityPhysics = function() {
 	};
 
 	EntityPhysics.collideEntities = function(entities, dim) {
+
 		if (dim === X) entities.sort(sortEntitiesXAxis);
 
 		var elength = entities.length;
@@ -243,6 +265,23 @@ gm.EntityPhysics = function() {
 					EntityPhysics.collideEntityWithEntity(currEntity, nextEntity, dim);
 				}
 			}
+		}
+
+		return EntityPhysics.needsCollisionRecheck(entities, dim);
+	};
+
+	EntityPhysics.storeLastPosition = function(entity, dim) {
+		body = entity._body;
+		if (dim === X) body.__dx = body._x;
+		else body.__dy = body._y;
+	};
+
+	EntityPhysics.needsCollisionRecheck = function(entities, dim) {
+		for (e = 0; e < entities.length; e++) {
+			body = entities[e]._body;
+			
+			if ((dim === X && body.__dx !== body._x) || 
+				(dim === Y && body.__dy !== body._y)) return true;
 		}
 	};
 
