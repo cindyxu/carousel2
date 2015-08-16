@@ -21,7 +21,11 @@ gm.EntityPhysics = function() {
 		EntityPhysics.storeLastPosition(entity, dim);
 	};
 
-	EntityPhysics.resolveCollisions = function(layers, entities, dim, callback) {
+	EntityPhysics.resolveStep = function(layers, entities, delta, dim, callback) {
+		var e;
+		for (e = 0; e < entities.length; e++) {
+			EntityPhysics.updateStep(entities[e], delta, dim);
+		}
 		EntityPhysics.startCollisions(layers, entities, dim);
 		
 		var loop = true;
@@ -29,7 +33,7 @@ gm.EntityPhysics = function() {
 			EntityPhysics.collideEntitiesWithLayers(layers, entities, dim);
 			EntityPhysics.finishCollisionStep(layers, entities, dim, callback);
 
-			for (var e = 0; e < entities.length; e++) {
+			for (e = 0; e < entities.length; e++) {
 				EntityPhysics.storeLastPosition(entities[e], dim);
 			}
 
@@ -270,6 +274,7 @@ gm.EntityPhysics = function() {
 		return EntityPhysics.needsCollisionRecheck(entities, dim);
 	};
 
+	// todo: is there a better way to do this? maybe have a collision object attached to the body ...
 	EntityPhysics.storeLastPosition = function(entity, dim) {
 		body = entity._body;
 		if (dim === X) body.__dx = body._x;

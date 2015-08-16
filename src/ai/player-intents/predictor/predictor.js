@@ -4,6 +4,8 @@ var LINK_OVERLAP_DISTANCE = 3;
 
 gm.Ai.PlayerIntent.Predictor = function() {
 
+	var Dir = gm.Constants.Dir;
+
 	var Predictor = function(observer, listener) {
 		this._predictedLinks = [];
 		this._discardedLinks = {};
@@ -70,14 +72,16 @@ gm.Ai.PlayerIntent.Predictor = function() {
 			for (var p = 0; p < preachableLinks.length; p++) {
 				var plink = preachableLinks[p];
 				if (!this._discardedLinks[plink._tag]) {
-					loop2:
-					for (var pl = 0; pl < overlappedLinks.length; pl++) {
-						var pllink = overlappedLinks[pl];
-						if (pllink._pxro > plink._pxli - LINK_OVERLAP_DISTANCE && 
-							pllink._pxlo < plink._pxri + LINK_OVERLAP_DISTANCE) {
-							if (pllink._pxri > plink._pxlo - LINK_OVERLAP_DISTANCE && 
-								pllink._pxli < plink._pxro + LINK_OVERLAP_DISTANCE) {
-								continue loop1;
+					if (plink._fromPlatform === platform && plink._toPlatform === lastPlatform) {
+						loop2:
+						for (var pl = 0; pl < overlappedLinks.length; pl++) {
+							var pllink = overlappedLinks[pl];
+							if (pllink._pxro > plink._pxli - LINK_OVERLAP_DISTANCE && 
+								pllink._pxlo < plink._pxri + LINK_OVERLAP_DISTANCE) {
+								if (pllink._pxri > plink._pxlo - LINK_OVERLAP_DISTANCE && 
+									pllink._pxli < plink._pxro + LINK_OVERLAP_DISTANCE) {
+									continue loop1;
+								}
 							}
 						}
 					}
@@ -108,16 +112,16 @@ gm.Ai.PlayerIntent.Predictor = function() {
 		var body = observer._body;
 		if (!body) return;
 		var walking = observer._walking;
-		return (body._x + body._sizeX < link._pxri && walking > 0) ||
-			(body._x > link._pxli && walking < 0);
+		return (body._x + body._sizeX < link._pxri && walking === Dir.RIGHT) ||
+			(body._x > link._pxli && walking === Dir.LEFT);
 	};
 
 	Predictor.prototype._linkInRange = function(link, observer) {
 		var body = observer._body;
 		if (!body) return;
 		var walking = observer._walking;
-		return !walking || (walking > 0 && link._pxri > body._x - DROP_DISTANCE) ||
-			(walking < 0 && link._pxli < body._x + body._sizeX + DROP_DISTANCE);
+		return !walking || (walking === Dir.RIGHT && link._pxri > body._x - DROP_DISTANCE) ||
+			(walking === Dir.LEFT && link._pxli < body._x + body._sizeX + DROP_DISTANCE);
 	};
 
 	Predictor.prototype._linkOverlapsJump = function(link, observer) {

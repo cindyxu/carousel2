@@ -246,9 +246,6 @@ gm.Level.prototype.updateStep = function(delta, dim) {
 	}
 
 	var elength = entities.length;
-	for (var e = 0; e < elength; e++) {
-		gm.EntityPhysics.updateStep(entities[e], delta, dim);
-	}
 
-	gm.EntityPhysics.resolveCollisions(collisionLayers, entities, dim, this);
+	gm.EntityPhysics.resolveStep(collisionLayers, entities, delta, dim, this);
 };
