@@ -16,8 +16,8 @@ gm.Ai.Reachable.Renderer = function() {
 		ctx.translate(x - bbox.x0, y - bbox.y0);
 
 		ctx.fillStyle = "rgba(100, 255, 0, 0.5)";
-		for (var r = 0; r < this._reachable.length; r++) {
-			var preachable = this._reachable[r];
+		for (var r = 0; r < this._reachable._from.length; r++) {
+			var preachable = this._reachable._from[r];
 			if (preachable) {
 				for (var l = 0; l < preachable._links.length; l++) {
 					var link = preachable._links[l];

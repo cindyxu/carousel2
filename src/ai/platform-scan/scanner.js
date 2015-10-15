@@ -11,7 +11,7 @@ gm.Ai.PlatformScanner = function() {
 			platformMap._body._sizeY, 
 			platformMap._kinematics);
 
-		var reachable = Reachable.newInstance();
+		var reachable = new Reachable();
 		
 		for (var p = 0; p < platforms.length; p++) {
 			var platform = platforms[p];
@@ -19,7 +19,7 @@ gm.Ai.PlatformScanner = function() {
 			// jump
 			scan.beginScan(
 				true, 
-				platform._pxli, 
+				platform._pxli,
 				platform._pxri, 
 				platformMap._map.tileToPosY(platform._ty));
 			while(scan.step());
@@ -58,7 +58,7 @@ gm.Ai.PlatformScanner = function() {
 					var link = new gm.Ai.Link.Platform(
 						originPlatform, reachedPlatform, tailArea, platformMap._kinematics);
 					
-					Reachable.addLink(reachable, link);
+					reachable.addLink(link);
 					break;
 
 				} else tx++;

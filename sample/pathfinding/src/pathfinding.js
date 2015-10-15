@@ -1,7 +1,6 @@
 gm.Sample.Pathfinding.Pathfinding = function() {
 
 	var PlatformMap = gm.Ai.PlatformMap;
-	var ObservedPlatformMap = gm.Ai.ObservedPlatformMap;
 	var PlatformUtil = gm.Ai.PlatformUtil;
 
 	var values = gm.Sample.Pathfinding.values;
@@ -25,16 +24,6 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 
 	var platformScan, platformScanRenderer;
 	var platformSearch, platformSearchRenderer;
-
-	var observedPlatformMap, observedPlatformMapRenderer;
-	var observedReachable, observedReachableRenderer;
-	var reachableObserver;
-
-	var observeCameraBody = new gm.Body({
-		sizeX: values.OBSERVE_CAMERA_SIZE_X,
-		sizeY: values.OBSERVE_CAMERA_SIZE_Y
-	});
-
 	var mx, my;
 
 	var Pathfinding = {};
@@ -43,10 +32,6 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 
 		platformSearch = platformSearchRenderer = undefined;
 		platformScan = platformScanRenderer = undefined;
-
-		observedPlatformMap = observedPlatformMapRenderer = undefined;
-		observedReachable = observedReachableRenderer = undefined;
-		reachableObserver = undefined;
 
 		combinedMap.fromLayers(ToyWorld._level._layers);
 		platformMap = new PlatformMap(startBody, kinematics, combinedMap);
@@ -82,27 +67,9 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 		}
 	};
 
-	var pres = {};
-	Pathfinding.startObserving = function() {
-		var center = observeCameraBody.getCenter();
-		camera.canvasToWorldPos(mx, my, pres);
-		observeCameraBody.moveTo(pres.x - center.x, pres.y - center.y);
-
-		observedPlatformMap = new ObservedPlatformMap(platformMap, observeCameraBody);
-		observedPlatformMapRenderer = new ObservedPlatformMap.Renderer(observedPlatformMap._map);
-		observedReachable = gm.Ai.Reachable.newInstance();
-		observedReachableRenderer = new gm.Ai.Reachable.Renderer(observedReachable);
-		reachableObserver = new gm.Ai.ReachableObserver(observedPlatformMap, reachable, observedReachable);
-	};
-
 	Pathfinding.onMouseMove = function(nmx, nmy) {
 		mx = nmx;
 		my = nmy;
-		if (observedPlatformMap) {
-			camera.canvasToWorldPos(mx, my, pres);
-			observeCameraBody.moveTo(pres.x - observeCameraBody._sizeX/2, pres.y - observeCameraBody._sizeY/2);
-			observedPlatformMap.observe();
-		}
 	};
 
 	Pathfinding.step = function() {
@@ -116,8 +83,6 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 		if (platformMapRenderer) platformMapRenderer.render(ctx, 0, 0, bbox);
 		if (platformScanRenderer) platformScanRenderer.render(ctx, 0, 0, bbox);
 		if (platformSearchRenderer) platformSearchRenderer.render(ctx, 0, 0, bbox);
-		if (observedPlatformMapRenderer) observedPlatformMapRenderer.render(ctx, 0, 0, bbox);
-		if (observedReachableRenderer) observedReachableRenderer.render(ctx, 0, 0, bbox);
 	};
 
 	return Pathfinding;

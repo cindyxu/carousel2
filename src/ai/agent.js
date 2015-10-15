@@ -8,7 +8,7 @@ gm.Ai.Agent = function() {
 
 		this._gameAi = undefined;
 		this._entity = entity;
-		this._playerIntent = new gm.Ai.PlayerIntent(camera);
+		this._camera = camera;
 
 		this._level = undefined;
 		this._levelInfo = undefined;
@@ -34,13 +34,11 @@ gm.Ai.Agent = function() {
 		}
 		if (this._level) {
 			var walker = this._entity._controller._behavior;
-			this._levelInfo = new gm.Ai.LevelInfo(this._level, walker, this._entity._body);
+			this._levelInfo = new gm.Ai.LevelInfo(this._level, walker, this._entity._body, this._camera);
 		} else {
 			this._levelInfo = undefined;
 		}
 		this._levelInfoDirty = false;
-
-		this._playerIntent.onInitWithLevel(this._levelInfo);
 	};
 
 	// entered new level
@@ -78,7 +76,7 @@ gm.Ai.Agent = function() {
 			up: undefined,
 			down: undefined,
 			left: undefined,
-			right: undefined	
+			right: undefined
 		}
 	};
 
@@ -86,7 +84,7 @@ gm.Ai.Agent = function() {
 		if (this._levelInfoDirty) {
 			this._initWithQueuedLevel();
 		}
-		this._playerIntent.preUpdate();
+		this._levelInfo.preUpdate();
 		return noInput;
 	};
 

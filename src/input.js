@@ -113,12 +113,14 @@ gm.Input = function() {
 		if (document.activeElement !== document.body) return;
 
 		var kstr = Input.keyToString(e);
-		Input.pressed[kstr] = true;
 		var wasDown = Input.down[kstr];
 		Input.down[kstr] = true;
 
-		if (!wasDown && Input.bindings.keydown[kstr]) {
-			Input.bindings.keydown[kstr]();
+		if (!wasDown) {
+			Input.pressed[kstr] = true;
+			if (Input.bindings.keydown[kstr]) {
+				Input.bindings.keydown[kstr]();
+			}
 		}
 	};
 

@@ -1,5 +1,5 @@
 gm.Ai.LevelInfo = function() {
-	var LevelInfo = function(level, walker, body) {
+	var LevelInfo = function(level, walker, body, camera) {
 
 		if (LOGGING) {
 			if (!level) console.log("!!! levelInfo - level was undefined");
@@ -12,18 +12,13 @@ gm.Ai.LevelInfo = function() {
 		var reachable = gm.Ai.PlatformScanner.scanPlatforms(level._combinedMap, 
 			platformMap, body, kinematics);
 
-		var observedPlatformMap = new gm.Ai.ObservedPlatformMap(platformMap, body);
-		var observedReachable = gm.Ai.Reachable.newInstance();
-
-		var reachableObserver = new gm.Ai.ReachableObserver(observedPlatformMap, 
-			reachable, observedReachable);
-
 		this._level = level;
 		this._kinematics = kinematics;
 		this._platformMap = platformMap;
 		this._reachable = reachable;
-		this._observedPlatformMap = observedPlatformMap;
-		this._observedReachable = observedReachable;
+	};
+
+	LevelInfo.prototype.preUpdate = function() {
 	};
 
 	LevelInfo._createKinematicsFromWalker = function(level, walker, body) {

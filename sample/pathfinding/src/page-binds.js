@@ -9,7 +9,6 @@ $(function() {
 	var $scanPlatformButton = $("#scan-platform");
 	var $searchPlatformsButton = $("#search-platforms");
 	var $stepButton = $("#step");
-	var $observeMapButton = $("#observe-map");
 	var $recordingDiv = $("#recording");
 
 	var editorActive = false;
@@ -88,13 +87,6 @@ $(function() {
 
 	$stepButton.click(function(e) {
 		Pathfinding.step();
-		render();
-	});
-
-	$observeMapButton.click(function(e) {
-		editorActive = false;
-		Pathfinding.regeneratePlatforms();
-		Pathfinding.startObserving();
 		render();
 	});
 

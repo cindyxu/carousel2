@@ -25,7 +25,7 @@ gm.Ai.PlatformSearch = function() {
 
 		if (this._originPlatform) {
 
-			var linkObj = this._reachable[this._originPlatform._index];
+			var linkObj = this._reachable._from[this._originPlatform._index];
 			if (linkObj) {
 
 				this._currentNode = {
@@ -173,9 +173,9 @@ gm.Ai.PlatformSearch = function() {
 		if (!this._currentNode) return false;
 
 		var platform = this._currentNode._platform;
-		if (!this._reachable[platform._index]) return false;
+		if (!this._reachable._from[platform._index]) return false;
 
-		if (this._reachable[platform._index]._links[this._linkIndex+1]) {
+		if (this._reachable._from[platform._index]._links[this._linkIndex+1]) {
 			this._linkIndex++;
 		
 		} else {
@@ -185,14 +185,14 @@ gm.Ai.PlatformSearch = function() {
 			if (!this._currentNode) return false;
 			
 			platform = this._currentNode._platform;
-			if (!this._reachable[platform._index]) return false;
+			if (!this._reachable._from[platform._index]) return false;
 			
 			this._linkIndex = 0;
 		}
 		
 		this._linkStepInc = 0;
 		this._currentNeighbor = this._resolveLink(this._currentNode, 
-				this._reachable[platform._index]._links[this._linkIndex]);
+				this._reachable._from[platform._index]._links[this._linkIndex]);
 		if (!this._currentNeighbor) return this.stepLink();
 
 		return true;
@@ -203,7 +203,7 @@ gm.Ai.PlatformSearch = function() {
 		
 		if (!currentNode) return false;
 		var platform = this._currentNode._platform;
-		if (!this._reachable[platform._index]) return false;
+		if (!this._reachable._from[platform._index]) return false;
 		
 		while (this.stepLink()) {
 			if (currentNode !== this._currentNode) break;

@@ -5,7 +5,10 @@ gm.Controllers.Partner = function(entity, params) {
 	
 	this._behavior = new gm.Behaviors.Walker(params, entity._body, entity._sprite);
 
-	this._camera = new gm.Camera();
+	this._camera = new gm.Camera({
+		sizeX: 400,
+		sizeY: 300
+	});
 	this._camera.track(entity._body);
 	
 	this._agent = new gm.Ai.Agent(entity, this._camera);
@@ -18,6 +21,7 @@ gm.Controllers.Partner.prototype.onBodyChanged = function() {
 };
 
 gm.Controllers.Partner.prototype.control = function() {
+	this._camera.update();
 	this._behavior.control(this._agent.getNextInput());
 };
 

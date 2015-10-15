@@ -1,33 +1,44 @@
 gm.Ai.Reachable = function() {
 
-	var _PlatformLinks = function() {
+	var _PlatformLinks = function(fromLinks) {
 		this._links = [];
 		this._linksByPlatform = [];
+		this._fromLinks = fromLinks;
 	};
 
-	var Reachable = {};
+	_PlatformLinks.prototype.addLink = function(link) {
+		if (this._links.indexOf(link) < 0) {
+			this._links.push(link);
 
-	Reachable.newInstance = function() {
-		return [];
-	};
-
-	Reachable.addLink = function(reachable, link) {
-		var fromPlatformIndex = link._fromPlatform._index;
-
-		var freachable = reachable[fromPlatformIndex];
-		if (!freachable) {
-			freachable = reachable[fromPlatformIndex] = new _PlatformLinks();
-		}
-
-		if (freachable._links.indexOf(link) < 0) {
-			freachable._links.push(link);
-
-			var linksByPlatform = freachable._linksByPlatform[link._toPlatform._index];
+			var targetPlatform = (this._fromLinks ? link._toPlatform : link._fromPlatform);
+			var linksByPlatform = this._linksByPlatform[targetPlatform._index];
 			if (!linksByPlatform) {
-				linksByPlatform = freachable._linksByPlatform[link._toPlatform._index] = [];
+				linksByPlatform = this._linksByPlatform[targetPlatform._index] = [];
 			}
 			linksByPlatform.push(link);
 		}
+	};
+
+	var Reachable = function() {
+		this._from = [];
+		this._to = [];
+	};
+
+	Reachable.prototype.addLink = function(link) {
+		var fromPlatformIndex = link._fromPlatform._index;
+		var toPlatformIndex = link._toPlatform._index;
+
+		var freachable = this._from[fromPlatformIndex];
+		if (!freachable) {
+			freachable = this._from[fromPlatformIndex] = new _PlatformLinks(true);
+		}
+		freachable.addLink(link);
+
+		var treachable = this._to[toPlatformIndex];
+		if (!treachable) {
+			treachable = this._to[toPlatformIndex] = new _PlatformLinks(false);
+		}
+		treachable.addLink(link);
 	};
 
 	return Reachable;

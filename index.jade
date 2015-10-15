@@ -13,16 +13,25 @@ html
 		script(src="/src/settings.js")
 		script(src="/src/math.js")
 		script(src="/src/image-resource.js")
+		script(src="/src/renderer.js")
 		script(src="/src/input.js")
 		script(src="/src/collision-rules.js")
 		script(src="/src/transform-functions.js")
 		script(src="/src/body.js")
-		script(src="/src/map.js")
+		script(src="/src/sprite.js")
+		
+		script(src="/src/map/map.js")
+		script(src="/src/map/renderer.js")
+		script(src="/src/map/renderer-image.js")
+		script(src="/src/map/renderer-sprite.js")
+
 		script(src="/src/pos-map.js")
 		script(src="/src/pos-map-tile.js")
-		script(src="/src/sprite.js")
+
 		script(src="/src/entity/entity.js")
 		script(src="/src/entity/model.js")
+		script(src="/src/entity/renderer-sprite.js")
+
 		script(src="/src/layer-map.js")
 		script(src="/src/layer/layer.js")
 		script(src="/src/layer/model.js")
@@ -32,15 +41,10 @@ html
 		script(src="/src/level/renderer.js")
 		script(src="/src/game.js")
 
-		script(src="/src/renderers/renderer.js")
-		script(src="/src/renderers/entity-sprite.js")
-		script(src="/src/renderers/entity-debug.js")
-		script(src="/src/renderers/map.js")
-		script(src="/src/renderers/map-image.js")
-		script(src="/src/renderers/map-sprite.js")
-		script(src="/src/renderers/map-collision.js")
-		script(src="/src/renderers/map-debug.js")
-		script(src="/src/renderers/map-platform.js")
+		script(src="/src/debug/entity/debug.js")
+		script(src="/src/debug/map/collision.js")
+		script(src="/src/debug/map/debug.js")
+		script(src="/src/debug/map/platform.js")
 		
 		script(src="/src/behaviors/walker.js")
 		
@@ -83,17 +87,7 @@ html
 		script(src="/src/ai/reachable/reachable.js")
 		script(src="/src/ai/platform-scan/scan.js")
 		script(src="/src/ai/platform-scan/scanner.js")
-		script(src="/src/ai/observe-map/map.js")
-		script(src="/src/ai/reachable-observer.js")
-		script(src="/src/ai/walker-observer/observer.js")
-		script(src="/src/ai/walker-observer/portal-observer.js")
 
-		script(src="/src/ai/player-intents/intent.js")
-		script(src="/src/ai/player-intents/predictor/predictor.js")
-		// TODO remove this
-		script(src="/src/ai/player-intents/predictor/renderer.js") 
-		script(src="/src/ai/player-intents/travelling/travelling.js")
-		
 		script(src="/src/ai/level-info.js")
 		script(src="/src/ai/agent.js")
 

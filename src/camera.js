@@ -30,9 +30,10 @@ gm.Camera.prototype.worldToCanvasPos = function(wx, wy, res) {
 
 gm.Camera.prototype.createTrackController = function(camera, target) {
 	return {
-		update: function(delta) {
+		updateStep: function(delta) {
 			var tcenter = target.getCenter();
-			camera._body.moveTo(tcenter.x, tcenter.y);
+			camera._body.moveTo(tcenter.x - camera._body._sizeX/2, 
+				tcenter.y - camera._body._sizeY/2);
 		}
 	};
 };
