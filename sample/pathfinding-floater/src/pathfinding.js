@@ -1,6 +1,6 @@
 gm.Sample.FloaterPathfinding.Pathfinding = function() {
 
-	var values = gm.Sample.FloaterPathfinding.values;
+	var Values = gm.Sample.FloaterPathfinding.Values;
 	var ToyWorld = gm.Sample.FloaterPathfinding.ToyWorld;
 	var combinedMap = new gm.Ai.CombinedMap(ToyWorld._level._layers);
 
@@ -10,14 +10,29 @@ gm.Sample.FloaterPathfinding.Pathfinding = function() {
 
 	var Pathfinding = {};
 
+	var tilePathSearch, tilePathSearchRenderer;
+
 	Pathfinding.startSearch = function() {
+		combinedMap.fromLayers(ToyWorld._level._layers);
+
+		tilePathSearch = new gm.Ai.Floater.TilePathSearch(
+			combinedMap, 
+			combinedMap.posToTileX(startBody._x), 
+			combinedMap.posToTileY(startBody._y), 
+			combinedMap.posToTileX(endBody._x), 
+			combinedMap.posToTileY(endBody._y), 
+			Math.ceil(startBody._sizeX / combinedMap._map.tilesize), 
+			Math.ceil(startBody._sizeY / combinedMap._map.tilesize));
+		tilePathSearchRenderer = new gm.Debug.Renderer.Ai.Floater.TilePathSearch(tilePathSearch);
 	};
 
 	Pathfinding.step = function() {
+		tilePathSearch.step();
 	};
 
 	Pathfinding.render = function(ctx) {
 		var bbox = ToyWorld._camera._body.getBbox();
+		if (tilePathSearchRenderer) tilePathSearchRenderer.render(ctx, 0, 0, bbox);
 	};
 
 	return Pathfinding;
