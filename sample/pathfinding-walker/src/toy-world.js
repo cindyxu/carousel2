@@ -1,4 +1,4 @@
-gm.Sample.Ai.Walker.Pathfinding.ToyWorld = (function(values) {
+gm.Sample.WalkerPathfinding.ToyWorld = (function(values) {
 
 	var TILES_X = values.TILES_X;
 	var TILES_Y = values.TILES_Y;
@@ -74,4 +74,4 @@ gm.Sample.Ai.Walker.Pathfinding.ToyWorld = (function(values) {
 	};
 
 	return ToyWorld;
-})(gm.Sample.Ai.Walker.Pathfinding.values);
+})(gm.Sample.WalkerPathfinding.values);

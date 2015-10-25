@@ -1,4 +1,4 @@
-gm.Sample.Ai.Floater.Pathfinding.ToyWorld = (function(values) {
+gm.Sample.FloaterPathfinding.ToyWorld = (function(values) {
 
 	var TILES_X = values.TILES_X;
 	var TILES_Y = values.TILES_Y;
@@ -67,4 +67,4 @@ gm.Sample.Ai.Floater.Pathfinding.ToyWorld = (function(values) {
 	};
 
 	return ToyWorld;
-})(gm.Sample.Ai.Floater.Pathfinding.values);
+})(gm.Sample.FloaterPathfinding.values);

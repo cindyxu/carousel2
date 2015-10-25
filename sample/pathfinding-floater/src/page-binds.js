@@ -1,8 +1,8 @@
 $(function() {
 
-	var values = gm.Sample.Ai.Floater.Pathfinding.values;
-	var ToyWorld = gm.Sample.Ai.Floater.Pathfinding.ToyWorld;
-	var Pathfinding = gm.Sample.Ai.Floater.Pathfinding.Pathfinding;
+	var values = gm.Sample.FloaterPathfinding.values;
+	var ToyWorld = gm.Sample.FloaterPathfinding.ToyWorld;
+	var Pathfinding = gm.Sample.FloaterPathfinding.Pathfinding;
 	var Recorder = gm.Sample.Recorder;
 	
 	var editor = new gm.Sample.SimpleEditor(ToyWorld._layer, ToyWorld._camera);

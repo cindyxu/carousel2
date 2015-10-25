@@ -1,8 +1,8 @@
 $(function() {
 
-	var values = gm.Sample.Ai.Walker.Pathfinding.values;
-	var ToyWorld = gm.Sample.Ai.Walker.Pathfinding.ToyWorld;
-	var Pathfinding = gm.Sample.Ai.Walker.Pathfinding.Pathfinding;
+	var values = gm.Sample.WalkerPathfinding.values;
+	var ToyWorld = gm.Sample.WalkerPathfinding.ToyWorld;
+	var Pathfinding = gm.Sample.WalkerPathfinding.Pathfinding;
 	var Recorder = gm.Sample.Recorder;
 
 	var editor = new gm.Sample.SimpleEditor(ToyWorld._layer, ToyWorld._camera);

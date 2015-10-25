@@ -1,10 +1,6 @@
-if (!gm.Sample.Ai) gm.Sample.Ai = {};
-if (!gm.Sample.Ai.Walker) gm.Sample.Ai.Walker = {};
-if (!gm.Sample.Ai.Walker.Pathfinding) gm.Sample.Ai.Walker.Pathfinding = {};
+gm.Sample.WalkerPathfinding = {};
 
-gm.Sample.Ai.Walker.Pathfinding = {};
-
-gm.Sample.Ai.Walker.Pathfinding.values = {
+gm.Sample.WalkerPathfinding.values = {
 	TILES_X: 30,
 	TILES_Y: 15,
 	TILESIZE: 32,
