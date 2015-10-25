@@ -29,7 +29,7 @@ gm.Controllers.Player.prototype.onBodyChanged = function() {
 gm.Controllers.Player.prototype.onEntityAddedToLevel = function(entity, level, levelManager) {
 	if (entity === this._entity) {
 		levelManager.addListener(this);
-		this._adjustForGravity(level);
+		this._initWithLevel(level);
 	}
 };
 
@@ -41,7 +41,7 @@ gm.Controllers.Player.prototype.onEntityRemovedFromLevel = function(entity, leve
 };
 
 gm.Controllers.Player.prototype.onLevelChanged = function(level) {
-	this._adjustForGravity(level);
+	this._initWithLevel(level);
 };
 
 gm.Controllers.Player.prototype.control = function() {
@@ -52,8 +52,7 @@ gm.Controllers.Player.prototype.post = function() {
 	this._behavior.post();
 };
 
-gm.Controllers.Player.prototype._adjustForGravity = function(level) {
-	console.log(this._walkParams, this._floatParams);
+gm.Controllers.Player.prototype._initWithLevel = function(level) {
 	if (level._gravity !== 0) {
 		this._entity._body.setParams(this._walkParams.body);
 		this._behavior = new gm.Behaviors.Walker(this._walkParams.behavior, this._entity._body);

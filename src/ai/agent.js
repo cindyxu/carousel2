@@ -78,7 +78,7 @@ gm.Ai.Agent = function() {
 		if (this._walkerLevelInfoDirty) {
 			this._initWithQueuedLevel();
 		}
-		this._levelInfo.preUpdate();
+		if (this._levelInfo) this._levelInfo.preUpdate();
 		return noInput;
 	};
 

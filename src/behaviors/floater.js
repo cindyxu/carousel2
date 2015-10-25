@@ -11,11 +11,12 @@ gm.Behaviors.Floater = function() {
 		if (params) this.setParams(params);
 
 		this._facing = Dir.RIGHT;
+
+		// this is a combination of directional flags
 		this._floating = 0;
 	};
 
 	Floater.prototype.setParams = function(params) {
-		console.log(params.floatForce);
 		if (params.floatForce !== undefined) this._floatForce = params.floatForce;
 	};
 
@@ -58,27 +59,17 @@ gm.Behaviors.Floater = function() {
 		if (input.pressed.up || 
 			(input.down.up && this._floating & Dir.UP)) {
 			body.addForce(0, -this._floatForce);
-			this._facing = Dir.UP;
 			this._floating = (this._floating | Dir.UP) ^ Dir.DOWN;
 		}
 
 		if (input.pressed.down || 
 			(input.down.down && this._floating & Dir.DOWN)) {
 			body.addForce(0, this._floatForce);
-			this._facing = Dir.DOWN;
 			this._floating = (this._floating | Dir.DOWN) ^ Dir.UP;
 		}
 	};
 
 	Floater.prototype.post = function() {
-		var body = this._body;
-		if (!body) return;
-
-		if (body._collisionState.down) {
-			this._jumpCount = 0;
-		} else if (!this._jumped && this._jumpCount === 0) {
-			this._jumpCount++;
-		}
 	};
 
 	return Floater;
