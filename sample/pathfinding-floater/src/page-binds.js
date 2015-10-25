@@ -21,8 +21,6 @@ $(function() {
 	});
 	$("#game").append($canvas);
 
-	var recorder = new Recorder($canvas[0]);
-
 	gm.Input.bind($canvas);
 	gm.Input.setListener('mousedown', function() {
 		if (editorActive) {
@@ -59,18 +57,6 @@ $(function() {
 		editor.onEraseKeyDown();
 		render();
 	});
-	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.RECORD, function() {
-		if (!recording) {
-			$recordingDiv.removeClass("hidden");
-			recorder.startRecording();
-			recording = true;
-			render();
-		} else {
-			recorder.stopRecording();
-			$recordingDiv.addClass("hidden");
-			recording = false;
-		}
-	});
 
 	$searchPathButton.click(function(e) {
 		Pathfinding.startSearch();
@@ -86,7 +72,6 @@ $(function() {
 		ToyWorld.render(ctx);
 		Pathfinding.render(ctx);
 		if (editorActive) editor.render(ctx);
-		if (recording) recorder.capture();
 	};
 
 	ctx = $canvas[0].getContext("2d");

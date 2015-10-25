@@ -15,23 +15,20 @@ html
 		include ./../../partials/editor.jade
 		
 		script(src="/src/ai/ai.js")
+		script(src="/src/ai/combined-map.js")
 		
 		script(src="/src/ai/floater/search.js")
 
 		script(src="/src/sample/sample.js")
-		script(src="/src/sample/recorder.js")
 		script(src="/src/sample/simple-editor.js")
 
 		script(src="/sample/pathfinding-floater/src/values.js")
 		script(src="/sample/pathfinding-floater/src/toy-world.js")
-		script(src="/sample/pathfinding-floater/src/editor.js")
 		script(src="/sample/pathfinding-floater/src/pathfinding.js")
 		script(src="/sample/pathfinding-floater/src/page-binds.js")
 		
 	body
-		#recording.hidden
-			p REC &#9679;
-		h1 PATHFINDING TEST
+		h1 PATHFINDING TEST - FLOATER
 		#editor
 			.option
 				button#search-path new search

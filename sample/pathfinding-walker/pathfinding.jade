@@ -15,9 +15,9 @@ html
 		include ./../../partials/editor.jade
 		
 		script(src="/src/ai/ai.js")
+		script(src="/src/ai/combined-map.js")
 		
 		script(src="/src/ai/walker/walker.js")
-		script(src="/src/ai/walker/combined-map.js")
 		script(src="/src/ai/walker/platform-map.js")
 		script(src="/src/ai/walker/generator.js")
 		script(src="/src/ai/walker/kinematics.js")
@@ -40,14 +40,13 @@ html
 
 		script(src="/sample/pathfinding-walker/src/values.js")
 		script(src="/sample/pathfinding-walker/src/toy-world.js")
-		script(src="/sample/pathfinding-walker/src/editor.js")
 		script(src="/sample/pathfinding-walker/src/pathfinding.js")
 		script(src="/sample/pathfinding-walker/src/page-binds.js")
 		
 	body
 		#recording.hidden
 			p REC &#9679;
-		h1 PATHFINDING TEST
+		h1 PATHFINDING TEST - WALKER
 		#editor
 			.option
 				button#scan-platform scan platform
