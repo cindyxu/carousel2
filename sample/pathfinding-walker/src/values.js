@@ -1,4 +1,3 @@
-if (!gm.Sample) gm.Sample = {};
 if (!gm.Sample.Ai) gm.Sample.Ai = {};
 if (!gm.Sample.Ai.Walker) gm.Sample.Ai.Walker = {};
 if (!gm.Sample.Ai.Walker.Pathfinding) gm.Sample.Ai.Walker.Pathfinding = {};

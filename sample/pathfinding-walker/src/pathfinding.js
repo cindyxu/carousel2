@@ -24,7 +24,6 @@ gm.Sample.Ai.Walker.Pathfinding.Pathfinding = function() {
 
 	var platformScan, platformScanRenderer;
 	var platformSearch, platformSearchRenderer;
-	var mx, my;
 
 	var Pathfinding = {};
 
@@ -65,11 +64,6 @@ gm.Sample.Ai.Walker.Pathfinding.Pathfinding = function() {
 				endBody._y);
 			platformSearchRenderer = new gm.Ai.PlatformSearch.Renderer(platformSearch);
 		}
-	};
-
-	Pathfinding.onMouseMove = function(nmx, nmy) {
-		mx = nmx;
-		my = nmy;
 	};
 
 	Pathfinding.step = function() {

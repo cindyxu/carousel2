@@ -1,7 +1,7 @@
 html
 	head
 		link(href="/reset.css", rel="stylesheet")
-		link(href="/sample/ai/walker/pathfinding/pathfinding.css", rel="stylesheet")
+		link(href="/sample/pathfinding-walker/pathfinding.css", rel="stylesheet")
 
 		script(src="/underscore-min.js")
 		script(src="/jquery-1.11.2.min.js")
@@ -10,9 +10,9 @@ html
 		script(src="/gif.worker.js")
 		script(src="/ccapture.min.js")
 
-		include ./partials/game.jade
-		include ./partials/debug.jade
-		include ./partials/editor.jade
+		include ./../../partials/game.jade
+		include ./../../partials/debug.jade
+		include ./../../partials/editor.jade
 		
 		script(src="/src/ai/ai.js")
 		
@@ -34,11 +34,15 @@ html
 		script(src="/src/ai/walker/platform-search/search.js")
 		script(src="/src/ai/walker/platform-search/renderer.js")
 
-		script(src="/sample/ai/walker/pathfinding/src/values.js")
-		script(src="/sample/ai/walker/pathfinding/src/toy-world.js")
-		script(src="/sample/ai/walker/pathfinding/src/editor.js")
-		script(src="/sample/ai/walker/pathfinding/src/pathfinding.js")
-		script(src="/sample/ai/walker/pathfinding/src/page-binds.js")
+		script(src="/src/sample/sample.js")
+		script(src="/src/sample/recorder.js")
+		script(src="/src/sample/simple-editor.js")
+
+		script(src="/sample/pathfinding-walker/src/values.js")
+		script(src="/sample/pathfinding-walker/src/toy-world.js")
+		script(src="/sample/pathfinding-walker/src/editor.js")
+		script(src="/sample/pathfinding-walker/src/pathfinding.js")
+		script(src="/sample/pathfinding-walker/src/page-binds.js")
 		
 	body
 		#recording.hidden

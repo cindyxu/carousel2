@@ -1,10 +1,11 @@
 $(function() {
 
-	var values = gm.Sample.Ai.Floater.Pathfinding.values;
-	var ToyWorld = gm.Sample.Ai.Floater.Pathfinding.ToyWorld;
-	var Editor = gm.Sample.Ai.Floater.Pathfinding.Editor;
-	var Pathfinding = gm.Sample.Ai.Floater.Pathfinding.Pathfinding;
-	var Recorder = gm.Debug.Recorder;
+	var values = gm.Sample.Ai.Walker.Pathfinding.values;
+	var ToyWorld = gm.Sample.Ai.Walker.Pathfinding.ToyWorld;
+	var Pathfinding = gm.Sample.Ai.Walker.Pathfinding.Pathfinding;
+	var Recorder = gm.Sample.Recorder;
+
+	var editor = new gm.Sample.SimpleEditor(ToyWorld._layer, ToyWorld._camera);
 
 	var $scanPlatformButton = $("#scan-platform");
 	var $searchPlatformsButton = $("#search-platforms");
@@ -26,38 +27,37 @@ $(function() {
 	gm.Input.bind($canvas);
 	gm.Input.setListener('mousedown', function() {
 		if (editorActive) {
-			Editor.onMouseDown();
+			editor.onMouseDown();
 			render();
 		}
 	});
 	gm.Input.setListener('mouseup', function() {
 		if (editorActive) {
-			Editor.onMouseUp();
+			editor.onMouseUp();
 			render();
 		}
 	});
 	gm.Input.setListener('mousemove', function(mx, my) {
-		Editor.onMouseMove(mx, my);
-		Pathfinding.onMouseMove(mx, my);
+		editor.onMouseMove(mx, my);
 		render();
 	});
 	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.MOVE, function() {
 		editorActive = true;
-		Editor.onMoveKeyDown();
+		editor.onMoveKeyDown();
 		render();
 	});
 	gm.Input.setListener('keyup', gm.Settings.Editor.keyBinds.MOVE, function() {
-		Editor.onMoveKeyUp();
+		editor.onMoveKeyUp();
 		render();
 	});
 	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.BRUSH, function() {
 		editorActive = true;
-		Editor.onBrushKeyDown();
+		editor.onBrushKeyDown();
 		render();
 	});
 	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.ERASE, function() {
 		editorActive = true;
-		Editor.onEraseKeyDown();
+		editor.onEraseKeyDown();
 		render();
 	});
 	gm.Input.setListener('keydown', gm.Settings.Editor.keyBinds.RECORD, function() {
@@ -71,6 +71,12 @@ $(function() {
 			$recordingDiv.addClass("hidden");
 			recording = false;
 		}
+	});
+
+	$scanPlatformButton.click(function(e) {
+		Pathfinding.regeneratePlatforms();
+		Pathfinding.startScan();
+		render();
 	});
 
 	$searchPlatformsButton.click(function(e) {
@@ -87,7 +93,7 @@ $(function() {
 	var render = function() {
 		ToyWorld.render(ctx);
 		Pathfinding.render(ctx);
-		if (editorActive) Editor.render(ctx);
+		if (editorActive) editor.render(ctx);
 		if (recording) recorder.capture();
 	};
 

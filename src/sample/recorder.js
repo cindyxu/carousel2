@@ -1,4 +1,4 @@
-gm.Debug.Recorder = function() {
+gm.Sample.Recorder = function() {
 
 	var a;
 	$(function() {
