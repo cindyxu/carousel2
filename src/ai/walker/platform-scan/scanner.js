@@ -1,11 +1,11 @@
-gm.Ai.PlatformScanner = function() {
+gm.Ai.Walker.PlatformScan.Scanner = function() {
 
 	var Reachable = gm.Ai.Reachable;
-	var PlatformScanner = {};
+	var Scanner = {};
 
-	PlatformScanner.scanPlatforms = function(combinedMap, platformMap) {
+	Scanner.scanPlatforms = function(combinedMap, platformMap) {
 		var platforms = platformMap._platforms;
-		var scan = new gm.Ai.PlatformScan(
+		var scan = new gm.Ai.Walker.PlatformScan(
 			combinedMap._map,
 			platformMap._body._sizeX, 
 			platformMap._body._sizeY, 
@@ -23,7 +23,7 @@ gm.Ai.PlatformScanner = function() {
 				platform._pxri, 
 				platformMap._map.tileToPosY(platform._ty));
 			while(scan.step());
-			PlatformScanner._addReachableLinks(platformMap, platform, 
+			Scanner._addReachableLinks(platformMap, platform, 
 				scan.getPatchesByPlatform(platformMap._map), reachable);
 		
 			// don't jump
@@ -33,14 +33,14 @@ gm.Ai.PlatformScanner = function() {
 				platform._pxri, 
 				platformMap._map.tileToPosY(platform._ty));
 			while(scan.step());
-			PlatformScanner._addReachableLinks(platformMap, platform, 
+			Scanner._addReachableLinks(platformMap, platform, 
 				scan.getPatchesByPlatform(platformMap._map), reachable);
 		}
 
 		return reachable;
 	};
 
-	PlatformScanner._addReachableLinks = function(platformMap, originPlatform, patches, reachable) {
+	Scanner._addReachableLinks = function(platformMap, originPlatform, patches, reachable) {
 		var map = platformMap._map;
 
 		for (var p = 0; p < patches.length; p++) {
@@ -55,7 +55,7 @@ gm.Ai.PlatformScanner = function() {
 				reachedPlatform = map.tileAt(tx, ty);
 				if (reachedPlatform && reachedPlatform !== originPlatform) {
 					
-					var link = new gm.Ai.Link.Platform(
+					var link = new gm.Ai.Walker.Link.Platform(
 						originPlatform, reachedPlatform, tailArea, platformMap._kinematics);
 					
 					reachable.addLink(link);
@@ -66,5 +66,5 @@ gm.Ai.PlatformScanner = function() {
 		}
 	};
 
-	return PlatformScanner;
+	return Scanner;
 }();

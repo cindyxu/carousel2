@@ -71,6 +71,8 @@ gm.Body.prototype.setParams = function(params) {
 			console.log("!!! body - weight:", body._weight);
 		}
 	}
+
+	console.log(this);
 };
 
 gm.Body.prototype.moveTo = function(x, y) {

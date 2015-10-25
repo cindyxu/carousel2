@@ -1,4 +1,4 @@
-gm.Ai.Link = function() {
+gm.Ai.Walker.Link = function() {
 
 	var tag = 0;
 
@@ -22,9 +22,9 @@ gm.Ai.Link = function() {
 	return Link;
 }();
 
-gm.Ai.Link.Platform = function() {
+gm.Ai.Walker.Link.Platform = function() {
 	
-	var Link = gm.Ai.Link;
+	var Link = gm.Ai.Walker.Link;
 	
 	var PlatformLink = function(fromPlatform, toPlatform, tailArea, kinematics) {
 		

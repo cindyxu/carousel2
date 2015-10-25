@@ -6,63 +6,57 @@ gm.Ai.Agent = function() {
 			if (!camera) console.log("!!! agent - camera was undefined");
 		}
 
-		this._gameAi = undefined;
 		this._entity = entity;
-		this._camera = camera;
 
 		this._level = undefined;
 		this._levelInfo = undefined;
-		this._levelInfoDirty = false;
+		this._walkerLevelInfoDirty = false;
 	};
 
 	Agent.prototype._setLevel = function(level) {
 		this._level = level;
-		this._levelInfoDirty = true;
-	};
-
-	Agent.prototype.initWithGameAi = function(gameAi) {
-		if (LOGGING) {
-			console.log("agent - initialize with game");
-		}
-		this._gameAi = gameAi;
-		gameAi.addListener(this);
+		this._walkerLevelInfoDirty = true;
 	};
 
 	Agent.prototype._initWithQueuedLevel = function() {
 		if (LOGGING) {
 			console.log("agent - level changed", this._level.name);
 		}
+		var behavior = this._entity._controller._behavior;
 		if (this._level) {
-			var walker = this._entity._controller._behavior;
-			this._levelInfo = new gm.Ai.LevelInfo(this._level, walker, this._entity._body, this._camera);
+			if (this._level._gravity !== 0) {
+				this._levelInfo = new gm.Ai.Walker.LevelInfo(this._level, behavior, this._entity._body);
+			} else {
+				this._levelInfo = undefined;
+			}
 		} else {
 			this._levelInfo = undefined;
 		}
-		this._levelInfoDirty = false;
+		this._walkerLevelInfoDirty = false;
 	};
 
 	// entered new level
-	Agent.prototype.onEntityAddedToLevel = function(entity, level, levelAi) {
+	Agent.prototype.onEntityAddedToLevel = function(entity, level, levelManager) {
 		if (entity === this._entity) {
 			this._setLevel(level);
-			levelAi.addListener(this);
+			levelManager.addListener(this);
 		}
 	};
 
 	// left level
-	Agent.prototype.onEntityRemovedFromLevel = function(entity, level, levelAi) {
+	Agent.prototype.onEntityRemovedFromLevel = function(entity, level, levelManager) {
 		if (entity === this._entity) {
-			levelAi.removeListener(this);
+			levelManager.removeListener(this);
 			this._setLevel(undefined);
 		}
 	};
 
 	Agent.prototype.onLevelChanged = function() {
-		this._levelInfoDirty = true;
+		this._walkerLevelInfoDirty = true;
 	};
 
 	Agent.prototype.onBodyChanged = function() {
-		this._levelInfoDirty = true;
+		this._walkerLevelInfoDirty = true;
 	};
 
 	var noInput = {
@@ -81,7 +75,7 @@ gm.Ai.Agent = function() {
 	};
 
 	Agent.prototype.getNextInput = function() {
-		if (this._levelInfoDirty) {
+		if (this._walkerLevelInfoDirty) {
 			this._initWithQueuedLevel();
 		}
 		this._levelInfo.preUpdate();

@@ -1,4 +1,4 @@
-gm.Ai.PlatformUtil = function() {
+gm.Ai.Walker.PlatformUtil = function() {
 
 	var PlatformUtil = {};
 

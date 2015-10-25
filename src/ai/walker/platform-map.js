@@ -1,4 +1,4 @@
-gm.Ai.PlatformMap = function() {
+gm.Ai.Walker.PlatformMap = function() {
 
 	var PlatformMap = function(body, kinematics, combinedMap) {
 
@@ -43,7 +43,7 @@ gm.Ai.PlatformMap = function() {
 		this._map.resize(cmap._tilesX, cmap._tilesY);
 		this._map.tilesize = tilesize;
 
-		this.setPlatforms(gm.Ai.PlatformGenerator.generatePlatforms(this));
+		this.setPlatforms(gm.Ai.Walker.PlatformGenerator.generatePlatforms(this));
 
 		for (var i = 0; i < this._listeners.length; i++) {
 			this._listeners[i].onPlatformMapUpdated();

@@ -1,4 +1,4 @@
-gm.Ai.Kinematics = function() {
+gm.Ai.Walker.Kinematics = function() {
 
 	var Kinematics = function(params) {
 		if (LOGGING) {

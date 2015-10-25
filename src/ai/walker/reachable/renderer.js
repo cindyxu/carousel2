@@ -1,6 +1,6 @@
 gm.Ai.Reachable.Renderer = function() {
 	
-	var RenderUtil = gm.Ai.PlatformUtil.Render;
+	var RenderUtil = gm.Ai.Walker.PlatformUtil.Render;
 
 	var Renderer = function(reachable) {
 		this._reachable = reachable;
@@ -21,7 +21,7 @@ gm.Ai.Reachable.Renderer = function() {
 			if (preachable) {
 				for (var l = 0; l < preachable._links.length; l++) {
 					var link = preachable._links[l];
-					gm.Ai.PlatformUtil.Render.renderLink(ctx, link._tail);
+					gm.Ai.Walker.PlatformUtil.Render.renderLink(ctx, link._tail);
 				}
 			}
 		}	

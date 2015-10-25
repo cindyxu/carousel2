@@ -1,7 +1,7 @@
-gm.Ai.PlatformGenerator = function() {
+gm.Ai.Walker.PlatformGenerator = function() {
 
 	var PlatformGenerator = {};
-	var PlatformMap = gm.Ai.PlatformMap;
+	var PlatformMap = gm.Ai.Walker.PlatformMap;
 
 	var LEFT = gm.Constants.Dir.LEFT;
 	var RIGHT = gm.Constants.Dir.RIGHT;

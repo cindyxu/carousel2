@@ -1,4 +1,4 @@
-gm.Ai._PlatformArea = function() {
+gm.Ai.Walker._PlatformArea = function() {
 	var _PlatformArea = function(parent, vyi, pxli, pxri, pyi, vyo, pxlo, pxro, pyo) {
 		this._vyi = vyi;
 		this._pxli = pxli;

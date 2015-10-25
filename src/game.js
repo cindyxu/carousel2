@@ -104,7 +104,7 @@ gm.Game = function() {
 			Game._onEntityRemovedFromLevel(entity, level);
 		}
 		level.addEntity(entity, layer);
-		Game.onEntityAddedToLevel(entity, level);
+		Game._onEntityAddedToLevel(entity, level);
 	};
 
 	Game._registerEntity = function(entity) {

@@ -1,7 +1,7 @@
 /* runs A* search over platform/link space */
 gm.Ai.PlatformSearch = function() {
 
-	var PlatformUtil = gm.Ai.PlatformUtil;
+	var PlatformUtil = gm.Ai.Walker.PlatformUtil;
 
 	var PlatformSearch = function(platformMap, reachable, pxf, pyf) {
 		this._platformMap = platformMap;

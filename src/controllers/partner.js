@@ -1,30 +1,27 @@
 if (!gm.Controllers) gm.Controllers = {};
 
 gm.Controllers.Partner = function(entity, params) {
-	this._entity = entity;
-	
-	this._behavior = new gm.Behaviors.Walker(params, entity._body, entity._sprite);
-
-	this._camera = new gm.Camera({
-		sizeX: 400,
-		sizeY: 300
-	});
-	this._camera.track(entity._body);
-	
+	gm.Controllers.Player.prototype.apply(this, entity, params);
 	this._agent = new gm.Ai.Agent(entity, this._camera);
 };
 
+gm.Controllers.Partner.prototype = Object.create(gm.Controllers.Player.prototype);
+
 gm.Controllers.Partner.prototype.onBodyChanged = function() {
-	this._behavior.setBody(this._entity._body);
-	this._camera.track(this._entity._body);
+	gm.Controllers.Player.prototype.apply(this);
 	this._agent.onBodyChanged();
 };
 
-gm.Controllers.Partner.prototype.control = function() {
-	this._camera.update();
-	this._behavior.control(this._agent.getNextInput());
+gm.Controllers.Partner.prototype.onEntityAddedToLevel = function(entity, level, levelManager) {
+	gm.Controllers.Player.prototype.apply(this);
+	this._agent.onEntityAddedToLevel(entity, level, levelManager);
 };
 
-gm.Controllers.Partner.prototype.post = function() {
-	this._behavior.post();
+gm.Controllers.Partner.prototype.onEntityRemovedFromLevel = function(entity, level, levelManager) {
+	gm.Controllers.Player.prototype.apply(this);
+	this._agent.onEntityRemovedFromLevel(entity, level, levelManager);
+};
+
+gm.Controllers.Partner.prototype.control = function() {
+	this._behavior.control(this._agent.getNextInput());
 };

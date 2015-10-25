@@ -7,17 +7,34 @@ gm.EntityClasses.Player = function() {
 	var bodyParams = {
 		sizeX: 24,
 		sizeY: 24,
-		maxVelX: 50,
-		maxVelY: 120,
-		dampX: 100,
-		dampY: 0,
 		weight: 200
 	};
 
 	var controllerParams = {
-		walkForce: 300,
-		jumpImpulse: 0.6,
-		maxJumps: 1
+		walk: {
+			body: {
+				maxVelX: 50,
+				maxVelY: 120,
+				dampX: 100,
+				dampY: 0
+			},
+			behavior: {
+				walkForce: 300,
+				jumpImpulse: 0.6,
+				maxJumps: 1	
+			}
+		},
+		float: {
+			body: {
+				maxVelX: 60,
+				maxVelY: 60,
+				dampX: 5,
+				dampY: 5
+			},
+			behavior: {
+				floatForce: 100
+			}
+		}
 	};
 
 	var entityParams = {

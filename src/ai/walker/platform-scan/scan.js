@@ -1,4 +1,4 @@
-gm.Ai.PlatformScan = function() {
+gm.Ai.Walker.PlatformScan = function() {
 
 	var DOWN = gm.Constants.Dir.DOWN;
 	var UP = gm.Constants.Dir.UP;
@@ -6,7 +6,7 @@ gm.Ai.PlatformScan = function() {
 	var RIGHT = gm.Constants.Dir.RIGHT;
 
 	var PlatformArea = gm.Ai.PlatformArea;
-	var PlatformPatch = gm.Ai.PlatformPatch;
+	var PlatformPatch = gm.Ai.Walker.PlatformPatch;
 
 	var PlatformScan = function(cmap, sizeX, sizeY, kinematics) {
 
