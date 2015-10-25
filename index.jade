@@ -8,92 +8,11 @@ html
 		script(src="/jquery.animate-colors-min.js")
 		script(src="/stats.js")
 
-		script(src="/src/gm.js")
-		script(src="/src/constants.js")
-		script(src="/src/settings.js")
-		script(src="/src/math.js")
-		script(src="/src/image-resource.js")
-		script(src="/src/renderer.js")
-		script(src="/src/input.js")
-		script(src="/src/collision-rules.js")
-		script(src="/src/transform-functions.js")
-		script(src="/src/body.js")
-		script(src="/src/sprite.js")
-		
-		script(src="/src/map/map.js")
-		script(src="/src/map/renderer.js")
-		script(src="/src/map/renderer-image.js")
-		script(src="/src/map/renderer-sprite.js")
-
-		script(src="/src/pos-map.js")
-		script(src="/src/pos-map-tile.js")
-
-		script(src="/src/entity/entity.js")
-		script(src="/src/entity/model.js")
-		script(src="/src/entity/renderer-sprite.js")
-
-		script(src="/src/layer-map.js")
-		script(src="/src/layer/layer.js")
-		script(src="/src/layer/model.js")
-		script(src="/src/camera.js")
-		script(src="/src/entity-physics.js")
-		script(src="/src/level/level.js")
-		script(src="/src/level/renderer.js")
-		script(src="/src/game.js")
-		
-		script(src="/src/entity-manager.js")
-
-		script(src="/src/debug/entity/debug.js")
-		script(src="/src/debug/map/collision.js")
-		script(src="/src/debug/map/debug.js")
-		script(src="/src/debug/map/platform.js")
-		
-		script(src="/src/behaviors/walker.js")
-		script(src="/src/behaviors/floater.js")
-		
-		script(src="/src/controllers/player.js")
-		script(src="/src/controllers/partner.js")
-
-		script(src="/src/entities/player.js")
-		script(src="/src/entities/partner.js")
-		
-		script(src="/src/portal-manager.js")
-		
-		script(src="/src/editor/settings.js")
-			
-		script(src="/src/editor/util/selector.js")
-		script(src="/src/editor/util/shapes.js")
-		script(src="/src/editor/util/pan-camera.js")
-		script(src="/src/editor/util/move-body.js")
-		
-		script(src="/src/editor/tools/brush.js")
-		script(src="/src/editor/tools/erase.js")
-		script(src="/src/editor/tools/pan.js")
-		script(src="/src/editor/tools/move.js")
-		script(src="/src/editor/tools/select-tileset.js")
-		
-		script(src="/src/editor/editor.js")
-		script(src="/src/editor/renderer.js")
-		script(src="/src/editor/page-binds.js")
-		script(src="/src/editor/toolbox.js")
-
-		script(src="/src/ai/ai.js")
-
-		script(src="/src/ai/walker/walker.js")
-		script(src="/src/ai/walker/combined-map.js")
-		script(src="/src/ai/walker/platform-map.js")
-		script(src="/src/ai/walker/kinematics.js")
-		script(src="/src/ai/walker/platform-area.js")
-		script(src="/src/ai/walker/patch.js")
-		script(src="/src/ai/walker/link.js")
-		script(src="/src/ai/walker/platform-util.js")
-		script(src="/src/ai/walker/generator.js")
-		script(src="/src/ai/walker/reachable/reachable.js")
-		script(src="/src/ai/walker/platform-scan/scan.js")
-		script(src="/src/ai/walker/platform-scan/scanner.js")
-		script(src="/src/ai/walker/level-info.js")
-
-		script(src="/src/ai/agent.js")
+		include ./partials/game.jade
+		include ./partials/debug.jade
+		include ./partials/editor.jade
+		include ./partials/player.jade
+		include ./partials/partner.jade
 
 		script(src="/src/init.js")
 	body

@@ -9,7 +9,7 @@ gm.Layer.Model.assignLayerMapRenderer = function(layerMap, params, callback) {
 	};
 
 	if (params.isCollision) {
-		renderer = new gm.Renderer.CollisionMap(layerMap._map, params.layerMap.renderer);
+		renderer = new gm.Debug.Renderer.Map.Collision(layerMap._map, params.layerMap.renderer);
 		onRendererPrepared();
 	}
 	else if (params.layerMap.renderer.tilesetSrc) {

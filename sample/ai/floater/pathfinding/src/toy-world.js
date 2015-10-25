@@ -1,21 +1,17 @@
-gm.Sample.Ai.Walker.Pathfinding.ToyWorld = (function(values) {
+gm.Sample.Ai.Floater.Pathfinding.ToyWorld = (function(values) {
 
 	var TILES_X = values.TILES_X;
 	var TILES_Y = values.TILES_Y;
 	var TILESIZE = values.TILESIZE;
 	var SIZE_X = values.SIZE_X;
 	var SIZE_Y = values.SIZE_Y;
-	var WALK_SPD = values.WALK_SPD;
-	var JUMP_SPD = values.JUMP_SPD;
-	var TERMINAL_V = values.TERMINAL_V;
-	var FALL_ACCEL = values.FALL_ACCEL;
 
 	var camera = new gm.Camera({
 		sizeX : TILES_X * TILESIZE, 
 		sizeY: TILES_Y * TILESIZE
 	});
 
-	var level = new gm.Level();
+	var level = new gm.Level(0);
 
 	var layer;
 	var map = new gm.Map({
@@ -32,10 +28,7 @@ gm.Sample.Ai.Walker.Pathfinding.ToyWorld = (function(values) {
 	(function() {
 		var body = new gm.Body({
 			sizeX: SIZE_X,
-			sizeY: SIZE_Y,
-			maxVelX: WALK_SPD,
-			maxVelY: TERMINAL_V,
-			weight: FALL_ACCEL
+			sizeY: SIZE_Y
 		});
 		var bodyRenderer = new gm.Debug.Renderer.Entity.Frame();
 		bodyRenderer._color = "#ffaaee";
@@ -74,4 +67,4 @@ gm.Sample.Ai.Walker.Pathfinding.ToyWorld = (function(values) {
 	};
 
 	return ToyWorld;
-})(gm.Sample.Ai.Walker.Pathfinding.values);
+})(gm.Sample.Ai.Floater.Pathfinding.values);

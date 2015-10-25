@@ -1,9 +1,9 @@
 $(function() {
 
-	var values = gm.Sample.Ai.Walker.Pathfinding.values;
-	var ToyWorld = gm.Sample.Ai.Walker.Pathfinding.ToyWorld;
-	var Editor = gm.Sample.Ai.Walker.Pathfinding.Editor;
-	var Pathfinding = gm.Sample.Ai.Walker.Pathfinding.Pathfinding;
+	var values = gm.Sample.Ai.Floater.Pathfinding.values;
+	var ToyWorld = gm.Sample.Ai.Floater.Pathfinding.ToyWorld;
+	var Editor = gm.Sample.Ai.Floater.Pathfinding.Editor;
+	var Pathfinding = gm.Sample.Ai.Floater.Pathfinding.Pathfinding;
 	var Recorder = gm.Debug.Recorder;
 
 	var $scanPlatformButton = $("#scan-platform");
@@ -71,12 +71,6 @@ $(function() {
 			$recordingDiv.addClass("hidden");
 			recording = false;
 		}
-	});
-
-	$scanPlatformButton.click(function(e) {
-		Pathfinding.regeneratePlatforms();
-		Pathfinding.startScan();
-		render();
 	});
 
 	$searchPlatformsButton.click(function(e) {

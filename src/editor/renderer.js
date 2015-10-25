@@ -45,13 +45,13 @@ gm.Editor._renderer = function(editor) {
 	};
 
 	renderer.onLayerParamsChanged = function(layer) {
-		mapRenderers[layer._tag] = new gm.Renderer.DebugMap(layer._layerMap._map, {
+		mapRenderers[layer._tag] = new gm.Debug.Renderer.Map.Frame(layer._layerMap._map, {
 			strokeStyle: gm.Settings.Editor.colors.MAP
 		});
 	};
 
 	renderer.onEntityChanged = function(entity) {
-		entityRenderers[entity._tag] = new gm.Renderer.DebugEntity(entity._body);
+		entityRenderers[entity._tag] = new gm.Debug.Renderer.Entity.Frame(entity._body);
 	};
 
 	renderer.onLayerRemoved = function(layer) {

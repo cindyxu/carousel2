@@ -1,9 +1,9 @@
-gm.Sample.Pathfinding.Pathfinding = function() {
+gm.Sample.Ai.Walker.Pathfinding.Pathfinding = function() {
 
 	var PlatformMap = gm.Ai.Walker.PlatformMap;
 	var PlatformUtil = gm.Ai.Walker.PlatformUtil;
 
-	var values = gm.Sample.Pathfinding.values;
+	var values = gm.Sample.Ai.Walker.Pathfinding.values;
 	var kinematics = new gm.Ai.Walker.Kinematics({
 		walkSpd: values.WALK_SPD,
 		jumpSpd: values.JUMP_SPD,
@@ -11,7 +11,7 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 		terminalV: values.TERMINAL_V
 	});
 
-	var ToyWorld = gm.Sample.Pathfinding.ToyWorld;
+	var ToyWorld = gm.Sample.Ai.Walker.Pathfinding.ToyWorld;
 
 	var combinedMap = new gm.Ai.CombinedMap(ToyWorld._level._layers);
 
@@ -35,7 +35,7 @@ gm.Sample.Pathfinding.Pathfinding = function() {
 
 		combinedMap.fromLayers(ToyWorld._level._layers);
 		platformMap = new PlatformMap(startBody, kinematics, combinedMap);
-		platformMapRenderer = new gm.Renderer.PlatformMap(platformMap._map);
+		platformMapRenderer = new gm.Debug.Renderer.Map.Platform(platformMap._map);
 		reachable = gm.Ai.Walker.PlatformScan.Scanner.scanPlatforms(combinedMap, platformMap);
 	};
 

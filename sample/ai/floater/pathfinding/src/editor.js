@@ -1,4 +1,4 @@
-gm.Sample.Ai.Walker.Pathfinding.Editor = (function(ToyWorld) {
+gm.Sample.Ai.Floater.Pathfinding.Editor = (function(ToyWorld) {
 	
 	var Editor = {};
 
@@ -63,4 +63,4 @@ gm.Sample.Ai.Walker.Pathfinding.Editor = (function(ToyWorld) {
 
 	return Editor;
 
-})(gm.Sample.Ai.Walker.Pathfinding.ToyWorld);
+})(gm.Sample.Ai.Floater.Pathfinding.ToyWorld);

@@ -1,4 +1,4 @@
-gm.Sample.Pathfinding.Recorder = function() {
+gm.Debug.Recorder = function() {
 
 	var a;
 	$(function() {

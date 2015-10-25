@@ -1,0 +1,36 @@
+html
+	head
+		link(href="/reset.css", rel="stylesheet")
+		link(href="/sample/ai/floater/pathfinding/pathfinding.css", rel="stylesheet")
+
+		script(src="/underscore-min.js")
+		script(src="/jquery-1.11.2.min.js")
+		script(src="/jquery.animate-colors-min.js")
+		script(src="/gif.js")
+		script(src="/gif.worker.js")
+		script(src="/ccapture.min.js")
+
+		include ./partials/game.jade
+		include ./partials/debug.jade
+		include ./partials/editor.jade
+		
+		script(src="/src/ai/ai.js")
+		
+		script(src="/src/ai/floater/search.js")
+
+		script(src="/sample/ai/walker/pathfinding/src/values.js")
+		script(src="/sample/ai/walker/pathfinding/src/toy-world.js")
+		script(src="/sample/ai/walker/pathfinding/src/editor.js")
+		script(src="/sample/ai/walker/pathfinding/src/pathfinding.js")
+		script(src="/sample/ai/walker/pathfinding/src/page-binds.js")
+		
+	body
+		#recording.hidden
+			p REC &#9679;
+		h1 PATHFINDING TEST
+		#editor
+			.option
+				button#search new search
+			.option
+				button#step step
+		#game

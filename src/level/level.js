@@ -1,6 +1,6 @@
 var tag = 1;
 
-gm.Level = function() {
+gm.Level = function(gravity) {
 	var level = this;
 
 	level._levelDirty = false;
@@ -13,7 +13,7 @@ gm.Level = function() {
 
 	level._combinedMap = new gm.Ai.CombinedMap(this._layers);
 
-	level._gravity = 0;
+	level._gravity = (gravity !== undefined ? gravity : 1);
 
 	level._tag = tag++;
 };

@@ -1,8 +1,11 @@
 if (!gm.Sample) gm.Sample = {};
+if (!gm.Sample.Ai) gm.Sample.Ai = {};
+if (!gm.Sample.Ai.Walker) gm.Sample.Ai.Walker = {};
+if (!gm.Sample.Ai.Walker.Pathfinding) gm.Sample.Ai.Walker.Pathfinding = {};
 
-gm.Sample.Pathfinding = {};
+gm.Sample.Ai.Walker.Pathfinding = {};
 
-gm.Sample.Pathfinding.values = {
+gm.Sample.Ai.Walker.Pathfinding.values = {
 	TILES_X: 30,
 	TILES_Y: 15,
 	TILESIZE: 32,
@@ -11,7 +14,5 @@ gm.Sample.Pathfinding.values = {
 	WALK_SPD: 60,
 	JUMP_SPD: 0.5 * 250,
 	TERMINAL_V: 400,
-	FALL_ACCEL: 100,
-	OBSERVE_CAMERA_SIZE_X: 240,
-	OBSERVE_CAMERA_SIZE_Y: 160
+	FALL_ACCEL: 100
 };

@@ -1,4 +1,4 @@
-gm.Renderer.CollisionMap = function() {
+gm.Debug.Renderer.Map.Collision = function() {
 
 	var CollisionMapRenderer = function(map) {
 		var renderer = this;

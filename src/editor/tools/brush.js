@@ -28,7 +28,7 @@ gm.Editor.Tools.Brush = function() {
 
 		if (layer._isCollision) {
 			brush._initCollisionBrush();
-			renderer = new gm.Renderer.CollisionMap(brush._map);
+			renderer = new gm.Debug.Renderer.Map.Collision(brush._map);
 		}
 		else {
 			if (layer._layerMap._renderer) {
@@ -38,7 +38,7 @@ gm.Editor.Tools.Brush = function() {
 			}
 		}
 		brush._renderer = renderer;
-		brush._debugRenderer = new gm.Renderer.DebugMap(brush._map, {
+		brush._debugRenderer = new gm.Debug.Renderer.Map.Frame(brush._map, {
 			strokeStyle: brush.color
 		});
 
