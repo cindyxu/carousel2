@@ -1,4 +1,4 @@
-gm.Ai.Walker.PlatformScan.Renderer = function() {
+gm.Debug.Renderer.Ai.Walker.PlatformScan = function() {
 
 	var Renderer = function(platformScan) {
 		this._platformScan = platformScan;

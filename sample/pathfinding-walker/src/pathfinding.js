@@ -50,7 +50,7 @@ gm.Sample.WalkerPathfinding.Pathfinding = function() {
 			platformScan.beginScan(true, originPlatform._pxli, 
 				originPlatform._pxri, 
 				combinedMap.tileToPosY(originPlatform._ty));
-			platformScanRenderer = new gm.Ai.Walker.PlatformScan.Renderer(platformScan);
+			platformScanRenderer = new gm.Debug.Renderer.Ai.Walker.PlatformScan(platformScan);
 		}
 	};
 
@@ -62,7 +62,7 @@ gm.Sample.WalkerPathfinding.Pathfinding = function() {
 				reachable,
 				endBody._x,
 				endBody._y);
-			platformSearchRenderer = new gm.Ai.PlatformSearch.Renderer(platformSearch);
+			platformSearchRenderer = new gm.Debug.Renderer.Ai.Walker.PlatformSearch(platformSearch);
 		}
 	};
 

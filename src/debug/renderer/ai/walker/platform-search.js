@@ -1,6 +1,6 @@
-gm.Ai.PlatformSearch.Renderer = function() {
+gm.Debug.Renderer.Ai.Walker.PlatformSearch = function() {
 
-	var RenderUtil = gm.Ai.Walker.PlatformUtil.Render;
+	var RenderUtil = gm.Debug.Renderer.Ai.Walker.RenderUtil;
 
 	var Renderer = function(search) {
 		this._search = search;

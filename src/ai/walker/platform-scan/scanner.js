@@ -1,6 +1,6 @@
 gm.Ai.Walker.PlatformScan.Scanner = function() {
 
-	var Reachable = gm.Ai.Reachable;
+	var Reachable = gm.Ai.Walker.Reachable;
 	var Scanner = {};
 
 	Scanner.scanPlatforms = function(combinedMap, platformMap) {

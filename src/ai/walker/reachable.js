@@ -1,4 +1,4 @@
-gm.Ai.Reachable = function() {
+gm.Ai.Walker.Reachable = function() {
 
 	var _PlatformLinks = function(fromLinks) {
 		this._links = [];

@@ -1,4 +1,4 @@
-gm.Ai.Walker.PlatformUtil.Render = {
+gm.Debug.Renderer.Ai.Walker.RenderUtil = {
 
 	renderPlatform: function(ctx, pmap, platform) {
 		var px0 = pmap.tileToPosX(platform._tx0);
