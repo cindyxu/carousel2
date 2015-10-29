@@ -6,7 +6,7 @@ gm.Debug.Renderer.Ai.Floater.TilePathSearch = function() {
 
 	Renderer.prototype.render = function(ctx, x, y, bbox) {
 		if (!ctx || !bbox) {
-			console.log("!!! reachable renderer - ctx:", ctx, ", bbox:", bbox);
+			console.log("!!! tilepathsearch renderer - ctx:", ctx, ", bbox:", bbox);
 			return;
 		}
 
