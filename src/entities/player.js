@@ -38,7 +38,7 @@ gm.EntityClasses.Player = function() {
 	};
 
 	var entityParams = {
-		collideBodyType: gm.Constants.Collision.bodyTypes.ALL,
+		collideBodyType: gm.Constants.Collision.bodyTypes.NONE,
 		collideMapType: gm.Constants.Collision.mapTypes.STICKY,
 		drawIndex: -99
 	};

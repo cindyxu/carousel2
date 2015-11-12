@@ -4,6 +4,7 @@ gm.Layer.Model.assignLayerMapRenderer = function(layerMap, params, callback) {
 	var renderer;
 
 	var onRendererPrepared = function() {
+		console.log(params.isCollision, renderer);
 		layerMap.setRenderer(renderer);
 		if (callback) callback();
 	};
@@ -34,9 +35,12 @@ gm.Layer.Model.createLayer = function(params, callback) {
 		gm.Layer.Model.assignLayerMapRenderer(layerMap, params, function() {
 			callback(layer);
 		});
+
 	} else {
 		gm.Layer.Model.assignLayerMapRenderer(layerMap, params);
+		callback(layer);
 	}
+
 	return layer;
 };
 

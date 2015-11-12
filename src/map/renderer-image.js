@@ -54,17 +54,20 @@ gm.Renderer.ImageMap.prototype.renderTileFn = function(ctx, map, tx, ty) {
 
 	var image = renderer._ires.image;
 	var index = renderer.map._tiles[mty * renderer.map._tilesX + mtx];
-	var ity = Math.floor(index / renderer._imageTilesX);
-	var itx = index % renderer._imageTilesY;
 
-	var tilesize = renderer.map.tilesize;
-	ctx.drawImage(image,
-		itx * tilesize,
-		ity * tilesize,
-		tilesize,
-		tilesize,
-		tx * tilesize,
-		ty * tilesize,
-		tilesize,
-		tilesize);
+	if (index !== null) {
+		var ity = Math.floor(index / renderer._imageTilesX);
+		var itx = index % renderer._imageTilesY;
+
+		var tilesize = renderer.map.tilesize;
+		ctx.drawImage(image,
+			itx * tilesize,
+			ity * tilesize,
+			tilesize,
+			tilesize,
+			tx * tilesize,
+			ty * tilesize,
+			tilesize,
+			tilesize);
+	}
 };

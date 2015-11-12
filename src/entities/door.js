@@ -1,49 +1,13 @@
 if (!gm.EntityClasses) gm.EntityClasses = {};
 
-gm.EntityClasses.Partner = function() {
+gm.EntityClasses.Door = function() {
 
-	var spriteSrc = "images/spritesheets/Partner.png";
+	var spriteSrc = "images/spritesheets/Door.png";
 
 	var bodyParams = {
 		sizeX: 24,
 		sizeY: 24,
-		weight: 200
-	};
-
-	var controllerParams = {
-		walk: {
-			body: {
-				maxVelX: 50,
-				maxVelY: 120,
-				dampX: 100,
-				dampY: 0
-			},
-			behavior: {
-				walkForce: 300,
-				jumpImpulse: 0.6,
-				maxJumps: 1	
-			}
-		},
-		float: {
-			body: {
-				maxVelX: 60,
-				maxVelY: 60,
-				dampX: 5,
-				dampY: 5
-			},
-			behavior: {
-				floatForce: 100
-			}
-		}
-	};
-
-	var aiParams = {
-		walk: {
-
-		},
-		float: {
-			maxDistance: 100
-		}
+		weight: 0
 	};
 
 	var entityParams = {

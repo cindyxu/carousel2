@@ -60,6 +60,7 @@ gm.Sample.WalkerPathfinding.ToyWorld = (function(values) {
 	level.addLayer(layer);
 	level.addEntity(startEntity, layer);
 	level.addEntity(endEntity, layer);
+	camera.setLevel(level);
 
 	var ToyWorld = {
 		_layer: layer,
@@ -70,7 +71,7 @@ gm.Sample.WalkerPathfinding.ToyWorld = (function(values) {
 	};
 
 	ToyWorld.render = function(ctx) {
-		gm.Level.Renderer.render(ctx, level, camera);
+		camera.render(ctx);
 	};
 
 	return ToyWorld;

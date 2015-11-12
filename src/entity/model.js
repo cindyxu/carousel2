@@ -8,7 +8,7 @@ gm.Entity.Model.createEntity = function(className, name, callback) {
 		return;
 	}
 	var entity = entityClass(name);
-	entity.className = className;
+	entity._className = className;
 	if (callback) {
 		// entity.renderer.load(function() { callback(entity); });
 		callback(entity);

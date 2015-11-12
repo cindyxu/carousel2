@@ -3,6 +3,11 @@ if (!gm.Behaviors) gm.Behaviors = {};
 gm.Behaviors.Walker = function() {
 	var Dir = gm.Constants.Dir;
 
+	var leftKey = gm.Settings.Keys.LEFT;
+	var rightKey = gm.Settings.Keys.RIGHT;
+	var upKey = gm.Settings.Keys.UP;
+	var downKey = gm.Settings.Keys.DOWN;
+
 	var Walker = function(params, body) {
 
 		this._walkForce = 0;
@@ -36,31 +41,31 @@ gm.Behaviors.Walker = function() {
 		var body = this._body;
 		if (!body) return;
 
-		if ((!input.down.left && this._walking === Dir.LEFT) ||
-			(!input.down.right && this._walking === Dir.RIGHT)) {
+		if ((!input.down[leftKey] && this._walking === Dir.LEFT) ||
+			(!input.down[rightKey] && this._walking === Dir.RIGHT)) {
 			this._walking = undefined;
 		}
 
-		if (input.pressed.left || 
-			(input.down.left && this._walking === Dir.LEFT)) {
+		if (input.pressed[leftKey] || 
+			(input.down[leftKey] && this._walking === Dir.LEFT)) {
 			body.addForce(-this._walkForce, 0);
 			this._facing = Dir.LEFT;
 			this._walking = Dir.LEFT;
 		}
 
-		if (input.pressed.right || 
-			(input.down.right && this._walking === Dir.RIGHT)) {
+		if (input.pressed[rightKey] || 
+			(input.down[rightKey] && this._walking === Dir.RIGHT)) {
 			body.addForce(this._walkForce, 0);
 			this._facing = Dir.RIGHT;
 			this._walking = Dir.RIGHT;
 		}
 
 		this._jumped = false;
-		if (body._collisionState.down && input.down.down) {
+		if (body._collisionState.down && input.down[downKey]) {
 			this._crouching = true;
 		} else {
 			this._crouching = false;
-			if (input.pressed.up && this._jumpCount < this._maxJumps) {
+			if (input.pressed[upKey] && this._jumpCount < this._maxJumps) {
 				body.addImpulse(0, -this._jumpImpulse);
 				this._jumpCount++;
 				this._jumped = true;

@@ -1,4 +1,3 @@
-if (!gm.Editor) gm.Editor = {};
 if (!gm.Editor.Tools) gm.Editor.Tools = {};
 
 gm.Editor.Tools.Erase = function() {

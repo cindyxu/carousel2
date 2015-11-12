@@ -3,116 +3,111 @@ gm.Game = function() {
 	var X = gm.Constants.Dim.X;
 	var Y = gm.Constants.Dim.Y;
 
-	var Game = {
-		_activeLevels: [],
-		_levels: [],
+	var Game = function() {
+		this._activeLevel = undefined;
+		this._levels = [];
 
-		_playing: false,
-		_lastRunTime: undefined,
-		_currentTime: undefined,
+		this._playing = false;
+		this._lastRunTime = undefined;
+		this._currentTime = undefined;
 
-		_width : gm.Settings.Game.WIDTH,
-		_height : gm.Settings.Game.HEIGHT,
-		_tickStep : gm.Settings.Game.TICKSTEP,
-		_maxTicks : gm.Settings.Game.MAX_TICKS,
+		this._width = gm.Settings.Game.WIDTH;
+		this._height = gm.Settings.Game.HEIGHT;
+		this._tickStep = gm.Settings.Game.TICKSTEP;
+		this._maxTicks = gm.Settings.Game.MAX_TICKS;
 
-		_listeners: [],
-		_registeredEntities: {},
-		_entityLocations: {}
+		this._listeners = [];
+		this._registeredEntities = {};
+		this._entityLocations = {};
 	};
 
-	Game.init = function() {
-		Game._defaultCamera = Game._camera = new gm.Camera({
-			sizeX: Game._width, 
-			sizeY: Game._height
+	Game.prototype.init = function() {
+		(new gm.Game.Observer(this));
+
+		this._defaultCamera = this._camera = new gm.Camera({
+			sizeX: this._width, 
+			sizeY: this._height
 		});
 
-		var level = new gm.Level();
-		Game._addLevel(level);
-		Game._addActiveLevel(level);
-
-		Game._lastRunTime = Game._currentTime = Date.now();
+		this._lastRunTime = this._currentTime = Date.now();
 	};
 
-	Game.play = function() {
-		Game._playing = true;
-		Game._lastRunTime = Game._currentTime = Date.now();
+	Game.prototype.play = function() {
+		this._playing = true;
+		this._lastRunTime = this._currentTime = Date.now();
 		if (LOGGING) console.log("Game is playing");
 	};
 
-	Game.pause = function() {
-		Game._playing = false;
+	Game.prototype.pause = function() {
+		this._playing = false;
 		if (LOGGING) console.log("Game is paused");
 	};
 
-	Game.update = function() {
-		if (!Game._playing) return;
+	Game.prototype.update = function() {
+		if (!this._playing) return;
 
 		var now = Date.now();
 
-		var targetTicks = Math.min(Game._maxTicks, 
-			Math.floor((now - Game._lastRunTime) / Game._tickStep));
+		var targetTicks = Math.min(this._maxTicks, 
+			Math.floor((now - this._lastRunTime) / this._tickStep));
 
-		var currentTime = Game._currentTime;
+		var currentTime = this._currentTime;
 
-		for (var l = 0; l < Game._activeLevels.length; l++) {
-			var level = Game._activeLevels[l];
-			level.preUpdate();
+		var level = this._activeLevel;
+		level.preUpdate();
 
-			for (var i = 0; i < targetTicks; i++) {
-				level.updateStep(Game._tickStep, X);
-				level.updateStep(Game._tickStep, Y);
-				currentTime += Game._tickStep;
-			}
-
-			var deltaTime = currentTime - Game._lastRunTime;
-			level.postUpdate(deltaTime);
+		for (var i = 0; i < targetTicks; i++) {
+			level.updateStep(this._tickStep, X);
+			level.updateStep(this._tickStep, Y);
+			currentTime += this._tickStep;
 		}
 
-		Game._currentTime += Game._tickStep * targetTicks;
-		Game._lastRunTime = Game._currentTime;
+		var deltaTime = currentTime - this._lastRunTime;
+		level.postUpdate(deltaTime);
+
+		this._currentTime += this._tickStep * targetTicks;
+		this._lastRunTime = this._currentTime;
 	};
 
-	Game.render = function(ctx) {
-		// TODO figure out which level to render
-		gm.Level.Renderer.render(ctx, Game._activeLevels[0], Game._camera);
+	Game.prototype.render = function(ctx) {
+		this._camera.render(ctx);
 	};
 
-	Game.getEntityLevel = function(entity) {
+	Game.prototype.getEntityLevel = function(entity) {
 		return this._entityLocations[entity._tag];
 	};
 
-	Game.addListener = function(listener) {
+	Game.prototype.addListener = function(listener) {
 		if (this._listeners.indexOf(listener) < 0) {
 			this._listeners.push(listener);
 		}
 	};
 
-	Game.addNewEntity = function(className, name, level, layer, callback) {
-		gm.Entity.Model.createEntity(className, name, function(entity) {
-			Game._registerEntity(entity);
+	Game.prototype.addNewEntity = function(className, name, level, layer, callback) {
+		var game = this;
+		return gm.Entity.Model.createEntity(className, name, function(entity) {
+			game._registerEntity(entity);
 			level.addEntity(entity, layer);
 			if (callback) callback(entity);
-			Game._onEntityAddedToLevel(entity, level);
+			game._onEntityAddedToLevel(entity, level, layer);
 		});
 	};
 
-	Game.moveEntityToLevel = function(entity, level, layer) {
+	Game.prototype.moveEntityToLevel = function(entity, level, layer) {
 		var plevel = this._entityLocations[entity._tag];
 		if (plevel) {
+			var rlayer = plevel.getLayerForEntity(entity);
 			plevel.removeEntity(entity);
-			Game._onEntityRemovedFromLevel(entity, level);
+			this._onEntityRemovedFromLevel(entity, level, rlayer);
 		}
 		level.addEntity(entity, layer);
-		Game._onEntityAddedToLevel(entity, level);
+		this._onEntityAddedToLevel(entity, level, layer);
 	};
 
-	Game._registerEntity = function(entity) {
+	Game.prototype._registerEntity = function(entity) {
 		if (!this._registeredEntities[entity._tag]) {
 			
-			if (LOGGING) {
-				console.log("game - registering entity", entity.name);
-			}
+			if (LOGGING) console.log("game - registering entity", entity._name);
 
 			this._registeredEntities[entity._tag] = true;
 
@@ -127,12 +122,16 @@ gm.Game = function() {
 		}
 	};
 
-	Game._addLevel = function(level) {
-		if (LOGGING) console.log("game - adding level", level.name);
+	Game.prototype.addLevel = function(level) {
+		if (LOGGING) console.log("game - adding level", level._name);
+
 		if (this._levels.indexOf(level) < 0) {
 			this._levels.push(level);
-			for (var e = 0; e < level._entities.length; e++) {
-				this.onEntityAddedToLevel(level._entities[e]);
+			for (var l = 0; l < level._layers.length; l++) {
+				var layer = level._layers[l];
+				for (var e = 0; e < layer._entities.length; e++) {
+					this._onEntityAddedToLevel(layer._entities[e], level, layer);
+				}
 			}
 			level.addListener(this);
 			for (var i = 0; i < this._listeners.length; i++) {
@@ -143,36 +142,42 @@ gm.Game = function() {
 		}
 	};
 
-	Game._addActiveLevel = function(level) {
-		if (this._activeLevels.indexOf(level) < 0) {
-			this._activeLevels.push(level);
+	Game.prototype.findLevelByName = function(name) {
+		for (var i = 0; i < this._levels.length; i++) {
+			if (this._levels[i]._name === name) return this._levels[i];
 		}
 	};
 
-	Game._removeActiveLevel = function(level) {
-		if (this._activeLevels.indexOf(level) < 0) {
-			this._activeLevels.push(level);
-		}
-	};
+	Game.prototype.setActiveLevel = function(level) {
+		if (LOGGING) console.log("game - set active level", level._name);
 
-	Game._bindToPlayer = function(playerEntity) {
-		this._camera = playerEntity._camera;
-	};
-
-	Game._onEntityAddedToLevel = function(entity, level) {
-		this._entityLocations[entity._tag] = level;
+		this._activeLevel = level;
+		this._camera.setLevel(level);
 		for (var i = 0; i < this._listeners.length; i++) {
-			if (this._listeners[i].onEntityAddedToLevel) {
-				this._listeners[i].onEntityAddedToLevel(entity, level);
+			if (this._listeners[i].onActiveLevelChanged) {
+				this._listeners[i].onActiveLevelChanged(level);
 			}
 		}
 	};
 
-	Game._onEntityRemovedFromLevel = function(entity, level) {
+	Game.prototype._bindToPlayer = function(playerEntity) {
+		this._camera = playerEntity._camera;
+	};
+
+	Game.prototype._onEntityAddedToLevel = function(entity, level, layer) {
+		this._entityLocations[entity._tag] = level;
+		for (var i = 0; i < this._listeners.length; i++) {
+			if (this._listeners[i].onEntityAddedToLevel) {
+				this._listeners[i].onEntityAddedToLevel(entity, level, layer);
+			}
+		}
+	};
+
+	Game.prototype._onEntityRemovedFromLevel = function(entity, level, layer) {
 		this._entityLocations[entity._tag] = undefined;
 		for (var i = 0; i < this._listeners.length; i++) {
 			if (this._listeners[i].onEntityRemovedFromLevel) {
-				this._listeners[i].onEntityRemovedFromLevel(entity, level);
+				this._listeners[i].onEntityRemovedFromLevel(entity, level, layer);
 			}
 		}
 	};

@@ -55,23 +55,26 @@ $(function() {
 	createCanvas();
 	createStats();
 
-	gm.Game.init();
-	gm.Editor.init();
-	gm.Input.bind($("#game"), $canvas);
+	gm.Driver.init(function() {
 
-	setupGameLoop();
+		gm.Editor.GameEditor.init();
+		gm.Input.bind($("#game"), $canvas);
+		
+		setupGameLoop();
 
-	window.onEachFrame(function() {
-		stats.begin();
+		window.onEachFrame(function() {
+			stats.begin();
 
-		gm.Game.update();
-		gm.Editor.update();
-		gm.Game.render(ctx);
-		gm.Editor.render(ctx);
+			gm.Driver.update();
+			gm.Editor.GameEditor.update();
+			gm.Driver.render(ctx);
+			gm.Editor.GameEditor.render(ctx);
 
-		gm.Input.reset();
+			gm.Input.reset();
 
-		stats.end();
+			stats.end();
+		});
 	});
+
 
 });

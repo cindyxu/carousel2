@@ -11,7 +11,7 @@ gm.Sample.FloaterPathfinding.ToyWorld = (function(values) {
 		sizeY: TILES_Y * TILESIZE
 	});
 
-	var level = new gm.Level(0);
+	var level = new gm.Level();
 
 	var layer;
 	var map = new gm.Map({
@@ -53,6 +53,7 @@ gm.Sample.FloaterPathfinding.ToyWorld = (function(values) {
 	level.addLayer(layer);
 	level.addEntity(startEntity, layer);
 	level.addEntity(endEntity, layer);
+	camera.setLevel(level);
 
 	var ToyWorld = {
 		_layer: layer,
@@ -63,7 +64,7 @@ gm.Sample.FloaterPathfinding.ToyWorld = (function(values) {
 	};
 
 	ToyWorld.render = function(ctx) {
-		gm.Level.Renderer.render(ctx, level, camera);
+		camera.render(ctx);
 	};
 
 	return ToyWorld;

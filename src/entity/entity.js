@@ -5,7 +5,7 @@ gm.Entity = function() {
 	var Entity = function(name, params) {
 		var entity = this;
 
-		entity.name = name;
+		entity._name = name;
 
 		entity._body = undefined;
 		entity._sprite = undefined;
@@ -21,14 +21,6 @@ gm.Entity = function() {
 		if (params) entity.setParams(params);
 
 		if (!name && LOGGING) console.log("!!! new entity - no name");
-	};
-
-	Entity.prototype.readState = function(state) {
-		this._body.readState(state);
-	};
-
-	Entity.prototype.writeState = function(state) {
-		this._body.writeState(state);
 	};
 
 	Entity.prototype.setParams = function(params) {

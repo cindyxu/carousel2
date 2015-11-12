@@ -52,8 +52,9 @@ gm.LayerMap = function() {
 	};
 
 	LayerMap.prototype.setRenderer = function(renderer) {
+		console.log("set renderer?", renderer);
 		this._renderer = renderer;
-		this._renderer.setMap(this._map);
+		if (this._renderer) this._renderer.setMap(this._map);
 	};
 
 	LayerMap.prototype.onMapChanged = function() {

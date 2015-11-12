@@ -3,6 +3,11 @@ if (!gm.Behaviors) gm.Behaviors = {};
 gm.Behaviors.Floater = function() {
 	var Dir = gm.Constants.Dir;
 
+	var leftKey = gm.Settings.Keys.LEFT;
+	var rightKey = gm.Settings.Keys.RIGHT;
+	var upKey = gm.Settings.Keys.UP;
+	var downKey = gm.Settings.Keys.DOWN;
+
 	var Floater = function(params, body) {
 
 		this._floatForce = 0;
@@ -29,41 +34,41 @@ gm.Behaviors.Floater = function() {
 		var body = this._body;
 		if (!body) return;
 
-		if (!input.down.left && (this._floating & Dir.LEFT)) {
+		if (!input.down[leftKey] && (this._floating & Dir.LEFT)) {
 			this._floating = this._floating ^ Dir.LEFT;
 		}
-		if (!input.down.right && (this._floating & Dir.RIGHT)) {
+		if (!input.down[rightKey] && (this._floating & Dir.RIGHT)) {
 			this._floating = this._floating ^ Dir.RIGHT;
 		}
-		if (!input.down.up && (this._floating & Dir.UP)) {
+		if (!input.down[upKey] && (this._floating & Dir.UP)) {
 			this._floating = this._floating ^ Dir.UP;
 		}
-		if (!input.down.down && (this._floating & Dir.DOWN)) {
+		if (!input.down[downKey] && (this._floating & Dir.DOWN)) {
 			this._floating = this._floating ^ Dir.DOWN;
 		}
 
-		if (input.pressed.left || 
-			(input.down.left && this._floating & Dir.LEFT)) {
+		if (input.pressed[leftKey] || 
+			(input.down[leftKey] && this._floating & Dir.LEFT)) {
 			body.addForce(-this._floatForce, 0);
 			this._facing = Dir.LEFT;
 			this._floating = (this._floating | Dir.LEFT) ^ Dir.RIGHT;
 		}
 
-		if (input.pressed.right || 
-			(input.down.right && this._floating & Dir.RIGHT)) {
+		if (input.pressed[rightKey] || 
+			(input.down[rightKey] && this._floating & Dir.RIGHT)) {
 			body.addForce(this._floatForce, 0);
 			this._facing = Dir.RIGHT;
 			this._floating = (this._floating | Dir.RIGHT) ^ Dir.LEFT;
 		}
 
-		if (input.pressed.up || 
-			(input.down.up && this._floating & Dir.UP)) {
+		if (input.pressed[upKey] || 
+			(input.down[upKey] && this._floating & Dir.UP)) {
 			body.addForce(0, -this._floatForce);
 			this._floating = (this._floating | Dir.UP) ^ Dir.DOWN;
 		}
 
-		if (input.pressed.down || 
-			(input.down.down && this._floating & Dir.DOWN)) {
+		if (input.pressed[downKey] || 
+			(input.down[downKey] && this._floating & Dir.DOWN)) {
 			body.addForce(0, this._floatForce);
 			this._floating = (this._floating | Dir.DOWN) ^ Dir.UP;
 		}

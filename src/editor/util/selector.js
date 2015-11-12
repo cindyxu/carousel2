@@ -1,4 +1,3 @@
-if (!gm.Editor) gm.Editor = {};
 if (!gm.Editor.Util) gm.Editor.Util = {};
 
 gm.Editor.Util.Selector = function() {

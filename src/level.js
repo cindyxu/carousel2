@@ -1,6 +1,6 @@
 var tag = 1;
 
-gm.Level = function(gravity) {
+gm.Level = function(name, params) {
 	var level = this;
 
 	level._levelDirty = false;
@@ -10,12 +10,19 @@ gm.Level = function(gravity) {
 	level._entities = [];
 	level._entityLayers = {};
 	level._listeners = [];
+	level._gravity = 0;
+
+	level._name = name;
+
+	if (params) level._setParams(params);
 
 	level._combinedMap = new gm.Ai.CombinedMap(this._layers);
 
-	level._gravity = (gravity !== undefined ? gravity : 1);
-
 	level._tag = tag++;
+};
+
+gm.Level.prototype.setParams = function(params) {
+	if (params.gravity !== undefined) this._gravity = params.gravity;
 };
 
 // do not add any ai-related listeners. use gm.LevelAi instead
@@ -33,26 +40,12 @@ gm.Level.prototype.removeListener = function(listener) {
 	}
 };
 
-gm.Level.prototype.writeState = function(state) {
-	var entities = this._entities,
-		elength = entities.length;
-	for (var e = 0; e < elength; e++) {
-		var entity = entities[e];
-		var estate = state[entity._tag];
-		if (!estate) estate = state[entity._tag] = {};
-		entities[e].writeState(estate);
+gm.Level.prototype.onLayerChanged = function(layer) {
+	for (var l = 0; l < this._listeners.length; l++) {
+		if (this._listeners[l].onLayerChanged) {
+			this._listeners[l].onLayerChanged(this, layer);
+		}
 	}
-};
-
-gm.Level.prototype.readState = function(state) {
-	var entities = this._entities,
-		elength = entities.length;
-	for (var e = 0; e < elength; e++) {
-		entities[e].readState(state[entities[e]._tag]);
-	}
-};
-
-gm.Level.prototype.onLayerChanged = function() {
 	this.onLevelChanged();
 };
 
@@ -68,10 +61,11 @@ gm.Level.prototype.clearLevel = function() {
 
 gm.Level.prototype.addNewLayer = function(params, callback) {
 	var level = this;
-	gm.Layer.Model.createLayer(params, function(layer) {
-		level.addLayer(layer);
+	var layer = gm.Layer.Model.createLayer(params, function(layer) {
 		if (callback) callback(layer);
 	});
+	level.addLayer(layer);
+	return layer;
 };
 
 gm.Level.prototype.addLayer = function(layer) {
@@ -81,7 +75,13 @@ gm.Level.prototype.addLayer = function(layer) {
 		level._collisionLayers.push(layer);
 	}
 	layer.listener = level;
-	if (LOGGING) console.log("added layer", layer.name);
+	if (LOGGING) console.log("added layer", layer._name);
+	
+	for (var l = 0; l < level._listeners.length; l++) {
+		if (level._listeners[l].onLayerAdded) {
+			level._listeners[l].onLayerAdded(level, layer);
+		}
+	}
 	level.onLevelChanged();
 };
 
@@ -97,7 +97,9 @@ gm.Level.prototype.updateLayer = function(layer, params, callback) {
 		} else if (!layer._isCollision && coli >= 0) {
 			level._collisionLayers.splice(coli, 1);
 		}
-		if (layers.indexOf(layer) >= 0) level.onLevelChanged();
+		if (layers.indexOf(layer) >= 0) {
+			level.onLayerChanged(layer);
+		}
 		if (callback) callback();
 	});
 };
@@ -121,14 +123,21 @@ gm.Level.prototype.removeLayer = function(layer) {
 		if (coli >= 0) collisionLayers.splice(coli, 1);
 	}
 
-	if (LOGGING) console.log("removed layer", layer.name);
+	if (LOGGING) console.log("removed layer", layer._name);
+	
+	for (var l = 0; l < level._listeners.length; l++) {
+		if (level._listeners[l].onLayerRemoved) {
+			level._listeners[l].onLayerRemoved(level, layer);
+		}
+	}
+	
 	level.onLevelChanged();
 };
 
 gm.Level.prototype.findLayerByName = function(name) {
 	var layers = this._layers;
 	for (var i = 0; i < layers.length; i++) {
-		if (layers[i].name === name) return layers[i];
+		if (layers[i]._name === name) return layers[i];
 	}
 };
 
@@ -150,14 +159,18 @@ gm.Level.prototype.addEntity = function(entity, layer) {
 		entities.push(entity);
 		layer.addEntity(entity);
 		this._entityLayers[entity._tag] = layer;
-		if (LOGGING) console.log("added entity", entity.name, "to", layer.name);
+		if (LOGGING) console.log("added entity", entity._name, "to", layer._name);
 	}
+};
+
+gm.Level.prototype.getLayerForEntity = function(entity) {
+	return this._entityLayers[entity._tag];
 };
 
 gm.Level.prototype.removeEntity = function(entity) {
 	var entities = this._entities;
 	
-	var layer = this._entityLayers[entity];
+	var layer = this._entityLayers[entity._tag];
 	if (layer) layer.removeEntity(entity);
 	this._entityLayers[entity._tag] = undefined;
 
@@ -165,22 +178,22 @@ gm.Level.prototype.removeEntity = function(entity) {
 	if (i >= 0) {
 		entities.splice(i, 1);
 	}
-	if (LOGGING) console.log("removed entity", entity.name);
+	if (LOGGING) console.log("removed entity", entity._name);
 };
 
 gm.Level.prototype.moveEntityToLayer = gm.Level.prototype.onEntityLayerChanged = 
 	function(entity, toLayer) {
-	var fromLayer = this._entityLayers[entity];
+	var fromLayer = this._entityLayers[entity._tag];
 	if (fromLayer) fromLayer.removeEntity(entity);
 	toLayer.addEntity(entity);
 	this._entityLayers[entity._tag] = toLayer;
-	if (LOGGING) console.log("moved entity", entity.name, "to", toLayer.name);
+	if (LOGGING) console.log("moved entity", entity._name, "to", tolayer._name);
 };
 
 gm.Level.prototype.findEntityByName = function(name) {
 	var entities = this._entities;
 	for (var i = 0; i < entities.length; i++) {
-		if (entities[i].name === name) return entities[i];
+		if (entities[i]._name === name) return entities[i];
 	}
 };
 

@@ -15,27 +15,27 @@ gm.Controllers.Player.prototype.setParams = function(params) {
 	if (params.float !== undefined) this._floatParams = params.float;
 };
 
-gm.Controllers.Player.prototype.initWithGame = function(gameManager) {
+gm.Controllers.Player.prototype.initWithGame = function(gameObserver) {
 	if (LOGGING) {
 		console.log("player - init with game");
 	}
-	gameManager.addListener(this);
+	gameObserver.addListener(this);
 };
 
 gm.Controllers.Player.prototype.onBodyChanged = function() {
 	if (this._behavior) this._behavior.setBody(this._entity._body);
 };
 
-gm.Controllers.Player.prototype.onEntityAddedToLevel = function(entity, level, levelManager) {
+gm.Controllers.Player.prototype.onEntityAddedToLevel = function(entity, level, levelObserver) {
 	if (entity === this._entity) {
-		levelManager.addListener(this);
+		levelObserver.addListener(this);
 		this._initWithLevel(level);
 	}
 };
 
-gm.Controllers.Player.prototype.onEntityRemovedFromLevel = function(entity, level, levelManager) {
+gm.Controllers.Player.prototype.onEntityRemovedFromLevel = function(entity, level, levelObserver) {
 	if (entity === this._entity) {
-		levelManager.removeListener(this);
+		levelObserver.removeListener(this);
 		this._behavior = undefined;
 	}
 };

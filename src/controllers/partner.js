@@ -1,8 +1,8 @@
 if (!gm.Controllers) gm.Controllers = {};
 
-gm.Controllers.Partner = function(entity, params) {
+gm.Controllers.Partner = function(entity, params, aiParams) {
 	gm.Controllers.Player.call(this, entity, params);
-	this._agent = new gm.Ai.Agent(entity, this._camera);
+	this._agent = new gm.Ai.Agent(entity, this._camera, aiParams);
 };
 
 gm.Controllers.Partner.prototype = Object.create(gm.Controllers.Player.prototype);

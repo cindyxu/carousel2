@@ -1,4 +1,5 @@
 html
+	
 	head
 		link(href="/reset.css", rel="stylesheet")
 		link(href="/style.css", rel="stylesheet")
@@ -15,13 +16,14 @@ html
 		include ./partials/partner.jade
 
 		script(src="/src/init.js")
+
 	body
 		#container
 			#level
-				label load
-				input
-				label write
-				input
+				input#load-file-input
+				a.button#load-file-button load
+				textarea#save-file-json-textarea
+				a.button#save-file-button save
 			#editor
 				#layer-section
 					h1 layers

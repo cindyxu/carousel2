@@ -11,7 +11,7 @@ gm.Layer = function() {
 
 		var layer = this;
 
-		layer.name = name;
+		layer._name = name;
 
 		layer._entities = [];
 		layer._entitiesNeedSort = false;
@@ -45,7 +45,7 @@ gm.Layer = function() {
 	};
 
 	Layer.prototype.onChanged = function() {
-		if (this.listener) this.listener.onLayerChanged();
+		if (this.listener) this.listener.onLayerChanged(this);
 	};
 
 	Layer.prototype.setParams = function(params) {

@@ -1,6 +1,4 @@
 $(function() {
-	var editor = gm.Editor;
-
 	var $body = $("body");
 	var $layerList = $("#layer-list");
 
@@ -32,6 +30,11 @@ $(function() {
 	var $addEntityButton = $("#add-entity");
 	var $updateEntityButton = $("#update-entity");
 
+	var $loadFileInput = $("#load-file-input");
+	var $loadFileButton = $("#load-file-button");
+	var $saveFileButton = $("#save-file-button");
+	var $saveFileJSONTextarea = $("#save-file-json-textarea");
+
 	var flashBody = function(success) {
 		if (success) {
 			$body.css("background-color", "#ffffff");
@@ -48,19 +51,20 @@ $(function() {
 		$entry.attr("data-layer-tag", layer._tag);
 
 		var $p = $("<p>");
-		$p.html(layer.name + " - " + layer._tag);
+		$p.html(layer._name + " - " + layer._tag);
 		
 		$entry.append($p);
 		return $entry;
 	};
 
 	var refreshSelectedLayer = function() {
-		var layer = editor._layer;
+		var layer = gm.Editor.GameEditor._layer;
 		$("#layer-list li.selected").removeClass("selected");
-		var $entry = $("[data-layer-tag='" + layer._tag + "']");
-		$entry.addClass("selected");
-
-		fillParamsForLayer(layer);
+		if (layer) {
+			var $entry = $("[data-layer-tag='" + layer._tag + "']");
+			$entry.addClass("selected");
+			fillParamsForLayer(layer);
+		}
 	};
 
 	var fillParamsForLayer = function(layer) {
@@ -130,7 +134,7 @@ $(function() {
 	var refreshLayerList = function() {
 		$layerList.empty();
 
-		var layers = editor._level._layers;
+		var layers = gm.Editor.GameEditor._level._layers;
 		for (var l = 0; l < layers.length; l++) {
 			$layerList.append(createLayerListEntry(layers[l]));
 		}
@@ -141,7 +145,7 @@ $(function() {
 		$entry.attr("data-entity-tag", entity._tag);
 
 		var $p = $("<p>");
-		$p.html(entity.name + " - " + entity._tag);
+		$p.html(entity._name + " - " + entity._tag);
 		
 		$entry.append($p);
 		return $entry;
@@ -150,28 +154,71 @@ $(function() {
 	var refreshEntityList = function() {
 		$entityList.empty();
 
-		var entities = editor._level._entities;
+		var entities = gm.Editor.GameEditor._level._entities;
 		for (var e = 0; e < entities.length; e++) {
 			$entityList.append(createEntityListEntry(entities[e]));
 		}
 	};
 
 	var refreshSelectedEntity = function() {
-		var entity = editor._entity;
-		$entityClassNameInput.val(entity.className);
-		$entityNameInput.val(entity.name);
+		var entity = gm.Editor.GameEditor._entity;
+		if (entity) {
+			$entityClassNameInput.val(entity._className);
+			$entityNameInput.val(entity._name);
+		}
 	};
 
+	gm.Editor.GameEditor.addListener({
+
+		onActiveLevelChanged: function() {
+			refreshLayerList();
+			refreshSelectedLayer();
+			refreshEntityList();
+			refreshSelectedEntity();
+		},
+
+		onLayerSelected: function() {
+			refreshSelectedLayer();
+		},
+
+		onLayerChanged: function() {
+			refreshLayerList();
+			refreshSelectedLayer();
+		},
+
+		onLayerAdded: function() {
+			refreshLayerList();
+			refreshSelectedLayer();
+		},
+
+		onLayerRemoved: function() {
+			refreshLayerList();
+			refreshSelectedLayer();
+		},
+
+		onEntityAdded: function() {
+			refreshEntityList();
+			refreshSelectedEntity();	
+		},
+
+		onEntitySelected: function() {
+			refreshSelectedEntity();
+		},
+
+		onEntityRemoved: function() {
+			refreshEntityList();
+			refreshSelectedEntity();
+		}
+	});
+
 	$("#layer-list").on("click", "li", function() {
-		var layer = editor._level.findLayerByTag(parseInt($(this).attr("data-layer-tag")));
-		gm.Editor.selectLayer(layer);
-		refreshSelectedLayer();
+		var layer = gm.Editor.GameEditor._level.findLayerByTag(parseInt($(this).attr("data-layer-tag")));
+		gm.Editor.GameEditor.selectLayer(layer);
 	});
 
 	$("#entity-list li").on("click", function() {
-		var entity = editor._level._entities[entity];
-		gm.Editor.selectEntity(entity);
-		refreshSelectedEntity();
+		var entity = gm.Editor.GameEditor._level._entities[entity];
+		gm.Editor.GameEditor.selectEntity(entity);
 	});
 
 	$layerCollisionCheckbox.change(function() {
@@ -185,15 +232,9 @@ $(function() {
 
 		var params = gatherLayerParams();
 		
-		gm.Editor.addNewLayer(params, function(layer) {
-			if (!layer) return flashBody(false);
-
-			refreshLayerList();
-			editor.selectLayer(layer);
-			refreshSelectedLayer();
-			flashBody(true);	
-		});
-		
+		var layer = gm.Editor.GameEditor.addNewLayer(params);
+		gm.Editor.GameEditor.selectLayer(layer);
+		return flashBody(layer);
 	});
 
 	$updateLayerButton.click(function(e) {
@@ -202,12 +243,7 @@ $(function() {
 
 		var params = gatherLayerParams();
 
-		editor.updateLayer(editor._layer, params, function(success) {
-			if (!success) return flashBody(false);
-
-			refreshSelectedLayer();
-			flashBody(true);
-		});
+		return (gm.Editor.GameEditor.updateLayer(gm.Editor.GameEditor._layer, params));
 	});
 
 	$removeLayerButton.click(function(e) {
@@ -222,14 +258,33 @@ $(function() {
 		var name = $entityNameInput.val();
 		var className = $entityClassNameInput.val();
 
-		editor.addNewEntity(className, name, function(entity) {
-			if (!entity) return flashBody(false);
-			
-			refreshEntityList();
-			editor.selectEntity(entity);
-			refreshSelectedEntity();
+		var entity = gm.Editor.GameEditor.addNewEntity(className, name);
+		gm.Editor.GameEditor.selectEntity(entity);
+		flashBody(entity);
+	});
+
+	$loadFileButton.click(function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		
+		var filename = $loadFileInput.val();
+		
+		gm.Editor.GameEditor.loadLevel(filename, function() {
 			flashBody(true);
 		});
+	});
+
+	$saveFileButton.click(function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		var json = gm.Store.Level.toJSON(gm.Editor.GameEditor._level);
+		// too lazy to set up a server so we just dump into console and save text manually
+		// +++++++++++++
+		if (json) {
+			var jsonString = JSON.stringify(json);
+			$saveFileJSONTextarea.val(jsonString);
+			flashBody(true);
+		}
 	});
 
 });

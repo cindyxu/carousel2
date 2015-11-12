@@ -1,67 +1,92 @@
-gm.Editor._renderer = function(editor) {
+gm.Editor.Renderer = function() {
 
-	var renderer = {};
+	var Renderer = function(editor) {
+		this._editor = editor;
+		this._mapRenderers = {};
+		this._entityRenderers = {};
 
-	var mapRenderers = {};
-	var entityRenderers = {};
+		this._tbbox = {};
 
-	var tbbox = {};
+		this._editor.addListener(this);
+	};
 
-	var renderLayerDebug = function(layer, ctx, bbox) {
+	Renderer.prototype._renderLayerDebug = function(layer, ctx, bbox) {
 		ctx.save();
 
-		layer.transformBboxToLocalSpace(bbox, tbbox);
+		layer.transformBboxToLocalSpace(bbox, this._tbbox);
 		
-		renderLayerMapDebug(layer, ctx, tbbox);
+		this._renderLayerMapDebug(layer, ctx, this._tbbox);
 		for (var e = 0; e < layer._entities.length; e++) {
-			renderEntityDebug(layer._entities[e], ctx, tbbox);
+			this._renderEntityDebug(layer._entities[e], ctx, this._tbbox);
 		}
 		
 		ctx.restore();
 	};
 
-	var renderLayerMapDebug = function(layer, ctx, bbox) {
-		mapRenderers[layer._tag].render(ctx, layer._layerMap._px, layer._layerMap._py, bbox);
+	Renderer.prototype._renderLayerMapDebug = function(layer, ctx, bbox) {
+		this._mapRenderers[layer._tag].render(ctx, layer._layerMap._px, layer._layerMap._py, bbox);
 	};
 
-	var renderEntityDebug = function(entity, ctx, bbox) {
-		entityRenderers[entity._tag].render(ctx, entity._body._x - bbox.x0, entity._body._y - bbox.y0);
+	Renderer.prototype._renderEntityDebug = function(entity, ctx, bbox) {
+		this._entityRenderers[entity._tag].render(ctx, entity._body._x - bbox.x0, entity._body._y - bbox.y0);
 	};
 
-	renderer.init = function() {
-	};
-
-	renderer.render = function(ctx, bbox) {
-		var level = editor._level;
+	Renderer.prototype.render = function(ctx, bbox) {
+		var level = this._editor._level;
+		if (!level) return;
 		var layers = level._layers;
 		for (var l = 0; l < layers.length; l++) {
-			renderLayerDebug(layers[l], ctx, bbox);
+			this._renderLayerDebug(layers[l], ctx, bbox);
 		}
 	};
 
-	renderer.onGameCleared = function() {
-		mapRenderers = {};
-		entityRenderers = {};
+	Renderer.prototype.onActiveLevelChanged = function() {
+		this._mapRenderers = {};
+		this._entityRenderers = {};
+
+		var level = this._editor._level;
+		if (!level) return;
+		
+		var layers = level._layers;
+		for (var l = 0; l < layers.length; l++) {
+			this.onLayerAdded(layers[l]);
+		}
+		
+		var entities = level._entities;
+		for (var e = 0; e < entities.length; e++) {
+			this.onEntityAdded(entities[e]);
+		}
 	};
 
-	renderer.onLayerParamsChanged = function(layer) {
-		mapRenderers[layer._tag] = new gm.Debug.Renderer.Map.Frame(layer._layerMap._map, {
+	Renderer.prototype.onLayerAdded = function(layer) {
+		this._mapRenderers[layer._tag] = new gm.Debug.Renderer.Map.Frame(layer._layerMap._map, {
 			strokeStyle: gm.Settings.Editor.colors.MAP
 		});
 	};
 
-	renderer.onEntityChanged = function(entity) {
-		entityRenderers[entity._tag] = new gm.Debug.Renderer.Entity.Frame(entity._body);
+	Renderer.prototype.onLayerParamsChanged = function(layer) {
+		this._mapRenderers[layer._tag] = new gm.Debug.Renderer.Map.Frame(layer._layerMap._map, {
+			strokeStyle: gm.Settings.Editor.colors.MAP
+		});
 	};
 
-	renderer.onLayerRemoved = function(layer) {
-		mapRenderers[layer._tag] = undefined;
+	Renderer.prototype.onLayerRemoved = function(layer) {
+		this._mapRenderers[layer._tag] = undefined;
 	};
 
-	renderer.onEntityRemoved = function(entity) {
-		entityRenderers[entity._tag] = undefined;
+	Renderer.prototype.onEntityAdded = function(entity) {
+		console.log("on entity added???");
+		this._entityRenderers[entity._tag] = new gm.Debug.Renderer.Entity.Frame(entity._body);
 	};
 
-	return renderer;
+	Renderer.prototype.onEntityChanged = function(entity) {
+		this._entityRenderers[entity._tag] = new gm.Debug.Renderer.Entity.Frame(entity._body);
+	};
 
-}(gm.Editor);
+	Renderer.prototype.onEntityRemoved = function(entity) {
+		this._entityRenderers[entity._tag] = undefined;
+	};
+
+	return Renderer;
+
+}();
