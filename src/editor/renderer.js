@@ -75,7 +75,6 @@ gm.Editor.Renderer = function() {
 	};
 
 	Renderer.prototype.onEntityAdded = function(entity) {
-		console.log("on entity added???");
 		this._entityRenderers[entity._tag] = new gm.Debug.Renderer.Entity.Frame(entity._body);
 	};
 

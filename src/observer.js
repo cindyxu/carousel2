@@ -42,12 +42,10 @@ gm.Game.Observer = function() {
 	};
 
 	GameObserver.prototype.onLevelAddedToGame = function(level) {
-		console.log("on level added to game?");
 		this._levelManagerMap[level._tag] = new LevelObserver(level);
 	};
 
 	GameObserver.prototype.onEntityAddedToLevel = function(entity, level) {
-		console.log("on entity added to level?");
 		for (var i = 0; i < this._listeners.length; i++) {
 			if (this._listeners[i].onEntityAddedToLevel) {
 				this._listeners[i].onEntityAddedToLevel(entity, level, this._levelManagerMap[level._tag]);

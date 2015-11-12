@@ -85,12 +85,13 @@ gm.Game = function() {
 
 	Game.prototype.addNewEntity = function(className, name, level, layer, callback) {
 		var game = this;
-		return gm.Entity.Model.createEntity(className, name, function(entity) {
-			game._registerEntity(entity);
-			level.addEntity(entity, layer);
+		var entity = gm.Entity.Model.createEntity(className, name, function(entity) {
 			if (callback) callback(entity);
-			game._onEntityAddedToLevel(entity, level, layer);
 		});
+		level.addEntity(entity, layer);
+		game._registerEntity(entity);
+		game._onEntityAddedToLevel(entity, level, layer);
+		return entity;
 	};
 
 	Game.prototype.moveEntityToLevel = function(entity, level, layer) {
@@ -127,16 +128,18 @@ gm.Game = function() {
 
 		if (this._levels.indexOf(level) < 0) {
 			this._levels.push(level);
-			for (var l = 0; l < level._layers.length; l++) {
-				var layer = level._layers[l];
-				for (var e = 0; e < layer._entities.length; e++) {
-					this._onEntityAddedToLevel(layer._entities[e], level, layer);
-				}
-			}
 			level.addListener(this);
 			for (var i = 0; i < this._listeners.length; i++) {
 				if (this._listeners[i].onLevelAddedToGame) {
 					this._listeners[i].onLevelAddedToGame(level);
+				}
+			}
+			for (var l = 0; l < level._layers.length; l++) {
+				var layer = level._layers[l];
+				for (var e = 0; e < layer._entities.length; e++) {
+					var entity = layer._entities[e];
+					this._registerEntity(entity);
+					this._onEntityAddedToLevel(entity, level, layer);
 				}
 			}
 		}

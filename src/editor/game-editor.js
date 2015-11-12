@@ -45,7 +45,6 @@ gm.Editor.GameEditor = function() {
 			},
 
 			onActiveLevelChanged: function(level) {
-				console.log("on active level changed???");
 				editor._onActiveLevelChanged(level);
 			}
 		};
