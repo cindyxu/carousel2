@@ -12,15 +12,15 @@ gm.EntityClasses.Door = function() {
 
 	var entityParams = {
 		collideBodyType: gm.Constants.Collision.bodyTypes.NONE,
-		collideMapType: gm.Constants.Collision.mapTypes.STICKY,
+		collideMapType: gm.Constants.Collision.mapTypes.NONE,
 		drawIndex: -99
 	};
 
-	var Partner = function(name) {
+	var Door = function(name) {
 		var body = new gm.Body(bodyParams);
 		//var renderer = new gm.Renderer.EntitySprite(body, sprite);
 		var entity = new gm.Entity(name, entityParams);
-		var controller = new gm.Controllers.Partner(entity, controllerParams, aiParams);
+		var controller = new gm.Controllers.Door(entity, controllerParams, aiParams);
 		entity.setBody(body);
 		//entity.setRenderer(renderer);
 		entity.setController(controller);
@@ -28,6 +28,6 @@ gm.EntityClasses.Door = function() {
 		return entity;
 	};
 
-	return Partner;
+	return Door;
 	
 }();

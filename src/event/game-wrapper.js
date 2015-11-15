@@ -8,15 +8,35 @@ gm.Event.GameWrapper = function() {
 
 	};
 
-	GameWrapper.prototype.overrideEntityBehavior = function(entityName, behavior) {
+	GameWrapper.prototype.createEntity = function(EntityClass, name, x, y) {
 
 	};
 
-	GameWrapper.prototype.overrideEntityController = function(entityName, controller) {
+	GameWrapper.prototype.destroyEntity = function(entityName) {
 
 	};
 
-	GameWrapper.prototype.overrideEntitySpriteMapper = function(entityName, spriteMapper) {
+	GameWrapper.prototype.goToLevel = function(levelName) {
+
+	};
+
+	GameWrapper.prototype.overrideEntityBehavior = function(entityName, BehaviorFactory) { 
+
+	};
+
+	GameWrapper.prototype.overrideEntityController = function(entityName, ControllerFactory) {
+
+	};
+
+	GameWrapper.prototype.overrideEntitySpriteMapper = function(entityName, SpriteMapperFactory) {
+
+	};
+
+	GameWrapper.prototype.showDialogueBox = function(show) {
+
+	};
+
+	GameWrapper.prototype.startDialogue = function(dialogue) {
 
 	};
 
