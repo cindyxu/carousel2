@@ -9,6 +9,110 @@ gm.Editor.GameEditor = function() {
 		this._toolbox = new gm.Editor.Toolbox(this);
 	};
 
+	GameEditor.prototype.addNewLayer = function(params, callback) {
+		var level = this._level;
+		var editor = this;
+		var layer = level.addNewLayer(params, function(layer) {
+			if (callback) callback(layer);
+		});
+		return layer;
+	};
+
+	GameEditor.prototype.updateLayer = function(layer, params, callback) {
+		var level = this._level;
+		var editor = this;
+		level.updateLayer(layer, params, function() {
+			// force refresh
+			level.resolveLevelChange();
+			if (callback) callback(true);
+		});
+		for (var i = 0; i < this._listeners.length; i++) {
+			if (this._listeners[i].onLayerParamsChanged) {
+				this._listeners[i].onLayerParamsChanged(layer);
+			}
+		}
+		return true;
+	};
+
+	GameEditor.prototype.selectLayer = function(layer) {
+		this._layer = layer;
+		for (var i = 0; i < this._listeners.length; i++) {
+			if (this._listeners[i].onLayerSelected) {
+				this._listeners[i].onLayerSelected(layer);
+			}
+		}
+	};
+
+	GameEditor.prototype.selectEntity = function(entity) {
+		this._entity = entity;
+		for (var i = 0; i < this._listeners.length; i++) {
+			if (this._listeners[i].onEntitySelected) {
+				this._listeners[i].onEntitySelected(entity);
+			}
+		}
+	};
+
+	GameEditor.prototype.addNewEntity = function(className, name, callback) {
+		var level = this._level;
+		var layer = this._layer;
+		
+		if (!layer) {
+			if (callback) callback(); 
+			return;
+		}
+		var editor = this;
+		var entity = gm.Driver._game.addNewEntity(className, name, level, layer, function(entity) {
+			if (!entity) {
+				if (callback) callback(); 
+				return;
+			}
+			if (callback) callback(entity);
+		});
+		return entity;
+	};
+
+	GameEditor.prototype.playGame = function() {
+		gm.Driver._game.play();
+	};
+
+	GameEditor.prototype.pauseGame = function() {
+		gm.Driver._game.pause();
+	};
+
+	GameEditor.prototype.loadLevel = function(levelName, callback) {
+		gm.Driver.requestEnterLevel(levelName, callback);
+	};
+
+	GameEditor.prototype.update = function() {
+
+		if (gm.Driver._game._playing) {
+			if (gm.Input.pressed[gm.Settings.Editor.keyBinds.TOGGLE_PLAY]) {
+				this.pauseGame();
+			}
+			else return;
+		
+		} else {
+			if (gm.Input.pressed[gm.Settings.Editor.keyBinds.TOGGLE_PLAY]) {
+				this.playGame();
+				return;
+			}
+		}
+
+		if (this._layer) {
+			this._toolbox.action(gm.Driver._game._camera);
+		}
+	};
+
+	GameEditor.prototype.render = function(ctx) {
+		// if (gm.Driver._game._playing) return;
+
+		var camera = gm.Driver._game._camera;
+		var bbox = camera._body.getBbox();
+
+		this._renderer.render(ctx, bbox);
+		this._toolbox.render(ctx, camera);
+	};
+
 	GameEditor.prototype.init = function() {
 		var editor = this;
 
@@ -115,110 +219,6 @@ gm.Editor.GameEditor = function() {
 		if (this._listeners.indexOf(listener) < 0) {
 			this._listeners.push(listener);
 		}
-	};
-
-	GameEditor.prototype.addNewLayer = function(params, callback) {
-		var level = this._level;
-		var editor = this;
-		var layer = level.addNewLayer(params, function(layer) {
-			if (callback) callback(layer);
-		});
-		return layer;
-	};
-
-	GameEditor.prototype.updateLayer = function(layer, params, callback) {
-		var level = this._level;
-		var editor = this;
-		level.updateLayer(layer, params, function() {
-			// force refresh
-			level.resolveLevelChange();
-			if (callback) callback(true);
-		});
-		for (var i = 0; i < this._listeners.length; i++) {
-			if (this._listeners[i].onLayerParamsChanged) {
-				this._listeners[i].onLayerParamsChanged(layer);
-			}
-		}
-		return true;
-	};
-
-	GameEditor.prototype.selectLayer = function(layer) {
-		this._layer = layer;
-		for (var i = 0; i < this._listeners.length; i++) {
-			if (this._listeners[i].onLayerSelected) {
-				this._listeners[i].onLayerSelected(layer);
-			}
-		}
-	};
-
-	GameEditor.prototype.selectEntity = function(entity) {
-		this._entity = entity;
-		for (var i = 0; i < this._listeners.length; i++) {
-			if (this._listeners[i].onEntitySelected) {
-				this._listeners[i].onEntitySelected(entity);
-			}
-		}
-	};
-
-	GameEditor.prototype.addNewEntity = function(className, name, callback) {
-		var level = this._level;
-		var layer = this._layer;
-		
-		if (!layer) {
-			if (callback) callback(); 
-			return;
-		}
-		var editor = this;
-		var entity = gm.Driver._game.addNewEntity(className, name, level, layer, function(entity) {
-			if (!entity) {
-				if (callback) callback(); 
-				return;
-			}
-			if (callback) callback(entity);
-		});
-		return entity;
-	};
-
-	GameEditor.prototype.playGame = function() {
-		gm.Driver._game.play();
-	};
-
-	GameEditor.prototype.pauseGame = function() {
-		gm.Driver._game.pause();
-	};
-
-	GameEditor.prototype.loadLevel = function(levelName, callback) {
-		gm.Driver.requestEnterLevel(levelName, callback);
-	};
-
-	GameEditor.prototype.update = function() {
-
-		if (gm.Driver._game._playing) {
-			if (gm.Input.pressed[gm.Settings.Editor.keyBinds.TOGGLE_PLAY]) {
-				this.pauseGame();
-			}
-			else return;
-		
-		} else {
-			if (gm.Input.pressed[gm.Settings.Editor.keyBinds.TOGGLE_PLAY]) {
-				this.playGame();
-				return;
-			}
-		}
-
-		if (this._layer) {
-			this._toolbox.action(gm.Driver._game._camera);
-		}
-	};
-
-	GameEditor.prototype.render = function(ctx) {
-		// if (gm.Driver._game._playing) return;
-
-		var camera = gm.Driver._game._camera;
-		var bbox = camera._body.getBbox();
-
-		this._renderer.render(ctx, bbox);
-		this._toolbox.render(ctx, camera);
 	};
 
 	return new GameEditor();

@@ -49,7 +49,7 @@ gm.DialogueBox = function() {
 	};
 
 	_DialogueAnimator.prototype.update = function(dt) {
-
+		
 	};
 
 	_DialogueAnimator.prototype.render = function(ctx, offset) {
