@@ -11,8 +11,6 @@ gm.Renderer.SpriteEntity = function(body, sprite, params) {
 	renderer.sizeY = 0;
 	renderer.offsetX = 0;
 	renderer.offsetY = 0;
-	renderer.flipX = 0;
-	renderer.flipY = 0;
 
 	if (params) renderer.setParams(params);
 
@@ -44,9 +42,6 @@ gm.Renderer.SpriteEntity.prototype.setParams = function(params) {
 	
 	if (params.offsetX !== undefined) renderer.offsetX = params.offsetX;
 	if (params.offsetY !== undefined) renderer.offsetY = params.offsetY;
-	
-	if (params.flipX !== undefined) renderer.flipX = params.flipX;
-	if (params.flipY !== undefined) renderer.flipY = params.flipY;
 };
 
 gm.Renderer.SpriteEntity.prototype.render = function(ctx, x, y) {
@@ -57,10 +52,10 @@ gm.Renderer.SpriteEntity.prototype.render = function(ctx, x, y) {
 	if (!renderer._ires || !sprite.anim) return;
 
 	var targetFrame = sprite._anim.frames[sprite._frame];
-	renderer.renderInternal(ctx, x, y, targetFrame, body._sizeX, body._sizeY);
+	renderer.renderInternal(ctx, x, y, targetFrame, body._sizeX, body._sizeY, sprite.flipX, sprite.flipY);
 };
 
-gm.Renderer.SpriteEntity.prototype.renderInternal = function(ctx, x, y, rframe, containerX, containerY) {
+gm.Renderer.SpriteEntity.prototype.renderInternal = function(ctx, x, y, rframe, containerX, containerY, flipX, flipY) {
 	var renderer = this;
 
 	var numFramesX = Math.floor(renderer.image.width / renderer.sizeX);
@@ -70,13 +65,13 @@ gm.Renderer.SpriteEntity.prototype.renderInternal = function(ctx, x, y, rframe, 
 
 	ctx.save();
 
-	if (renderer.flipX) {
+	if (flipX) {
 		ctx.translate(Math.round(x + containerX - renderer.offsetX), 0);
 		ctx.scale(-1, 1);
 	}
 	else ctx.translate(Math.round(x+renderer.offsetX), 0);
 
-	if (renderer.flipY) {
+	if (flipY) {
 		ctx.translate(0, Math.round(y + containerY - renderer.offsetY));
 		ctx.scale(1, -1);
 	}

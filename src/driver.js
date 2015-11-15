@@ -21,6 +21,11 @@ gm.Driver = function() {
 		this._game = new gm.Game();
 		this._game.init();
 
+		this._dialogueBox = new gm.DialogueBox(undefined, gm.Settings.Game.WIDTH);
+
+		this._eventManager = new gm.Event.Manager(this);
+		this._eventRunning = false;
+
 		this._levelQueue = [];
 		this._listeners = [];
 
@@ -33,10 +38,19 @@ gm.Driver = function() {
 			}
 			if (callback) callback();
 		});
+
+		this._lastTime = -1;
 	};
 
 	Driver.update = function() {
-		this._game.update();
+		if (this._lastTime < 0) this._lastTime = Date.now();
+
+		var time = Date.now();
+		var deltaTime = time - this._lastTime;
+		
+		this._game.update(deltaTime);
+		
+		this._lastTime = time;
 	};
 
 	Driver.render = function(ctx) {
@@ -69,6 +83,15 @@ gm.Driver = function() {
 		});
 
 		if (!queueStarted) Driver._loadNextLevelInQueue();
+	};
+
+	Driver.requestStartEvents = function() {
+		this._eventRunning = true;
+		return true;
+	};
+
+	Driver.onEventsFinished = function() {
+		this._eventRunning = false;
 	};
 
 	Driver._onLevelLoaded = function(level, callback) {

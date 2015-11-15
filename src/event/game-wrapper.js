@@ -1,6 +1,6 @@
 gm.Event.GameWrapper = function() {
 
-	var GameWrapper = function(game) {
+	var GameWrapper = function(driver) {
 
 	};
 
@@ -33,17 +33,19 @@ gm.Event.GameWrapper = function() {
 	};
 
 	GameWrapper.prototype.showDialogueBox = function(show) {
-
+		driver._dialogueBox.show(show);
 	};
 
-	GameWrapper.prototype.startDialogue = function(dialogue) {
-
+	GameWrapper.prototype.startDialogue = function(dialogueJSON, callback) {
+		driver._dialogueBox.startDialogue(dialogueJSON, callback);
 	};
 
 	GameWrapper.prototype.revertOverrides = function() {
 
 	};
 
+	return GameWrapper;
+
 	// etc. let's create these functions as needed
 
-};
+}();

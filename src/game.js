@@ -15,6 +15,7 @@ gm.Game = function() {
 		this._height = gm.Settings.Game.HEIGHT;
 		this._tickStep = gm.Settings.Game.TICKSTEP;
 		this._maxTicks = gm.Settings.Game.MAX_TICKS;
+		this._elapsed = 0;
 
 		this._listeners = [];
 		this._registeredEntities = {};
@@ -29,12 +30,12 @@ gm.Game = function() {
 			sizeY: this._height
 		});
 
-		this._lastRunTime = this._currentTime = Date.now();
+		this._elapsed = 0;
 	};
 
 	Game.prototype.play = function() {
 		this._playing = true;
-		this._lastRunTime = this._currentTime = Date.now();
+		this._elapsed = 0;
 		if (LOGGING) console.log("Game is playing");
 	};
 
@@ -43,15 +44,13 @@ gm.Game = function() {
 		if (LOGGING) console.log("Game is paused");
 	};
 
-	Game.prototype.update = function() {
+	Game.prototype.update = function(delta) {
 		if (!this._playing) return;
 
-		var now = Date.now();
+		this._elapsed += delta;
 
 		var targetTicks = Math.min(this._maxTicks, 
-			Math.floor((now - this._lastRunTime) / this._tickStep));
-
-		var currentTime = this._currentTime;
+			Math.floor(this._elapsed / this._tickStep));
 
 		var level = this._activeLevel;
 		level.preUpdate();
@@ -59,14 +58,11 @@ gm.Game = function() {
 		for (var i = 0; i < targetTicks; i++) {
 			level.updateStep(this._tickStep, X);
 			level.updateStep(this._tickStep, Y);
-			currentTime += this._tickStep;
+			this._elapsed -= this._tickStep;
 		}
 
-		var deltaTime = currentTime - this._lastRunTime;
+		var deltaTime = this._tickStep * targetTicks;
 		level.postUpdate(deltaTime);
-
-		this._currentTime += this._tickStep * targetTicks;
-		this._lastRunTime = this._currentTime;
 	};
 
 	Game.prototype.render = function(ctx) {

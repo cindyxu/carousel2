@@ -20,7 +20,7 @@ gm.EntityClasses.Door = function() {
 		var body = new gm.Body(bodyParams);
 		//var renderer = new gm.Renderer.EntitySprite(body, sprite);
 		var entity = new gm.Entity(name, entityParams);
-		var controller = new gm.Controllers.Door(entity, controllerParams, aiParams);
+		var controller = new gm.Controllers.Door(entity, controllerParams);
 		entity.setBody(body);
 		//entity.setRenderer(renderer);
 		entity.setController(controller);

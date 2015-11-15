@@ -7,6 +7,9 @@ gm.Sprite = function(anims) {
 	sprite._loopCount = 0;
 	sprite._running = true;
 	sprite._anims = anims;
+	
+	sprite.flipX = false;
+	sprite.flipY = false;
 };
 
 gm.Sprite.prototype.update = function(delta) {

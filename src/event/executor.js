@@ -1,26 +1,13 @@
 gm.Event.Executor = function() {
 
-	var EventExecutor = function(event) {
-		this._nodeExecutors = [];
-		this._currentNodeExecutors = [];
-		var i;
-
-		for (i = 0; i < event._nodes.length; i++) {
-			this._nodeExecutors.push(new _EventNodeExecutor(event._nodes[i]));
-		}
+	var createEventRunner = function() {
 		
-		for (i = 0; i < event._nodeMapping.length; i++) {
-			var mapping = event._nodeMapping[i];
-			for (var j = 0; j < mapping.length; j++) {
-				this._nodeExecutors[i]._addParentExecutor(this._nodeExecutors[j]);
-				this._nodeExecutors[j]._addChildExecutor(this._nodeExecutors[i]);
-			}
-		}
 	};
 
-	var _EventNodeExecutor = function(node) {
-		this._node = node;
-		this._delayLeft = this._node._delay;
+	var _EventNodeExecutor = function(nodeJSON, gameWrapper) {
+		this._delayLeft = nodeJSON.delay;
+		this._runner = createEventRunner(nodeJSON.instruction, gameWrapper);
+		
 		this._finished = false;
 		this._childExecutors = [];
 		this._parentsRemaining = 0;
@@ -32,11 +19,11 @@ gm.Event.Executor = function() {
 		if (this._delayLeft > 0) {
 			this._delayLeft -= delta;
 			if (this._delayLeft <= 0) {
-				this._node._runner.start();
+				this._runner.start();
 			}
 		}
 		if (this._delayLeft <= 0) {
-			if (this._node._runner.run()) {
+			if (this._runner.run()) {
 				this._finished = true;
 			}
 		}
@@ -50,6 +37,24 @@ gm.Event.Executor = function() {
 
 	_EventNodeExecutor._addChildExecutor = function(childExecutor) {
 		this._childExecutors.push(child);
+	};
+
+	var EventExecutor = function(eventJSON, gameWrapper) {
+		this._nodeExecutors = [];
+		this._currentNodeExecutors = [];
+		var i;
+
+		for (i = 0; i < eventJSON.nodes.length; i++) {
+			this._nodeExecutors.push(new _EventNodeExecutor(eventJSON.nodes[i], gameWrapper));
+		}
+		
+		for (i = 0; i < eventJSON.nodeMapping.length; i++) {
+			var mapping = eventJSON.nodeMapping[i];
+			for (var j = 0; j < mapping.length; j++) {
+				this._nodeExecutors[i]._addParentExecutor(this._nodeExecutors[j]);
+				this._nodeExecutors[j]._addChildExecutor(this._nodeExecutors[i]);
+			}
+		}
 	};
 
 	EventExecutor.prototype.update = function(delta) {
@@ -73,7 +78,7 @@ gm.Event.Executor = function() {
 	EventExecutor.prototype._onNodeExecutionFinished = function(nodeExecutor) {
 		this._currentNodeExecutors.splice(this._currentNodeExecutors.indexOf(nodeExecutor), 1);
 		
-		var mapping = this._event._nodeMapping[nodeExecutor._node._tag];
+		var mapping = this._event.nodeMapping[nodeExecutor._node._tag];
 		for (var j = 0; j < mapping.length; j++) {
 			var childExecutor = this._nodeExecutors[mapping[j]];
 			if (childExecutor.onParentFinished(nodeExecutor)) {
@@ -83,4 +88,4 @@ gm.Event.Executor = function() {
 	};
 
 	return EventExecutor;
-};
+}();
