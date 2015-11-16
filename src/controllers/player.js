@@ -26,6 +26,10 @@ gm.Controllers.Player.prototype.onBodyChanged = function() {
 	if (this._behavior) this._behavior.setBody(this._entity._body);
 };
 
+gm.Controllers.Player.prototype.onSpriteChanged = function() {
+	if (this._spriteMapper) this._spriteMapper.setSprite(this._entity._sprite);
+};
+
 gm.Controllers.Player.prototype.onEntityAddedToLevel = function(entity, level, levelObserver) {
 	if (entity === this._entity) {
 		levelObserver.addListener(this);
@@ -46,6 +50,7 @@ gm.Controllers.Player.prototype.onLevelChanged = function(level) {
 
 gm.Controllers.Player.prototype.control = function() {
 	this._behavior.control(gm.Input);
+	this._spriteMapper.update();
 };
 
 gm.Controllers.Player.prototype.post = function() {
@@ -56,9 +61,10 @@ gm.Controllers.Player.prototype._initWithLevel = function(level) {
 	if (level._gravity !== 0) {
 		this._entity._body.setParams(this._walkParams.body);
 		this._behavior = new gm.Behaviors.Walker(this._walkParams.behavior, this._entity._body);
+		this._spriteMapper = new gm.SpriteMapper.Walker(this._behavior, this._entity._sprite);
 	} else {
 		this._entity._body.setParams(this._floatParams.body);
 		this._behavior = new gm.Behaviors.Floater(this._floatParams.behavior, this._entity._body);
+		this._spriteMapper = new gm.SpriteMapper.Floater(this._behavior, this._entity._sprite);
 	}
-	if (this._entity._body) this._behavior.setBody(this._entity._body);
 };

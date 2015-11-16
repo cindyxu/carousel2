@@ -61,8 +61,7 @@ gm.Game = function() {
 			this._elapsed -= this._tickStep;
 		}
 
-		var deltaTime = this._tickStep * targetTicks;
-		level.postUpdate(deltaTime);
+		level.postUpdate(delta);
 	};
 
 	Game.prototype.render = function(ctx) {

@@ -230,19 +230,19 @@ gm.Level.prototype.preUpdate = function() {
 	}
 };
 
-gm.Level.prototype.postUpdate = function() {
+gm.Level.prototype.postUpdate = function(delta) {
 	var level = this,
 		entities = level._entities;
 
 	var elength = entities.length;
 	for (var e = 0; e < elength; e++) {
-		entities[e].postUpdate();
+		entities[e].postUpdate(delta);
 		gm.EntityPhysics.postUpdate(entities[e]);
 	}
 
 	for (var l = 0; l < this._listeners.length; l++) {
 		if (this._listeners[l].onPostUpdate) {
-			this._listeners[l].onPostUpdate();
+			this._listeners[l].onPostUpdate(delta);
 		}
 	}
 };

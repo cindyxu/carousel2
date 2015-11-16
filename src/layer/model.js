@@ -1,6 +1,6 @@
 gm.Layer.Model = {};
 
-gm.Layer.Model.assignLayerMapRenderer = function(layerMap, params, callback) {
+gm.Layer.Model._assignLayerMapRenderer = function(layerMap, params, callback) {
 	var renderer;
 
 	var onRendererPrepared = function() {
@@ -32,12 +32,12 @@ gm.Layer.Model.createLayer = function(params, callback) {
 	var layer = new gm.Layer(params.name, layerMap, params);
 
 	if (callback) {
-		gm.Layer.Model.assignLayerMapRenderer(layerMap, params, function() {
+		gm.Layer.Model._assignLayerMapRenderer(layerMap, params, function() {
 			callback(layer);
 		});
 
 	} else {
-		gm.Layer.Model.assignLayerMapRenderer(layerMap, params);
+		gm.Layer.Model._assignLayerMapRenderer(layerMap, params);
 		callback(layer);
 	}
 
@@ -49,5 +49,5 @@ gm.Layer.Model.updateLayer = function(layer, params, callback) {
 	layer._layerMap.setParams(params.layerMap);
 	layer._layerMap._map.setParams(params.layerMap.map);
 
-	gm.Layer.Model.assignLayerMapRenderer(layer._layerMap, params, callback);
+	gm.Layer.Model._assignLayerMapRenderer(layer._layerMap, params, callback);
 };

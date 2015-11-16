@@ -37,7 +37,8 @@ gm.Entity = function() {
 
 	Entity.prototype.setSprite = function(sprite) {
 		this._sprite = sprite;
-		if (this._sprite) this._renderer.setSprite(this._sprite);
+		if (this._renderer) this._renderer.setSprite(this._sprite);
+		if (this._controller) this._controller.onSpriteChanged();
 	};
 
 	Entity.prototype.setRenderer = function(renderer) {
@@ -49,14 +50,16 @@ gm.Entity = function() {
 	Entity.prototype.setController = function(controller) {
 		this._controller = controller;
 		this._controller.onBodyChanged();
+		this._controller.onSpriteChanged();
 	};
 
 	Entity.prototype.preUpdate = function() {
 		if (this._controller) this._controller.control();
 	};
 
-	Entity.prototype.postUpdate = function() {
+	Entity.prototype.postUpdate = function(delta) {
 		if (this._controller && this._controller.post) this._controller.post();
+		if (this._sprite) this._sprite.update(delta);
 	};
 
 	Entity.prototype.render = function(ctx, bbox) {

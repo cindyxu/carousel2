@@ -1,7 +1,7 @@
 gm.Event.Executor = function() {
 
 	var createEventRunner = function() {
-		
+
 	};
 
 	var _EventNodeExecutor = function(nodeJSON, gameWrapper) {
@@ -37,6 +37,11 @@ gm.Event.Executor = function() {
 
 	_EventNodeExecutor._addChildExecutor = function(childExecutor) {
 		this._childExecutors.push(child);
+	};
+
+	_EventNodeExecutor._onParentFinished = function(parentExecutor) {
+		this._parentsRemaining--;
+		return this._parentsRemaining === 0;
 	};
 
 	var EventExecutor = function(eventJSON, gameWrapper) {
@@ -81,7 +86,7 @@ gm.Event.Executor = function() {
 		var mapping = this._event.nodeMapping[nodeExecutor._node._tag];
 		for (var j = 0; j < mapping.length; j++) {
 			var childExecutor = this._nodeExecutors[mapping[j]];
-			if (childExecutor.onParentFinished(nodeExecutor)) {
+			if (childExecutor._onParentFinished(nodeExecutor)) {
 				this._currentNodeExecutors.push(childExecutor);
 			}
 		}

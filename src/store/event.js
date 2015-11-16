@@ -3,7 +3,6 @@ gm.Store.Event = function() {
 	var EventStore = {};
 
 	/*
-
 	{
 		eventNodes: [
 			{

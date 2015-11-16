@@ -37,7 +37,6 @@ gm.Behaviors.Walker = function() {
 	};
 
 	Walker.prototype.control = function(input) {
-
 		var body = this._body;
 		if (!body) return;
 

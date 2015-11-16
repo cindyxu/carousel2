@@ -13,35 +13,37 @@ gm.Sprite = function(anims) {
 };
 
 gm.Sprite.prototype.update = function(delta) {
+
 	var sprite = this;
 	var anim = sprite._anim;
 
-	if (anim && sprite._running && animFrames.length >= 1 && !sprite.isFinished()) {
+	if (anim) {
 		var animFrames = anim.frames;
+		if (sprite._running && animFrames.length >= 1 && !sprite.isFinished()) {
 
-		// increment current frame
-		if (sprite._elapsed + delta > anim.speed) {
-			sprite._frame += Math.floor((sprite._elapsed + delta) / anim.speed);
+			// increment current frame
+			if (sprite._elapsed + delta > anim.speed) {
+				sprite._frame += Math.floor((sprite._elapsed + delta) / anim.speed);
 
-			// increment loop
-			if (sprite._frame >= animFrames.length) {
-				sprite._loopCount += Math.floor(sprite._frame / animFrames.length);
-				
-				if (anim.loop) {
-					sprite._loopCount = Math.min(sprite._loopCount, anim.loop);
+				// increment loop
+				if (sprite._frame >= animFrames.length) {
+					sprite._loopCount += Math.floor(sprite._frame / animFrames.length);
+					
+					if (anim.loop !== undefined) {
+						sprite._loopCount = Math.min(sprite._loopCount, anim.loop);
+						if (sprite._loopCount >= anim.loop) {
+							sprite._frame = Math.min(sprite._frame, animFrames.length - 1);
+						}
+						else sprite._frame %= animFrames.length;
+					}
+					else sprite._frame %= animFrames.length;
 				}
 
-				if (sprite._loopCount >= anim.loop) {
-					sprite._frame = Math.min(sprite._frame, animFrames.length - 1);
-				}
-				
-				else sprite._frame %= animFrames.length;
+				sprite._elapsed = (sprite._elapsed + delta) % anim.speed;
 			}
-
-			sprite._elapsed = (sprite._elapsed + delta) % anim.speed;
-		}
-		else {
-			sprite._elapsed += delta;
+			else {
+				sprite._elapsed += delta;
+			}
 		}
 	}
 };
@@ -51,7 +53,7 @@ gm.Sprite.prototype.isPlaying = function(name) {
 };
 
 gm.Sprite.prototype.isFinished = function() {
-	return this._anim.loop & this._loopCount >= this._anim.loop;
+	return this._anim.loop !== undefined && this._loopCount >= this._anim.loop;
 };
 
 gm.Sprite.prototype.play = function(animName, force) {

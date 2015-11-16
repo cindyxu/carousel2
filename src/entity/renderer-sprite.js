@@ -1,8 +1,8 @@
-gm.Renderer.SpriteEntity = function(body, sprite, params) {
+gm.Renderer.SpriteEntity = function(spritesheetSrc, params) {
 	var renderer = this;
 
-	if (body) renderer.setBody(body);
-	if (sprite) renderer.setSprite(sprite);
+	this._body = undefined;
+	this._sprite = undefined;
 
 	renderer._spritesheetSrc = spritesheetSrc;
 	renderer._ires = new gm.ImageResource(spritesheetSrc);
@@ -49,7 +49,7 @@ gm.Renderer.SpriteEntity.prototype.render = function(ctx, x, y) {
 	var body = renderer._body;
 	var sprite = renderer._sprite;
 	
-	if (!renderer._ires || !sprite.anim) return;
+	if (!renderer._ires || !renderer._ires.image || !sprite._anim) return;
 
 	var targetFrame = sprite._anim.frames[sprite._frame];
 	renderer.renderInternal(ctx, x, y, targetFrame, body._sizeX, body._sizeY, sprite.flipX, sprite.flipY);
@@ -58,7 +58,7 @@ gm.Renderer.SpriteEntity.prototype.render = function(ctx, x, y) {
 gm.Renderer.SpriteEntity.prototype.renderInternal = function(ctx, x, y, rframe, containerX, containerY, flipX, flipY) {
 	var renderer = this;
 
-	var numFramesX = Math.floor(renderer.image.width / renderer.sizeX);
+	var numFramesX = Math.floor(renderer._ires.image.width / renderer.sizeX);
 	
 	var spx = (rframe % numFramesX) * renderer.sizeX;
 	var spy = Math.floor(rframe / numFramesX) * renderer.sizeY;

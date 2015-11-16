@@ -24,4 +24,5 @@ gm.Controllers.Partner.prototype.onEntityRemovedFromLevel = function(entity, lev
 
 gm.Controllers.Partner.prototype.control = function() {
 	this._behavior.control(this._agent.getNextInput());
+	this._spriteMapper.update();
 };
