@@ -19,9 +19,10 @@ gm.Editor.Tools.Move = (function() {
 
 	var res = {};
 	var lres = {};
+	var bbox = {};
 	Move.prototype.getMoveBody = function(mx, my, camera) {
 		camera.canvasToWorldPos(mx, my, res);
-		var bbox = camera._body.getBbox();
+		camera._body.getBbox(bbox);
 		var level = this.level;
 
 		this._layer.transformPointToLocalSpace(res.x, res.y, bbox, lres);

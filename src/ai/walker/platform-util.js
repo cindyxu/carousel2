@@ -2,11 +2,12 @@ gm.Ai.Walker.PlatformUtil = function() {
 
 	var PlatformUtil = {};
 
+	var bbox = {};
 	var obbox = {};
 	PlatformUtil.getPlatformUnderBody = function(platformMap, body) {
 		var pmap = platformMap._map;
 		var tilesize = pmap.tilesize;
-		var bbox = body.getBbox();
+		body.getBbox(bbox);
 		
 		platformMap.getOverlappingTileBbox(bbox, obbox);
 

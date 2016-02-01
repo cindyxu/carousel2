@@ -85,13 +85,14 @@ gm.EntityPhysics = function() {
 
 	var tres = {};
 	var pres0 = {};
+	var bbox = {};
 	var tbbox = {};
 	EntityPhysics.collideEntityWithLayer = function(entity, layer, dim) {
 
 		var tile, stileX, stileY, etileX, etileY;
 
 		var body = entity._body;
-		var bbox = body.getBbox();
+		body.getBbox(bbox);
 		var layerMap = layer._layerMap;
 		var map = layerMap._map;
 		var collided = false;

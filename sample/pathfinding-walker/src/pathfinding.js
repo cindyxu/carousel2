@@ -71,8 +71,9 @@ gm.Sample.WalkerPathfinding.Pathfinding = function() {
 		if (platformSearch) platformSearch.stepLinkIncrement();
 	};
 
+	var bbox = {};
 	Pathfinding.render = function(ctx) {
-		var bbox = ToyWorld._camera._body.getBbox();
+		ToyWorld._camera._body.getBbox(bbox);
 
 		if (platformMapRenderer) platformMapRenderer.render(ctx, 0, 0, bbox);
 		if (platformScanRenderer) platformScanRenderer.render(ctx, 0, 0, bbox);

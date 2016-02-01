@@ -7,6 +7,10 @@ gm.Event.Manager = function() {
 		this._running = false;
 	};
 
+	Manager.prototype.onActiveLevelChanged = function(level) {
+		
+	};
+
 	Manager.prototype.queueEvent = function(eventName) {
 		if (!this._running) {
 			if (!this._driver.requestStartEvents()) return false;

@@ -103,11 +103,12 @@ gm.Editor.GameEditor = function() {
 		}
 	};
 
+	var bbox = {};
 	GameEditor.prototype.render = function(ctx) {
 		// if (gm.Driver._game._playing) return;
 
 		var camera = gm.Driver._game._camera;
-		var bbox = camera._body.getBbox();
+		camera._body.getBbox(bbox);
 
 		this._renderer.render(ctx, bbox);
 		this._toolbox.render(ctx, camera);

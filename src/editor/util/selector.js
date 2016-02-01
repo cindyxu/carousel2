@@ -68,18 +68,15 @@ gm.Editor.Util.Selector = function() {
 		var trx0, trx1, try0, try1;
 
 		if (selector._origtx === undefined || selector._origty === undefined) {
-
 			trx0 = trx1 = selector._endtx;
 			try0 = try1 = selector._endty;
 
 		} else {
-			
 			trx0 = Math.min(selector._origtx, selector._endtx);
 			trx1 = Math.max(selector._origtx, selector._endtx);
 			
 			try0 = Math.min(selector._origty, selector._endty);
 			try1 = Math.max(selector._origty, selector._endty);
-
 		}
 
 		selector.layerMap.tileToPos(trx0, try0, res0);

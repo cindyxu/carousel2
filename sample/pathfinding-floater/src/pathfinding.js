@@ -30,8 +30,9 @@ gm.Sample.FloaterPathfinding.Pathfinding = function() {
 		tilePathSearch.step();
 	};
 
+	var bbox = {};
 	Pathfinding.render = function(ctx) {
-		var bbox = ToyWorld._camera._body.getBbox();
+		ToyWorld._camera._body.getBbox(bbox);
 		if (tilePathSearchRenderer) tilePathSearchRenderer.render(ctx, 0, 0, bbox);
 	};
 

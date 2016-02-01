@@ -1,10 +1,22 @@
 gm.Event.GameWrapper = function() {
 
-	var GameWrapper = function(driver) {
+	var _EntityWrapper = function(entity) {
 
 	};
 
-	GameWrapper.prototype.moveEntityToLevel = function(entityName, levelName, destX, destY) {
+	_EntityWrapper.prototype.newTransition = function() {
+
+	};
+
+	var _EntityTransition = function(entity) {
+
+	};
+
+	_EntityTransition.prototype.start = function() {
+
+	};
+
+	var GameWrapper = function(driver) {
 
 	};
 
@@ -12,23 +24,15 @@ gm.Event.GameWrapper = function() {
 
 	};
 
-	GameWrapper.prototype.destroyEntity = function(entityName) {
+	GameWrapper.prototype.destroyEntity = function(entityRef) {
 
 	};
 
-	GameWrapper.prototype.goToLevel = function(levelName) {
+	GameWrapper.prototype.controlEntity = function(entityName) {
 
 	};
 
-	GameWrapper.prototype.overrideEntityBehavior = function(entityName, BehaviorFactory) { 
-
-	};
-
-	GameWrapper.prototype.overrideEntityController = function(entityName, ControllerFactory) {
-
-	};
-
-	GameWrapper.prototype.overrideEntitySpriteMapper = function(entityName, SpriteMapperFactory) {
+	GameWrapper.prototype.goToLevel = function(levelName, entityRefs, callback) {
 
 	};
 
@@ -38,10 +42,6 @@ gm.Event.GameWrapper = function() {
 
 	GameWrapper.prototype.startDialogue = function(dialogueJSON, callback) {
 		driver._dialogueBox.startDialogue(dialogueJSON, callback);
-	};
-
-	GameWrapper.prototype.revertOverrides = function() {
-
 	};
 
 	return GameWrapper;

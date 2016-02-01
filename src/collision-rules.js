@@ -8,7 +8,11 @@
 	cconsts.mapTypes = {
 		NONE: 1,
 		ALL: 1 << 1,
-		STICKY: 1 << 2
+		
+		/* if standing on layer, only collide with that layer.
+		 * if airborne, collide with all layers
+		 */
+		STICKY: 1 << 2 
 	};
 
 	cconsts.bodyTypes = {
@@ -30,6 +34,7 @@ gm.CollisionRules = function() {
 	var cconsts = gm.Constants.Collision;
 	var COLLIDE_MAP_TYPE_ALL = cconsts.mapTypes.ALL;
 	var COLLIDE_MAP_TYPE_STICKY = cconsts.mapTypes.STICKY;
+	
 	var X = gm.Constants.Dim.X;
 	var Y = gm.Constants.Dim.Y;
 	

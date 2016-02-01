@@ -1,34 +1,29 @@
 gm.Event.Runners.Portal = function() {
 
-	var Status = {
-		ANIMATING_LEAVING : 0,
-		REQUESTING_LEVEL : 1,
-		ANIMATING_ENTERING : 2,
-		FINISHED : 3
-	};
-
-	var DialogueRunner = function(eventWrapper, params) {
-		this._eventWrapper = eventWrapper;
+	var PortalRunner = function(gameWrapper, params) {
+		this._gameWrapper = gameWrapper;
 		this._setParams(params);
-		this._status = Status.ANIMATING_LEAVING;
+		this._finished = false;
 	};
 
-	DialogueRunner.prototype._setParams = function(params) {
+	PortalRunner.prototype._setParams = function(params) {
 		this._fromPortalName = params.fromPortalName;
+		this._toLevelName = params.toLevelName;
 		this._toPortalName = params.toPortalName;
 	};
 
-	DialogueRunner.prototype.start = function() {
+	var bbox;
+	PortalRunner.prototype.start = function() {
 		this._status = false;
-		this._eventWrapper.overrideEntitySpriteMapper(this._fromPortalName);
+		this._gameWrapper.goToLevel(this._toLevelName, this._targetEntityNames, function() {
+			for (var i = 0; i < this._targetEntityNames.length; i++) {
+				this._gameWrapper.moveEntityToEntity(this._targetEntityNames[i], this._toPortalName);
+			}
+		});
 	};
 
-	DialogueRunner.prototype.update = function() {
-		return this._status === Status.FINISHED;
-	};
-
-	DialogueRunner.prototype.onDialogueFinished = function() {
-		this._status = true;
+	PortalRunner.prototype.update = function() {
+		return this._finished;
 	};
 
 }();

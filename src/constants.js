@@ -9,11 +9,7 @@ gm.Constants.Dir = {
 	LEFT: 1,
 	RIGHT: 1 << 1,
 	UP: 1 << 2,
-	DOWN: 1 << 3,
-	NORTHWEST: 1 << 4,
-	NORTHEAST: 1 << 5,
-	SOUTHWEST: 1 << 6,
-	SOUTHEAST: 1 << 7
+	DOWN: 1 << 3
 };
 
 gm.Constants.Ineq = {

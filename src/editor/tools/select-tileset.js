@@ -149,13 +149,14 @@ gm.Editor.Tools.SelectTileset = function() {
 		this._state = states.IDLE;
 	};
 
+	var bbox = {};
 	SelectTileset.prototype.render = function(ctx) {
 		
 		if (!this.isValid()) {
 			gm.Editor.Util.Shapes.X(ctx, this._mx, this._my);
 		}
 		else {
-			var bbox = this._localCamera._body.getBbox();
+			this._localCamera._body.getBbox(bbox);
 
 			ctx.save();
 			ctx.fillStyle = "rgba(0,0,0,0.5)";

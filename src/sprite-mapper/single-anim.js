@@ -1,7 +1,9 @@
 gm.SpriteMapper.SingleAnim = function() {
 
 	var SingleAnimMapper = function(behavior, sprite, animName) {
-		gm.SpriteMapper.prototype.call(this, behavior, sprite);
+		if (arguments.length === 1) animName = behavior;
+		else gm.SpriteMapper.prototype.call(this, behavior, sprite);
+		
 		this._animName = animName;
 	};
 

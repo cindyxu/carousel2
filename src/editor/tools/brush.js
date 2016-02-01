@@ -50,12 +50,13 @@ gm.Editor.Tools.Brush = function() {
 
 	var tres = {};
 	var pres = {};
+	var bbox = {};
 	Brush.prototype.render = function(ctx, camera) {
 
 		var layerMap = this._layer._layerMap;
 
 		camera.canvasToWorldPos(this._mx, this._my, pres);
-		var bbox = camera._body.getBbox();
+		camera._body.getBbox(bbox);
 
 		this._layer.posToObservedTile(pres.x, pres.y, bbox, tres);
 		this._layer.tileToObservedPos(tres.tx, tres.ty, bbox, pres);
@@ -86,9 +87,10 @@ gm.Editor.Tools.Brush = function() {
 		var brush = this;
 		var bmap = brush._map;
 		var layerMap = brush._layer._layerMap;
-
+		
+		camera._body.getBbox(bbox);
 		camera.canvasToWorldPos(this._mx, this._my, pres);
-		brush._layer.posToObservedTile(pres.x, pres.y, camera._body.getBbox(), tres);
+		brush._layer.posToObservedTile(pres.x, pres.y, bbox, tres);
 
 		layerMap._map.copyArea(bmap, 
 			tres.tx, 

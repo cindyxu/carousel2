@@ -54,6 +54,8 @@ gm.Driver = function() {
 	};
 
 	Driver.render = function(ctx) {
+		ctx.fillStyle = "black";
+		ctx.fillRect(0, 0, gm.Settings.Game.WIDTH, gm.Settings.Game.HEIGHT);
 		this._game.render(ctx);
 	};
 
